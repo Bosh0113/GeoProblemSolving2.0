@@ -107,7 +107,7 @@
               >*You do not have permission to manage resource.</small
             >
           </div>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
+          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px)" v-else>
             <Card class="res-content"
               ><Icon
                 type="ios-add"
@@ -116,7 +116,7 @@
                 @click="addFolderModalShow"
             /></Card>
             <div v-for="(item, index) in fileList" :key="index">
-              <Card class="res-content" v-if="!resEdit ">
+              <Card class="res-content" v-if="!resEdit && item.fromParents == undefined">
                 <div
                   class="res-content-image"
                   v-if="item.folder"
@@ -138,6 +138,51 @@
                       height="42px"
                       width="42px"
                       :title="item.type"
+                    />
+                  </template>
+                  <template v-else>
+                    <img :src="item.thumbnail" height="42px" width="42px" />
+                  </template>
+                </div>
+                <div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name"
+                    v-if="item.folder"
+                  >
+                    {{ item.name }}
+                  </div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name + item.suffix"
+                    v-else
+                  >
+                    {{ item.name + item.suffix }}
+                  </div>
+                </div>
+              </Card>
+              <Card class="res-content-parents" v-else-if="!resEdit && item.fromParents != undefined">
+                <div
+                  class="res-content-image"
+                  v-if="item.folder"
+                  @click="enterFolder(item)"
+                >
+                  <img
+                    :src="folderUrl"
+                    height="42px"
+                    width="42px"
+                    title="Folder"
+                  />
+                </div>
+                <div class="res-content-image" @click="checkData(item)" :title="item.fromParents" v-else>
+                  <template
+                    v-if="item.thumbnail == '' || item.thumbnail == undefined"
+                  >
+                    <img
+                      :src="getImageUrl(item.type)"
+                      height="42px"
+                      width="42px"
+                      :title="item.type + ' | ' + item.fromParents"
                     />
                   </template>
                   <template v-else>
@@ -425,7 +470,7 @@
         </div>
         <div class="dataInfo">
           <Label class="dataLabel">File size:</Label>
-          <span class="dataContent">{{ selectData.fileSize }}</span>
+          <span class="dataContent">{{ selectData.fileSize | filterSizeType }}</span>
           <Label class="dataLabel">Created time:</Label>
           <span class="dataContent">{{
             dateFormat(selectData.uploadTime)
@@ -698,6 +743,8 @@ export default {
       activityDataList: [], //data in the activity
       relatedResList: [], //related materials in the activity
       // toolDataList: [], //data from tools in the activity
+      parentActivitiesID: [],
+      parentActivitiesName: [],
       dataListStyle: false, // 数据列表展示样式
       // 资源avatar 图片路径
       dataUrl: require("@/assets/images/data.png"),
@@ -900,6 +947,8 @@ export default {
       return url;
     },
     getParentActivities(){
+      this.parentActivitiesID = [];
+      this.parentActivitiesName = [];
       if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined){
         let url = "";
         let aid = this.activityInfo.aid;
@@ -911,7 +960,43 @@ export default {
         this.$axios.get(url)
           .then((res) => {
             if (res.data.code == 0) {
-              console.log(res.data.data);
+              let list = res.data.data.ancestors;
+              for(let i = 1 ; i < list.length ; i++){
+                this.parentActivitiesID.push(list[i].aid);
+                this.parentActivitiesName.push("From " + list[i].name);
+              }
+              this.getParentActivitiesFile();
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      }
+    },
+    getParentActivitiesFile(){
+      if(this.parentActivitiesID != undefined && this.parentActivitiesID.length > 0){
+        this.$axios.get("/GeoProblemSolving/rip/file/" + this.parentActivitiesID.toString())
+        .then((res) => {
+            if (res.data.code == 0) {
+              let parentsFilesList = res.data.data;
+              let fileList = JSON.parse(JSON.stringify(this.fileList));
+              for(let i = 0 ; i < this.parentActivitiesID.length ; i++){
+                for(let j = 0 ; j < parentsFilesList[this.parentActivitiesID[i]].length ; j++){
+                  parentsFilesList[this.parentActivitiesID[i]][j].fromParents = this.parentActivitiesName[i];
+                  fileList.push(parentsFilesList[this.parentActivitiesID[i]][j]);
+                }
+              }
+              console.log(fileList);
+              this.$set(this, "activityResList", fileList);
+              this.filterData();
+              this.filterRelatedRes();
+              // this.filterToolData();
+
+              // show resources
+              this.$set(this, "fileList", fileList);
+
             } else {
               console.log(res.data.msg);
             }
@@ -933,13 +1018,6 @@ export default {
               // this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               let list = res.data.data;
-              console.log(list);
-              this.$set(this, "activityResList", list);
-              this.filterData();
-              this.filterRelatedRes();
-              // this.filterToolData();
-
-              // show resources
               this.$set(this, "fileList", list);
             }
           })
@@ -1310,13 +1388,13 @@ export default {
     },
     getPreActivities() {
       this.preActivities = [];
-      // parent
-      if (
-        this.activityInfo.parent != undefined &&
-        this.activityInfo.parent != ""
-      ) {
-        this.preActivities.push({ aid: this.activityInfo.parent });
-      }
+      // // parent
+      // if (
+      //   this.activityInfo.parent != undefined &&
+      //   this.activityInfo.parent != ""
+      // ) {
+      //   this.preActivities.push({ aid: this.activityInfo.parent });
+      // }
       // last activities
       if (this.activityInfo.last != undefined) {
         for (var i = 0; i < this.activityInfo.last.length; i++) {
@@ -1461,42 +1539,47 @@ export default {
       if (temp.length == 0) {
         temp = ["0"];
       }
-      this.axios
-        .get(
-          "/GeoProblemSolving/rip/" +
-            this.activityInfo.aid +
-            "/" +
-            temp.toString()
-        )
-        .then((res) => {
-          if (res.data == "Offline") {
-            // confirm("You are offline, please login again.");
-            this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
-            this.tempLoginModal = true;
-          } else if (res.data.code == 0) {
-            let list = res.data.data;
+      if(temp[0] == "0"){
+        this.getResList();
+        this.getParentActivities();
+      } else {
+        this.axios
+          .get(
+            "/GeoProblemSolving/rip/" +
+              this.activityInfo.aid +
+              "/" +
+              temp.toString()
+          )
+          .then((res) => {
+            if (res.data == "Offline") {
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              let list = res.data.data;
 
-            this.$set(this, "activityResList", list);
-            this.filterData();
-            this.filterRelatedRes();
-            // this.filterToolData();
+              this.$set(this, "activityResList", list);
+              this.filterData();
+              this.filterRelatedRes();
+              // this.filterToolData();
 
-            // show resources
-            this.$set(this, "fileList", list);
+              // show resources
+              this.$set(this, "fileList", list);
 
-            if (operationType == "enter") {
-              this.folderStack.push({ uid: folder.uid, name: folder.name });
-            } else if (operationType == "back") {
-              this.folderStack.pop();
+              if (operationType == "enter") {
+                this.folderStack.push({ uid: folder.uid, name: folder.name });
+              } else if (operationType == "back") {
+                this.folderStack.pop();
+              }
+            } else {
+              this.$Message.warning("Get folder info fail.");
             }
-          } else {
+          })
+          .catch((err) => {
             this.$Message.warning("Get folder info fail.");
-          }
-        })
-        .catch((err) => {
-          this.$Message.warning("Get folder info fail.");
-        });
+          });
+      }
     },
     addFolderModalShow() {
       this.newValidate.setName = "";
@@ -1856,6 +1939,14 @@ export default {
   float: left;
   margin: 5px;
   cursor: pointer;
+}
+.res-content-parents {
+  width: 90px;
+  height: 85px;
+  float: left;
+  margin: 5px;
+  cursor: pointer;
+  background-color:	#CCEEFF;
 }
 .res-content-edit {
   width: 90px;

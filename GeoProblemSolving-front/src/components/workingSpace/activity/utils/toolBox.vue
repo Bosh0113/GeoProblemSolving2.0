@@ -34,7 +34,7 @@
 </style>
 <template>
   <div>
-    <Card dis-hover class="toolCard">
+    <Card dis-hover class="toolCard" >
       <div slot="title">
         <h4>Tools</h4>
       </div>
@@ -66,7 +66,7 @@
               >*You do not have permission to manage tools.</small
             >
           </div>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 200px); padding-top: 5px" v-else>
+          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px); padding-top: 5px" v-else>
             <Card
               class= "tool-content"
               v-show="toolsetLevel > 0"
@@ -91,7 +91,7 @@
                   style="padding-top: 5px;text-align: center; cursor: pointer"
                   @click="expandTool(tool)"
                 >
-                  <Tooltip placement="bottom" max-width="600">
+                  <Tooltip placement="bottom" max-width="400" :transfer="true">
                     <img
                       :src="tool.toolImg"
                       v-if="tool.toolImg != ''"
@@ -141,7 +141,7 @@
                   style="padding-top: 5px;text-align: center; cursor: pointer"
                   @click="useTool(tool)"
                 >
-                  <Tooltip placement="bottom" max-width="600" >
+                  <Tooltip placement="bottom" max-width="400" :transfer="true">
                     <img
                       :src="tool.toolImg"
                       v-if="tool.toolImg != '' && tool.toolImg != null"

@@ -946,7 +946,7 @@
           formData.privacy = createToolForm.privacy;
           formData.description = createToolForm.description;
           formData.tags = createToolForm.categoryTag;
-          this.axios.post("/GeoProblemSolving/toolset",formData)
+          this.axios.post("/GeoProblemSolving/tool/toolset",formData)
           .then(res=>{
             if (res.data.code == 0){
               this.createToolsetModal = false;
@@ -1027,7 +1027,7 @@
         } else if(this.delToolInfo.delToolSet == true){
           this.$axios
           .delete(
-            "/GeoProblemSolving/toolset/" + this.delToolInfo.delToolId
+            "/GeoProblemSolving/tool/toolSet/" + this.delToolInfo.delToolId
           )
           .then((res) => {
             if (res.data.code == 0) {
@@ -1097,7 +1097,7 @@
         for(let i = 0 ; i < toolList.length ; i++){
           formData.toolList.push(toolList[i].tid);
         }
-        this.$axios.put("/GeoProblemSolving/toolset/", formData)
+        this.$axios.put("/GeoProblemSolving/tool", formData)
           .then((res) => {
             if(res.data.code == 0){
               let toolsetInfo = res.data.data;
@@ -1126,6 +1126,7 @@
       commitEdit: function () {
         // "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
         //   this.editToolInfo
+        console.log(this.editToolInfo);
         if(this.editToolInfo.toolSet == false){
           this.$axios
           .put(
@@ -1144,7 +1145,7 @@
         } else {
           this.$axios
           .put(
-            "/GeoProblemSolving/toolset/",
+            "/GeoProblemSolving/tool",
             this.editToolInfo
           )
           .then((res) => {

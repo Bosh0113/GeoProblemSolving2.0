@@ -17,14 +17,14 @@
     </div>
     <div style="width: 430px; border: 1px solid lightgray; position: absolute; top: 5px; right: 10px; z-index: 10">
       <Collapse simple v-model="unfold" class="panel">
-        <Panel name="tool">
-          Toolbox
-          <tool-box slot="content" :activityInfo="activityInfo" :projectInfo="projectInfo"></tool-box>
-        </Panel>
-        <Panel name="data">
-          Resource list
-          <res-list slot="content" :activityInfo="activityInfo"></res-list>
-        </Panel>
+          <Panel name="tool">
+            Toolbox
+            <tool-box slot="content" :activityInfo="activityInfo" :projectInfo="projectInfo"></tool-box>
+          </Panel>
+          <Panel name="data">
+            Resource list
+            <res-list slot="content" :activityInfo="activityInfo"></res-list>
+          </Panel>
       </Collapse>
     </div>
   </div>
@@ -45,6 +45,11 @@ export default {
   data() {
     return {
       unfold: [],
+      ops: {
+        bar: {
+          background: "#808695",
+        },
+      },
     };
   },
   mounted() {},

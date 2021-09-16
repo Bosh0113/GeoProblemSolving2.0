@@ -623,7 +623,7 @@ export default {
     },
     async getPublicTools() {
       let data = await get(
-        "/GeoProblemSolving/toolset/privacy/Public"
+        "/GeoProblemSolving/tool/toolSet/privacy/Public"
       );
       this.$set(this, "publicTools", data);
     },
@@ -770,7 +770,7 @@ export default {
       this.filterShowListByType();
     },
     addToolsettoStep(evt) {
-      var addedToolsetId = this.stepToolsetsShow[evt.newDraggableIndex].tsId;
+      var addedToolsetId = this.stepToolsetsShow[evt.newDraggableIndex].tid;
       for (var i = 0; i < this.publicToolsets.length; i++) {
         if (this.publicToolsets[i].tid == addedToolsetId) {
           this.publicToolsets.splice(i, 1);

@@ -3,17 +3,13 @@ package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.controller;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
-import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,23 +185,6 @@ public class ToolRestController {
     public JsonResult deleteToolSet(@PathVariable String tid){
         toolService.delToolService(tid);
         return ResultUtils.success();
-    }
-
-
-    /**
-     * 更新工具集
-     * 必须携带 toolSetId
-     * 将需要修改的字段携带过来即可
-     * @param putToolSet
-     * @return 修改后的工具集
-     */
-    @RequestMapping(method = RequestMethod.PUT, produces = {"application/json;charset=UTF-8"})
-    public JsonResult updateToolSet(@RequestBody Tool putToolSet){
-        Tool tool = toolService.updateToolService(putToolSet);
-        if (tool == null) return ResultUtils.error(-2, "Fail");
-        ToolSetVo toolSetVo = new ToolSetVo();
-        BeanUtils.copyProperties(tool, toolSetVo);
-        return ResultUtils.success(toolSetVo);
     }
 
 
