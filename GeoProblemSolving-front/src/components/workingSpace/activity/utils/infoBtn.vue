@@ -215,7 +215,7 @@
                   <div class="memberImg" style="position: relative">
                     <img
                       v-if="member.avatar != '' && member.avatar != undefined"
-                      :src="avatar"
+                      :src="avatarUrl(member.avatar)"
                       style="width: 40px; height: 40px"
                     />
                     <avatar
@@ -380,10 +380,6 @@ export default {
     };
   },
   computed: {
-    avatar() {
-      let avatarUrl = this.$store.state.UserServer + this.$store.getters.avatar;
-      return avatarUrl;
-    },
   },
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);
@@ -877,6 +873,10 @@ export default {
       } else {
         window.location.href = "/GeoProblemSolving/memberPage/" + id;
       }
+    },
+    avatarUrl(url) {
+      let avatarUrl = this.$store.state.UserServer + url;
+      return avatarUrl;
     },
   },
 };

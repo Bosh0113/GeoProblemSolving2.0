@@ -224,6 +224,7 @@ public class UserResController {
                                        @RequestBody ResourceEntity resourceEntity,
                                        HttpServletRequest req){
         String userId = (String) req.getSession().getAttribute("userId");
+//        String userId = "d174bf5a-e17e-4c5a-b840-1bf624c9e465";
         return resService.changeFileLocation(userId, oldPath, newPath, resourceEntity);
     }
 

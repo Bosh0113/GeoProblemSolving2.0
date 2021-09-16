@@ -46,7 +46,7 @@ public class ToolsetDaoImpl implements ToolSetDao {
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             toolset.setCreatedTime(dateFormat.format(date));
-            toolset.setToolList(new ArrayList<>());
+//            toolset.setToolList(new ArrayList<>());
             mongoTemplate.save(toolset);
             return toolset;
         }
@@ -91,7 +91,7 @@ public class ToolsetDaoImpl implements ToolSetDao {
     @Override
     public String updateToolset(HttpServletRequest request) {
         try {
-            Query query = new Query(Criteria.where("tsId").is(request.getParameter("tsId")));
+            Query query = new Query(Criteria.where("tsid").is(request.getParameter("tsid")));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, ToolsetEntity.class);
@@ -104,7 +104,7 @@ public class ToolsetDaoImpl implements ToolSetDao {
     @Override
     public String updateToolList(UpdateToolListReq updateToolListReq){
         try {
-            Query query = new Query(Criteria.where("tsId").is(updateToolListReq.getTsId()));
+            Query query = new Query(Criteria.where("tsid").is(updateToolListReq.getTsId()));
             ArrayList<ToolEntity> toolList = updateToolListReq.getNewToolList();
             Update update = new Update();
             update.set("toolList",toolList);

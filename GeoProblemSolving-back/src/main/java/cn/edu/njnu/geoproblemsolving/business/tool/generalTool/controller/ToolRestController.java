@@ -3,20 +3,15 @@ package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.controller;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
-import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolServiceImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -108,7 +103,7 @@ public class ToolRestController {
      * @throws UnsupportedEncodingException
      */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public JsonResult createTool(@RequestBody JSONObject toolJson) throws UnsupportedEncodingException {
+    public JsonResult createToolOrToolSet(@RequestBody JSONObject toolJson) throws UnsupportedEncodingException {
         Tool tool = toolService.createTool(toolJson);
         if (tool != null){
             return ResultUtils.success(tool);

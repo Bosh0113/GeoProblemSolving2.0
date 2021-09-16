@@ -9,10 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.beans.PropertyDescriptor;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @ClassName computeTaskDaoImpl
  * @Description Todo

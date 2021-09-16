@@ -36,7 +36,6 @@ import javax.servlet.http.Part;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -46,7 +45,7 @@ import java.util.*;
  * @Date 2021/4/20
  **/
 @Service
-public class ActivityResServiceImpl implements ActivityResService {
+public class ActivityResServiceImpl<num> implements ActivityResService {
     @Autowired
     UserDaoImpl userDao;
 

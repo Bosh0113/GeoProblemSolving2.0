@@ -1153,8 +1153,7 @@ export default {
     getPersonalToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiryAll" +
-            "?provider=" +
+          "/GeoProblemSolving/tool/toolSet/provider/" +
             this.userInfo.userId
         )
         .then(res => {
@@ -1177,11 +1176,7 @@ export default {
     getPublicToolsets() {
       this.axios
         .get(
-          "/GeoProblemSolving/toolset/inquiry" +
-            "?key=" +
-            "privacy" +
-            "&value=" +
-            "Public"
+          "/GeoProblemSolving/tool/toolSet/privacy/Public"
         )
         .then(res => {
           if (res.data == "Offline") {

@@ -69,12 +69,12 @@
     /* border: 1px solid #eee; */
   }
 
-  .personalFileLabel {
+  /* .personalFileLabel {
     width: 250px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
+  } */
 
   .personalFileDes {
     display: inline-block;
@@ -266,16 +266,22 @@
                 :padding="5"
               >
                 <Checkbox :label="file.address">&nbsp;</Checkbox>
-                <Icon type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                <Icon v-else type="ios-create-outline" class="itemIcon" size="25"/>
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
                   :title="file.name"
                 >{{ file.name }}</span
                 >
-                <span class="fileItemSize">{{ file.fileSize }}</span>
+                <span class="fileItemSize">{{ file.fileSize | filterSizeType }}</span>
                 <span style="width: 20%; margin-right: 5%">{{
-                  file.uploadTime
+                  file.uploadTime | filterTimeStyle
                 }}</span>
 
                 <!--                使用资源-->
@@ -501,7 +507,23 @@
                 :title="file.name"
                 v-if="canBeShare(file.uid)"
               >
-                <strong>{{ file.name }}</strong>
+                <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                <Icon v-else type="ios-create-outline" class="itemIcon" size="25"/>
+                <p style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 100px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                ">
+                  <strong>{{ file.name }}</strong>
+                </p>
               </Checkbox>
               <Checkbox
                 :label="file.uid"
@@ -510,16 +532,36 @@
                 disabled
                 v-else
               >
-                <strong>{{ file.name }}</strong>
+                <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                <p style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 100px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                ">
+                  <strong>{{ file.name }}</strong>
+                </p>
               </Checkbox>
-              <span
-                class="personalFileDes"
-                style="width: 150px"
-                :title="file.description"
-              >{{ file.description }}</span
-              >
-              <span style="display: inline-block; vertical-align: top">{{
-                file.fileSize
+              <p :title="file.description" style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 200px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  margin-left:50px;
+                ">
+                  {{ file.description }}
+              </p>
+              <span style="display: inline-block; vertical-align: top;float:right">{{
+                file.fileSize | filterSizeType
               }}</span>
             </Card>
           </CheckboxGroup>
@@ -862,15 +904,15 @@
           },
           {
             key: "File size",
-            value: file.fileSize,
+            value: this.$options.filters['filterSizeType'](file.fileSize),
           },
           {
             key: "Uploader",
-            value: file.uploadName,
+            value: file.uploaderName,
           },
           {
             key: "Upload Time",
-            value: file.uploadTime,
+            value: this.$options.filters['filterTimeStyle'](file.uploadTime),
           },
         ];
         this.fileInfoModal = true;
@@ -1347,7 +1389,8 @@
               uid: this.putFileInfo.uid,
               name: this.editFileValidate.name,
               type: this.editFileValidate.type,
-              description: this.editFileValidate.description
+              description: this.editFileValidate.description,
+              fileSize: this.putFileInfo.fileSize,
             }
             let temp = this.folderIdStack;
             if (temp.length == 0) {
@@ -1415,6 +1458,19 @@
             this.$Message.error("Copy file fail.");
           });
       },
+    },
+    filters: {
+      filterSizeType(value){
+        if(value === 0) return "0 B";
+        let k = 1024;
+        let sizes = ["B","KB","MB","GB"];
+        let i = Math.floor(Math.log(value) / Math.log(k));
+        return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
+      },
+      filterTimeStyle(str){
+        let result = str.split('.')[0];
+        return result.replace('T'," ");
+      }
     },
   };
 </script>

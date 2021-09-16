@@ -1,4 +1,12 @@
 <style scoped>
+
+.tool-content {
+  width: 85px;
+  height: 85px;
+  float: left;
+  margin: 5px;
+  cursor: pointer;
+}
 .modelToolBtn {
   height: 60px;
   width: 60px;
@@ -26,7 +34,7 @@
 </style>
 <template>
   <div>
-    <Card dis-hover class="toolCard">
+    <Card dis-hover class="toolCard" >
       <div slot="title">
         <h4>Tools</h4>
       </div>
@@ -44,143 +52,142 @@
           style="margin-top: -10px"
         ></manage-tools>
       </div>
-      <vue-scroll
-        :ops="ops"
-        style="max-height: calc(100vh - 200px); padding-top: 5px"
-      >
-        <div
-          v-if="toolList != undefined && toolList.length < 1"
-          style="text-align: center"
-        >
-          <h2 style="color: #808695">No tools</h2>
-          <small style="color: #dcdee2"
-            >*Click the button on the top right to add tools.</small
+      <div style="display: flex; justify-content: space-between">
+        <div style="width: 100%">
+          <div
+            v-if="toolList != undefined && toolList.length < 1"
+            style="text-align: center"
           >
-        </div>
-        <div
-          v-for="tool in toolList"
-          :key="tool.tid"
-          style="width: 99px; display: inline-block"
-          v-else
-        >
-          <Card
-            style="margin: 5px; height: 50px; width: 50px"
-            v-show="toolsetLevel > 0"
-            title="Back to last level"
-            ><Icon
-              type="md-arrow-back"
-              size="30"
-              style="text-align: center; margin-top: 10px"
-              color="#5089b8"
-              @click="back2LastLevel()"
-          /></Card>
-          <Card
-            style="padding-top: 5px; background-color: #d3f1b1; margin: 5px"
-            v-if="tool.toolSet"
-          >
-            <div
-              style="text-align: center; cursor: pointer"
-              @click="expandTool(tool)"
+            <h2 style="color: #808695">No tools</h2>
+            <small style="color: #dcdee2" v-if="permissionIdentity(activityInfo.permission, userRole, 'manage_tool')"
+              >*Click the button to add tools.</small
             >
-              <Tooltip placement="bottom" max-width="600">
-                <img
-                  :src="tool.toolImg"
-                  v-if="tool.toolImg != ''"
-                  style="height: 100%; max-height: 50px"
-                />
-                <avatar
-                  :username="tool.toolName"
-                  :size="50"
-                  style="margin-bottom: 6px"
-                  v-else
-                ></avatar>
-                <div
-                  slot="content"
-                  v-if="
-                    tool.description !== '' ||
-                    (tool.tags != undefined && tool.tags.length > 0)
-                  "
-                >
-                  <span>{{ tool.description }}</span>
-                  <template
-                    v-if="tool.tags != undefined && tool.tags.length > 0"
-                  >
-                    <br />
-                    <span>
-                      <i>{{ tool.tags.join(" | ") }}</i>
-                    </span>
-                  </template>
-                </div>
-              </Tooltip>
-              <h4
-                :title="tool.toolName"
-                style="
-                  display: block;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                "
-              >
-                {{ tool.toolName }}
-              </h4>
-            </div>
-          </Card>
-          <Card
-            style="
-              padding-top: 5px;
-              background-color: ghostwhite;
-              margin-right: 5px;
-            "
-          >
-            <div
-              style="text-align: center; cursor: pointer"
-              @click="useTool(tool)"
+            <small style="color: #dcdee2" v-else
+              >*You do not have permission to manage tools.</small
             >
-              <Tooltip placement="bottom" max-width="600">
-                <img
-                  :src="tool.toolImg"
-                  v-if="tool.toolImg != '' && tool.toolImg != null"
-                  style="height: 100%; max-height: 50px"
-                />
-                <avatar
-                  :username="tool.toolName"
-                  :size="50"
-                  style="margin-bottom: 6px"
-                  v-else
-                ></avatar>
-                <div
-                  slot="content"
-                  v-if="
-                    tool.description !== '' ||
-                    (tool.tags != undefined && tool.tags.length > 0)
-                  "
-                >
-                  <span>{{ tool.description }}</span>
-                  <template
-                    v-if="tool.tags != undefined && tool.tags.length > 0"
-                  >
-                    <br />
-                    <span>
-                      <i>{{ tool.tags.join(" | ") }}</i>
-                    </span>
-                  </template>
-                </div>
-              </Tooltip>
-              <h4
-                :title="tool.toolName"
-                style="
-                  display: block;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                "
+          </div>
+          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px); padding-top: 5px" v-else>
+            <Card
+              class= "tool-content"
+              v-show="toolsetLevel > 0"
+              ><Icon
+                type="md-arrow-back"
+                size="70"
+                style="margin-top:5px"
+                title="Back to last level"
+                color="#5089b8"
+                @click="back2LastLevel()"
+            /></Card>
+            <div
+              v-for="tool in toolList"
+              :key="tool.tid"
+            >
+              <Card
+                class= "tool-content"
+                style=" background-color: #d3f1b1;"
+                v-if="tool.toolSet"
               >
-                {{ tool.toolName }}
-              </h4>
+                <div
+                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  @click="expandTool(tool)"
+                >
+                  <Tooltip placement="bottom" max-width="400" :transfer="true">
+                    <img
+                      :src="tool.toolImg"
+                      v-if="tool.toolImg != ''"
+                      style="height: 100%; max-height: 50px"
+                    />
+                    <avatar
+                      :username="tool.toolName"
+                      :size="50"
+                      style="margin-bottom: 6px"
+                      v-else
+                    ></avatar>
+                    <div
+                      slot="content"
+                      v-if="
+                        tool.description !== '' ||
+                        (tool.tags != undefined && tool.tags.length > 0)
+                      "
+                    >
+                      <span>{{ tool.description }}</span>
+                      <template
+                        v-if="tool.tags != undefined && tool.tags.length > 0"
+                      >
+                        <br />
+                        <span>
+                          <i>{{ tool.tags.join(" | ") }}</i>
+                        </span>
+                      </template>
+                    </div>
+                  </Tooltip>
+                  <h4
+                    :title="tool.toolName"
+                    style="
+                      display: block;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                    "
+                  >
+                    {{ tool.toolName }}
+                  </h4>
+                </div>
+              </Card>
+              <Card
+                class= "tool-content" v-else
+              >
+                <div
+                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  @click="useTool(tool)"
+                >
+                  <Tooltip placement="bottom" max-width="400" :transfer="true">
+                    <img
+                      :src="tool.toolImg"
+                      v-if="tool.toolImg != '' && tool.toolImg != null"
+                      style="height: 100%; max-height: 50px"
+                    />
+                    <avatar
+                      :username="tool.toolName"
+                      :size="50"
+                      style="margin-bottom: 6px"
+                      v-else
+                    ></avatar>
+                    <div
+                      slot="content"
+                      v-if="
+                        tool.description !== '' ||
+                        (tool.tags != undefined && tool.tags.length > 0)
+                      "
+                    >
+                      <span>{{ tool.description }}</span>
+                      <template
+                        v-if="tool.tags != undefined && tool.tags.length > 0"
+                      >
+                        <br />
+                        <span>
+                          <i>{{ tool.tags.join(" | ") }}</i>
+                        </span>
+                      </template>
+                    </div>
+                  </Tooltip>
+                  <h4
+                    :title="tool.toolName"
+                    style="
+                      display: block;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                    "
+                  >
+                    {{ tool.toolName }}
+                  </h4>
+                </div>
+              </Card>
             </div>
-          </Card>
+          </vue-scroll>
         </div>
-      </vue-scroll>
+      </div>
     </Card>
     <Modal
       v-model="jupyterModal"
@@ -329,8 +336,8 @@ export default {
       this.$set(this, "toolList", data);
     },
     stepToolListChanged(tools, toolsets) {
-      this.toolIdList = tools;
-      this.toolIdList.push.apply(this.toolIdList, toolsets);
+      this.toolIdList = toolsets;
+      this.toolIdList.push.apply(this.toolIdList, tools);
       this.getToolInfos();
     },
     // showTools(toolsetInfo) {

@@ -716,6 +716,7 @@
       goSingleProject(projectInfo) {
         // sessionStorage.setItem("projectInfo", JSON.stringify(projectInfo));
         // sessionStorage.setItem("projectInfo", this.encrypto(projectInfo));
+        // console.log(JSON.parse(projectInfo.permission).auto_join.visitor);
         window.location.href =
           "/GeoProblemSolving/projectInfo/" + projectInfo.aid;
       },
