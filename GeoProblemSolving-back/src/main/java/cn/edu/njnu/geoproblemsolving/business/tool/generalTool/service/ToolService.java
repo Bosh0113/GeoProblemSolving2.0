@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public interface ToolService {
@@ -50,7 +51,7 @@ public interface ToolService {
     //将工具标记为删除
     void delToolService(String tid);
 
-    List<Tool> getToolByIds(ArrayList<String> ids);
+    List<Tool> getToolByIds(HashSet<String> ids);
 
     Object emptyProviderService(String tid);
 

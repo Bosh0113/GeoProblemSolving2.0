@@ -67,7 +67,7 @@ public class ToolServiceImpl implements ToolService {
         headers.set("user-agent", "geoProblemSolving");
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModelByUser?page=" + page
-                + "&size="+ size +"&asc=-1&searchText=&userName=" + email;
+                + "&size=" + size + "&asc=-1&searchText=&userName=" + email;
         ResponseEntity<JSONObject> getResult = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class);
         JSONObject resultData = getResult.getBody().getJSONObject("data");
         int computableModelNum = resultData.getInteger("total");
@@ -79,14 +79,14 @@ public class ToolServiceImpl implements ToolService {
 
     @Override
     public List<JSONObject> getPublicComputeModel(int page, int size) {
-        String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModel?page="+ page +"&size="+ size +"&asc=-1&searchText=";
+        String url = "http://" + portalIpAndPort + "/computableModel/searchDeployedModel?page=" + page + "&size=" + size + "&asc=-1&searchText=";
         HttpHeaders headers = new HttpHeaders();
         headers.set("user-agent", "geoProblemSolving");
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(headers);
         JSONObject getResult = restTemplate.exchange(url, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
         // JSONObject getResult = restTemplate.getForEntity(url, JSONObject.class).getBody();
         JSONArray jsonArray = getResult.getJSONObject("data").getJSONArray("content");
-        if (jsonArray == null){
+        if (jsonArray == null) {
             return null;
         }
         return jsonArray.toJavaList(JSONObject.class);
@@ -120,11 +120,11 @@ public class ToolServiceImpl implements ToolService {
             return null;
         }
         String userDataMethodUrl = "http://" + portalIpAndPort + "/dataApplication/getApplication?userOid=" + oid +
-                "&page="+ page +"&pagesize="+ size +"&asc=-1&type=";
+                "&page=" + page + "&pagesize=" + size + "&asc=-1&type=";
         JSONObject getResult = restTemplate.exchange(userDataMethodUrl, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
         // JSONObject getResult = restTemplate.getForEntity(userDataMethodUrl, JSONObject.class).getBody();
         JSONObject publicModelJson = getResult.getJSONObject("data");
-        if (publicModelJson.getBoolean("empty")){
+        if (publicModelJson.getBoolean("empty")) {
             return null;
         }
         List<JSONObject> userDataMethodList = publicModelJson.getJSONArray("content").toJavaList(JSONObject.class);
@@ -135,7 +135,7 @@ public class ToolServiceImpl implements ToolService {
     public List<JSONObject> getPublicDataMethod(int page, int size) {
         JSONObject jsonObject = queryDataMethodReq("", "", page, size);
         JSONArray dataMethodArray = jsonObject.getJSONArray("list");
-        if (dataMethodArray == null){
+        if (dataMethodArray == null) {
             return null;
         }
         return dataMethodArray.toJavaList(JSONObject.class);
@@ -148,12 +148,12 @@ public class ToolServiceImpl implements ToolService {
         return queryDataMethodReq(searchText, "", page, 5);
     }
 
-    private JSONObject queryDataMethodReq(String searchText, String methodType, int page, int size){
+    private JSONObject queryDataMethodReq(String searchText, String methodType, int page, int size) {
         String url = "http://" + portalIpAndPort + "/dataApplication/methods/getApplicationInvokable";
         JSONObject searchJson = new JSONObject();
         searchJson.put("asc", false);
         searchJson.put("curQueryField", "name");
-        searchJson.put("searchText",searchText);
+        searchJson.put("searchText", searchText);
         searchJson.put("method", methodType);
         searchJson.put("page", page);
         searchJson.put("pageSize", size);
@@ -163,7 +163,7 @@ public class ToolServiceImpl implements ToolService {
         try {
             ResponseEntity<JSONObject> searchRes = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
             return searchRes.getBody().getJSONObject("data");
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
@@ -201,17 +201,17 @@ public class ToolServiceImpl implements ToolService {
         JSONArray recomSteps = toolJson.getJSONArray("recomStep");
         String toolImg = toolJson.getString("toolImg");
         ArrayList<String> recommendation = Lists.newArrayList();
-        if (recomSteps != null){
-            for (int i =0; i< recomSteps.size(); i++){
-                String recomStep = (String)recomSteps.get(i);
+        if (recomSteps != null) {
+            for (int i = 0; i < recomSteps.size(); i++) {
+                String recomStep = (String) recomSteps.get(i);
                 recommendation.add(recomStep);
             }
         }
         JSONArray categoryTags = toolJson.getJSONArray("categoryTag");
         ArrayList<String> tags = Lists.newArrayList();
-        if (categoryTags!=null){
-            for (int j = 0; j< categoryTags.size(); j++){
-                String tag = (String)categoryTags.get(j);
+        if (categoryTags != null) {
+            for (int j = 0; j < categoryTags.size(); j++) {
+                String tag = (String) categoryTags.get(j);
                 tags.add(tag);
             }
         }
@@ -232,11 +232,11 @@ public class ToolServiceImpl implements ToolService {
         String backendType = toolJson.getString("backendType");
         tool.setBackendType(backendType);
         JSONObject backendService = toolJson.getJSONObject("backendService");
-        if (backendType.equals("webTool")){
+        if (backendType.equals("webTool")) {
             String toolUrl = toolJson.getString("toolUrl");
             tool.setToolUrl(toolUrl);
-        }else {
-            if (backendType.equals("modelItem")){
+        } else {
+            if (backendType.equals("modelItem")) {
                 String modelId = backendService.getString("oid");
                 String modelMd5 = backendService.getString("md5");
                 String author = backendService.getString("author");
@@ -252,11 +252,11 @@ public class ToolServiceImpl implements ToolService {
                 tool.setComputableModelMd5(modelMd5);
                 tool.setBackendProvider(author);
                 tool.setMdlJson(stateAndDataSetJson);
-            }else if (backendType.equals("dataMethod")){
+            } else if (backendType.equals("dataMethod")) {
                 String backendProvider = backendService.getString("authorName");
                 JSONArray invokeServices = backendService.getJSONArray("invokeServices");
                 //
-                if (invokeServices == null){
+                if (invokeServices == null) {
                     return null;
                 }
                 String backendServiceName = backendService.getString("name");
@@ -273,21 +273,21 @@ public class ToolServiceImpl implements ToolService {
 
                 //三种服务类型：Processing, Visualization, Data
                 String tempType = "Processing";
-                if (dataMethodType.equals("Visualization")){
+                if (dataMethodType.equals("Visualization")) {
                     tempType = "Visualization";
                 }
                 //数据处理方法元数据
-                String metaUrl = "http://"+ proxyServerLocation +"/capability?id="+ dataMethodId + "&type=" + tempType + "&token=" + encodeToken;
+                String metaUrl = "http://" + proxyServerLocation + "/capability?id=" + dataMethodId + "&type=" + tempType + "&token=" + encodeToken;
                 HttpHeaders headers = new HttpHeaders();
-                headers.add("Content-Type","application/json");
+                headers.add("Content-Type", "application/json");
                 HttpEntity httpEntity = new HttpEntity<>(headers);
                 ResponseEntity<JSONObject> jsonObjectResponseEntity = restTemplate.exchange(metaUrl, HttpMethod.GET, httpEntity, JSONObject.class);
-                if (jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()){
+                if (jsonObjectResponseEntity.getStatusCode().is2xxSuccessful()) {
                     JSONObject dataMethodMeta = jsonObjectResponseEntity.getBody();
                     Integer code = dataMethodMeta.getInteger("code");
-                    if (code == 0){
+                    if (code == 0) {
                         tool.setDataMethodMeta(dataMethodMeta.getJSONObject("capability"));
-                    }else {
+                    } else {
                         return null;
                     }
                 }
@@ -295,15 +295,15 @@ public class ToolServiceImpl implements ToolService {
 
                 //从数据容器读取测试数据直接存入工具库中
                 ArrayList<ToolTestData> toolTestDatas = new ArrayList<>();
-                String url = "http://"+ proxyServerLocation +"/files?id=" + dataMethodId + "&token=" + encodeToken;
+                String url = "http://" + proxyServerLocation + "/files?id=" + dataMethodId + "&token=" + encodeToken;
                 JSONObject testDataJson = restTemplate.getForEntity(url, JSONObject.class).getBody();
                 JSONArray testIds = testDataJson.getJSONArray("id");
-                for (int i = 0; i<testIds.size(); i++){
+                for (int i = 0; i < testIds.size(); i++) {
                     ToolTestData toolTestData = new ToolTestData();
                     toolTestData.setTestDataId(UUID.randomUUID().toString());
                     JSONObject testDataId = JSONObject.parseObject(JSONObject.toJSONString(testIds.get(i)));
                     String fileName = testDataId.getString("file_name");
-                    String[] fileNameSplit= fileName.split("\\.");
+                    String[] fileNameSplit = fileName.split("\\.");
                     String dataUrl = testDataId.getString("url");
                     toolTestData.setFileName(fileNameSplit[0]);
                     toolTestData.setSuffix(fileNameSplit[1]);
@@ -356,14 +356,10 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public void delToolService(String tid) {
         Tool tool = toolDao.findToolById(tid);
-        if (tool != null){
-            if (tool.getToolSet()){
-                toolDao.deleteById(tid);
-            }else {
-                //将工具标记为删除
-                tool.setPresent(false);
-                toolDao.saveTool(tool);
-            }
+        if (tool != null) {
+            //将工具标记为删除
+            tool.setPresent(false);
+            toolDao.saveTool(tool);
         }
     }
 
@@ -373,13 +369,8 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public List<Tool> getToolByIds(ArrayList<String> ids) {
-        ArrayList<Tool> toolList = Lists.newArrayList();
-        for (String id: ids){
-            Tool toolById = toolDao.findToolById(id);
-            toolList.add(toolById);
-        }
-        return toolList;
+    public List<Tool> getToolByIds(HashSet<String> ids) {
+        return toolDao.findToolByIds(ids);
     }
 
     @Override
@@ -401,7 +392,7 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public ToolSetVo delToolInToolSet(String tid, ArrayList<String> tids){
+    public ToolSetVo delToolInToolSet(String tid, ArrayList<String> tids) {
         Tool toolSet = toolDao.findToolById(tid);
         if (toolSet == null) return null;
         toolSet.getToolList().removeAll(tids);
@@ -414,26 +405,26 @@ public class ToolServiceImpl implements ToolService {
     @Override
     public JsonResult uploadToolImg(HttpServletRequest req) throws IOException, ServletException {
         //确认是否有文件
-        if (!ServletFileUpload.isMultipartContent(req)){
+        if (!ServletFileUpload.isMultipartContent(req)) {
             System.out.println("File is not multimedia.");
             return ResultUtils.error(-2, "File is not multimedia.");
         }
 
         //新建存储文件夹
         File path = new File(ResourceUtils.getURL("classpath:").getPath());
-        if (!path.exists()){
+        if (!path.exists()) {
             path = new File("");
         }
         File toolImgLocation = new File(path.getAbsolutePath(), "static/images");
-        if (!toolImgLocation.exists()){
+        if (!toolImgLocation.exists()) {
             toolImgLocation.mkdirs();
         }
         try {
             Collection<Part> parts = req.getParts();
             String pathURL = "Fail";
             String newFileName = "";
-            for (Part part : parts){
-                if (part.getName().equals("img")){
+            for (Part part : parts) {
+                if (part.getName().equals("img")) {
                     String filePath = part.getSubmittedFileName();
                     String folderPath = toolImgLocation.getPath();
 
@@ -445,7 +436,7 @@ public class ToolServiceImpl implements ToolService {
                 }
             }
             return ResultUtils.success(pathURL);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResultUtils.error(-2, e.toString());
         }
     }
@@ -453,6 +444,7 @@ public class ToolServiceImpl implements ToolService {
 
     @Override
     public List<Tool> getRelevantPurposeTool(String purpose) {
+        if (purpose.equals("Other purpose")) purpose = "All";
         Query query = new Query();
         Criteria criteria = new Criteria("privacy").is("Public");
         Criteria orOperator = new Criteria().orOperator(Criteria.where("recommendation").is("All"), Criteria.where("recommendation").is(purpose));

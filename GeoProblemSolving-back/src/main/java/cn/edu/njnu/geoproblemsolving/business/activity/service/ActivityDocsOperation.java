@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityDocRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -42,7 +43,7 @@ public class ActivityDocsOperation {
         activityDoc = builder.parse(xmlDoc);
     }
 
-    //初始化活动文档
+    //初始化活动文档，新建 Activity 的时候会用到
     public Object activityDocInit(JSONObject activity, JSONObject user){
         activityDoc = builder.newDocument();
         //根节点
@@ -83,17 +84,18 @@ public class ActivityDocsOperation {
         rootElement.appendChild(participants);
         rootElement.appendChild(activityDoc.createElement("ResourceCollection"));
         rootElement.appendChild(activityDoc.createElement("OperationRecords"));
-        rootElement.appendChild(activityDoc.createElement("TaskDependency"));
 
-        rootElement.appendChild(activityDoc.createElement("ToolBox"));
-        rootElement.appendChild(activityDoc.createElement("TaskList"));
+        String activityType = activity.getString("type");
+        if (activityType.equals(ActivityType.Activity_Group.toString())){
+            rootElement.appendChild(activityDoc.createElement("ChildActivities"));
+            rootElement.appendChild(activityDoc.createElement("ActivityDependencies"));
+            rootElement.appendChild(activityDoc.createElement("TaskDependency"));
+        }else if (activityType.equals(ActivityType.Activity_Unit.toString())){
+            rootElement.appendChild(activityDoc.createElement("ToolBox"));
+            rootElement.appendChild(activityDoc.createElement("TaskList"));
+        }else {
 
-
-        rootElement.appendChild(activityDoc.createElement("ChildActivities"));
-        rootElement.appendChild(activityDoc.createElement("ActivityDependencies"));
-
-
-
+        }
         ActivityDoc doc = new ActivityDoc();
         doc.setAid(activity.getString("aid"));
         doc.setDocument(doc.toString());

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -97,8 +98,17 @@ public class ToolRestController {
 
     全部使用restful API 风格
      */
+
+    /**
+     * 新建工具
+     * 同新建工具集差别较大、分开为两个接口
+     *
+     * @param toolJson
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public JsonResult createToolOrToolSet(@RequestBody JSONObject toolJson) throws UnsupportedEncodingException {
+    public JsonResult createTool(@RequestBody JSONObject toolJson) throws UnsupportedEncodingException {
         Tool tool = toolService.createTool(toolJson);
         if (tool != null){
             return ResultUtils.success(tool);
@@ -106,6 +116,23 @@ public class ToolRestController {
         return ResultUtils.error(-2, "Fail");
     }
 
+    /**
+     * 创建工具集
+     * @param toolSet
+     * @return
+     */
+    @RequestMapping(value = "/toolset", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    public JsonResult createToolSet(@RequestBody Tool toolSet){
+        ToolSetVo toolSetVo = toolService.createToolSet(toolSet);
+        if (toolSetVo == null) return ResultUtils.error(-2, "Fail");
+        return ResultUtils.success(toolSetVo);
+    }
+
+    /**
+     * 根据 id 查询
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public JsonResult getToolByTid(@PathVariable String id){
         Tool tool = toolService.getToolByTid(id);
@@ -115,6 +142,26 @@ public class ToolRestController {
         return ResultUtils.error(-2, "Fail");
     }
 
+    /**
+     * 根据字段查询
+     * 支持同时满足多字段
+     * @param key
+     * @param value
+     * @return
+     */
+    @RequestMapping(value = "/{key}/{value}", method = RequestMethod.GET)
+    public JsonResult queryToolSet(@PathVariable ArrayList<String> key, @PathVariable ArrayList<String> value){
+        List<Tool> toolSets = toolService.queryTool(key, value);
+        if (toolSets != null) return ResultUtils.success(toolSets);
+        return ResultUtils.error(-2, "Fail");
+    }
+
+
+    /**
+     * 根据 id 删除
+     * @param tid
+     * @return
+     */
     @RequestMapping(value = "/{tid}", method = RequestMethod.DELETE)
     public JsonResult delTool(@PathVariable String tid){
         toolService.delToolService(tid);
@@ -143,7 +190,7 @@ public class ToolRestController {
      * @return
      */
     @RequestMapping(value = "/all/{ids}", method = RequestMethod.GET)
-    public JsonResult getToolListByToolIds(@PathVariable ArrayList<String> ids){
+    public JsonResult getToolListByToolIds(@PathVariable HashSet<String> ids){
         List<Tool> toolList = toolService.getToolByIds(ids);
         return ResultUtils.success(toolList);
     }
@@ -151,33 +198,6 @@ public class ToolRestController {
 
 //================toolSet 操作==========================================================================================/
 
-    /**
-     * 创建工具集
-     * @param toolSet
-     * @return
-     */
-    @RequestMapping(value = "/toolset", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
-    public JsonResult createToolSet(@RequestBody Tool toolSet){
-        ToolSetVo toolSetVo = toolService.createToolSet(toolSet);
-        if (toolSetVo == null) return ResultUtils.error(-2, "Fail");
-        return ResultUtils.success(toolSetVo);
-    }
-
-
-
-    /**
-     * 根据字段查询
-     * 支持同时满足多字段
-     * @param key
-     * @param value
-     * @return
-     */
-    @RequestMapping(value = "/toolSet/{key}/{value}", method = RequestMethod.GET)
-    public JsonResult queryToolSet(@PathVariable ArrayList<String> key, @PathVariable ArrayList<String> value){
-        List<Tool> toolSets = toolService.queryTool(key, value);
-        if (toolSets != null) return ResultUtils.success(toolSets);
-        return ResultUtils.error(-2, "Fail");
-    }
 
 
     /**
@@ -192,21 +212,6 @@ public class ToolRestController {
     }
 
 
-    /**
-     * 更新工具集
-     * 必须携带 toolSetId
-     * 将需要修改的字段携带过来即可
-     * @param putToolSet
-     * @return 修改后的工具集
-     */
-    @RequestMapping(method = RequestMethod.PUT, produces = {"application/json;charset=UTF-8"})
-    public JsonResult updateToolSet(@RequestBody Tool putToolSet){
-        Tool tool = toolService.updateToolService(putToolSet);
-        if (tool == null) return ResultUtils.error(-2, "Fail");
-        ToolSetVo toolSetVo = new ToolSetVo();
-        BeanUtils.copyProperties(tool, toolSetVo);
-        return ResultUtils.success(toolSetVo);
-    }
 
 
     /**

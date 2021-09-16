@@ -5,6 +5,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
@@ -39,6 +41,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ProjectRepository projectRepository;
 
     private final ProjectUtil projectUtil;
+    private final ToolService toolService;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -46,7 +49,10 @@ public class ActivityServiceImpl implements ActivityService {
                                UserRepository userRepository,
                                SubprojectRepository subprojectRepository,
                                MongoTemplate mongoTemplate,
-                               FolderDaoImpl folderDao, ProjectRepository projectRepository, ProjectUtil httpUtil) {
+                               FolderDaoImpl folderDao,
+                               ProjectRepository projectRepository,
+                               ProjectUtil httpUtil,
+                               ToolService toolService) {
         this.activityRepository = activityRepository;
         this.protocolRepository = protocolRepository;
         this.userRepository = userRepository;
@@ -55,6 +61,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.projectUtil = httpUtil;
+        this.toolService = toolService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -155,6 +162,14 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setType(activity.getType());
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
+            }else if (activity.getType().equals(ActivityType.Activity_Unit)){
+                String purpose = activity.getPurpose();
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : relevantPurposeTool){
+                    toolSet.add(tool.getTid());
+                }
+                activity.setToolList(toolSet);
             }
 
             // tools and toolsets
@@ -227,6 +242,16 @@ public class ActivityServiceImpl implements ActivityService {
             Optional result = activityRepository.findById(aid);
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) result.get();
+
+            if (activity.getType().equals(ActivityType.Activity_Unit)){
+                String purpose = activity.getPurpose();
+                List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : tools){
+                    toolSet.add(tool.getTid());
+                }
+                activity.setToolList(toolSet);
+            }
 
             update.updateTo(activity);
 
