@@ -339,6 +339,8 @@ public class ToolServiceImpl implements ToolService {
             Criteria criteria = new Criteria(key).is(value);
             query.addCriteria(criteria);
         }
+        Criteria criteria = new Criteria("present").is(true);
+        query.addCriteria(criteria);
         return toolDao.findByFields(query);
     }
 

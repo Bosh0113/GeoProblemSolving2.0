@@ -249,6 +249,7 @@ export default {
       jupyterModal: false,
       selectedTool: {},
       operationStore: false,
+      toolSetId: false
       // openToolModal: false,
     };
   },
@@ -358,6 +359,7 @@ export default {
       this.toolIdList = toolset.toolList;
       this.getToolInfos();
       this.toolsetLevel++;
+      this.toolSetId = toolset.tid;
     },
     openTool() {
       let toolInfo = this.selectedTool;

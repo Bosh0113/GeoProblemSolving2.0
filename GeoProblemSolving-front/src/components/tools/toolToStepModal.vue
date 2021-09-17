@@ -623,7 +623,7 @@ export default {
     },
     async getPublicTools() {
       let data = await get(
-        "/GeoProblemSolving/tool/toolSet/privacy/Public"
+        "/GeoProblemSolving/tool/privacy/Public"
       );
       this.$set(this, "publicTools", data);
     },
@@ -631,7 +631,7 @@ export default {
       let data = await get(
         `/GeoProblemSolving/tool/provider/${this.userInfo.userId}`
       );
-      
+
       this.$set(this, "personalTools", data);
     },
     isToolIdList(tid){
@@ -834,7 +834,7 @@ export default {
       });
 
       // 更新协同文档
-      // add
+      // add 只能添加工具集和工具，不能单独添加工具集中的工具
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {
         if (this.isToolIdList(this.stepToolsetsShow[i].tid) == false) {
 
@@ -848,7 +848,7 @@ export default {
           );
         }
       }
-      for (var i = 0; i < this.stepToolsShow.length; i++) {
+      for (let i = 0; i < this.stepToolsShow.length; i++) {
         if (this.isToolIdList(this.stepToolsShow[i].tid) == false) {
 
           this.operationApi.toolOperationRecord(

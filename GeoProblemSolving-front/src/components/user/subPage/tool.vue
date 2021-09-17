@@ -862,7 +862,6 @@
       editTool: function (item) {
         this.editToolModal = true;
         this.editToolInfo = item;
-        console.log(this.editToolInfo);
       },
       manageTool(item){
         this.manageToolInfo = item;
@@ -893,7 +892,7 @@
             } else if (res.data.code == 0){
               let tempTools = res.data.data;
               console.log(res.data.data);
-              
+
               for (let i = 0; i < tempTools.length; i++) {
                 if (tempTools[i].privacy == "Public" && tempTools[i].toolSet == false) {
                   this.publicTools.push(tempTools[i]);
@@ -913,7 +912,7 @@
             this.$Message.error("Loading Fail.");
           });
       },
-      
+
       nextStep: function () {
         if (this.currentStep == 0) {
           this.currentStep = 1;
@@ -931,7 +930,6 @@
           this.loading = false;
         }, 2000)
         createToolForm["provider"] = this.$store.getters.userId;
-        // let data = await post("/GeoProblemSolving/tool", createToolForm);
         if(createToolForm.toolSet == true){
           let formData = {};
           formData.toolName = createToolForm.toolsetName;
@@ -1117,7 +1115,7 @@
               }
               this.$Notice.success({title: "Update successfully."});
             }
-            
+
           })
           .catch((err) => {
             this.$Message.error("Update Fail.Try again!");
@@ -1136,7 +1134,7 @@
           .then((res) => {
             this.$Notice.success({title: "Update successfully."});
             this.currentStep = 0;
-            this.editToolInfo = {};
+            // this.editToolInfo = {};
             this.editToolModal = false;
           })
           .catch((err) => {
@@ -1151,7 +1149,7 @@
           .then((res) => {
             this.$Notice.success({title: "Update successfully."});
             this.currentStep = 0;
-            this.editToolInfo = {};
+            // this.editToolInfo = {};
             this.editToolModal = false;
           })
           .catch((err) => {
@@ -1220,7 +1218,7 @@
       },
     },
     computed: {
-      
+
       userToolCount: function () {
         if (this.checkedType.length == 0 || this.toolAndToolset.length == 0) {
           this.personalTools = [];
