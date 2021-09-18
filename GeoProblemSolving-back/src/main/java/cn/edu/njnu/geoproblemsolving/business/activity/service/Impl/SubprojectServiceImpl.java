@@ -158,7 +158,7 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             Subproject subproject = (Subproject) result.get();
             String purpose = update.getPurpose();
-            if (subproject.getType().equals(ActivityType.Activity_Group) && purpose != null){
+            if (subproject.getType().equals(ActivityType.Activity_Unit) && purpose != null){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : relevantPurposeTool){

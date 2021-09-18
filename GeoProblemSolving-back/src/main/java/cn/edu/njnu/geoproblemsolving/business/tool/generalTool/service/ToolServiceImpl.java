@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.entity.ToolTestData;
 import cn.edu.njnu.geoproblemsolving.business.modeltask.Utils;
@@ -10,8 +9,8 @@ import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
-import com.google.common.collect.Lists;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -447,9 +446,9 @@ public class ToolServiceImpl implements ToolService {
         if (purpose.equals("Other purpose")) purpose = "All";
         Query query = new Query();
         Criteria criteria = new Criteria("privacy").is("Public");
-        Criteria orOperator = new Criteria().orOperator(Criteria.where("recommendation").is("All"), Criteria.where("recommendation").is(purpose));
+        Criteria inCriteria = new Criteria("recommendation").in("All", purpose);
         query.addCriteria(criteria);
-        query.addCriteria(orOperator);
+        query.addCriteria(inCriteria);
         return toolDao.findByFields(query);
     }
 }

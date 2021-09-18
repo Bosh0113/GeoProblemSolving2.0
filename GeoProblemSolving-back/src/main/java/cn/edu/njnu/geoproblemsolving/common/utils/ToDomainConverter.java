@@ -2,7 +2,6 @@ package cn.edu.njnu.geoproblemsolving.common.utils;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ModelTools.CModel.support.BaseEntity;
 import cn.edu.njnu.geoproblemsolving.common.exception.MyException;
-import cn.edu.njnu.geoproblemsolving.common.utils.CopyUtils;
 import cn.hutool.core.util.ReflectUtil;
 
 import java.lang.annotation.Annotation;
@@ -33,7 +32,7 @@ public interface ToDomainConverter<DOMAIN> {
      */
     default void updateTo(DOMAIN domain)  {
         invokeMethodByAnnotation(domain,BEFORE_UPDATE);
-        CopyUtils.copyProperties(this, domain);
+        CopyUtils.copyProperties(domain, this);
     }
 
     /**

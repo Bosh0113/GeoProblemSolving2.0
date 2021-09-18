@@ -307,8 +307,6 @@ export default {
         ],
         description: [
           {
-            required: true,
-            message: "The toolset description cannot be empty",
             trigger: "blur"
           }
         ],
