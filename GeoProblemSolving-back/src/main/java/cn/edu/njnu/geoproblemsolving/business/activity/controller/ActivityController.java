@@ -142,41 +142,41 @@ public class ActivityController {
         return activityService.findLineage(aid);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{aid}/next")
-    public JsonResult getNextActivities(@PathVariable("aid") String aid) {
-        logger.info("getNextActivities");
-        return activityService.findNext(aid);
-    }
+//    @RequestMapping(method = RequestMethod.GET, value = "/{aid}/next")
+//    public JsonResult getNextActivities(@PathVariable("aid") String aid) {
+//        logger.info("getNextActivities");
+//        return activityService.findNext(aid);
+//    }
+//
+//    @RequestMapping(method = RequestMethod.GET, value = "/{aid}/last")
+//    public JsonResult getLastActivities(@PathVariable("aid") String aid) {
+//        logger.info("getLastActivities");
+//        return activityService.findLast(aid);
+//    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{aid}/last")
-    public JsonResult getLastActivities(@PathVariable("aid") String aid) {
-        logger.info("getLastActivities");
-        return activityService.findLast(aid);
-    }
-
-    /**
-     * Link two activity
-     * @param aid1
-     * @param aid2
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/link/{aid1}/{aid2}")
-    public JsonResult linkActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestParam("pid") String pid, @RequestBody UpdateActivityDTO update) {
-        logger.info("linkActivities");
-        return activityService.linkActivities(update, aid1, aid2, pid);
-    }
-
-    /**
-     * Separate two activities
-     * @param aid1
-     * @param aid2
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.POST, value = "/separate/{aid1}/{aid2}")
-    public JsonResult separateActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestBody UpdateActivityDTO update) {
-        logger.info("separateActivities");
-        return activityService.separateActivities(update, aid1, aid2);
-    }
+//    /**
+//     * Link two activity
+//     * @param aid1
+//     * @param aid2
+//     * @return
+//     */
+//    @RequestMapping(method = RequestMethod.POST, value = "/link/{aid1}/{aid2}")
+//    public JsonResult linkActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestParam("pid") String pid, @RequestBody UpdateActivityDTO update) {
+//        logger.info("linkActivities");
+//        return activityService.linkActivities(update, aid1, aid2, pid);
+//    }
+//
+//    /**
+//     * Separate two activities
+//     * @param aid1
+//     * @param aid2
+//     * @return
+//     */
+//    @RequestMapping(method = RequestMethod.POST, value = "/separate/{aid1}/{aid2}")
+//    public JsonResult separateActivities(@PathVariable("aid1") String aid1, @PathVariable("aid2") String aid2, @RequestBody UpdateActivityDTO update) {
+//        logger.info("separateActivities");
+//        return activityService.separateActivities(update, aid1, aid2);
+//    }
 
     /**
      * Join activity

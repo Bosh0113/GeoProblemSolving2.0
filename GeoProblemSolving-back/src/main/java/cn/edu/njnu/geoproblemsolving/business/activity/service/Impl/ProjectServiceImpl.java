@@ -587,110 +587,110 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    @Override
-    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
-        try {
-            // Confirm aid
-            Optional optional = projectRepository.findById(update.getAid());
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
-            Project project = (Project) optional.get();
-            optional = subprojectRepository.findById(aid1);
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Subproject activity1 = (Subproject) optional.get();
-            optional = subprojectRepository.findById(aid2);
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Subproject activity2 = (Subproject) optional.get();
+//    @Override
+//    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
+//        try {
+//            // Confirm aid
+//            Optional optional = projectRepository.findById(update.getAid());
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+//            Project project = (Project) optional.get();
+//            optional = subprojectRepository.findById(aid1);
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Subproject activity1 = (Subproject) optional.get();
+//            optional = subprojectRepository.findById(aid2);
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Subproject activity2 = (Subproject) optional.get();
+//
+//            // Save the pathway
+//            update.updateTo(project);
+//
+//            // Save the protocol------------------------------------------------待完善----------------------------------
+//            // String pid = protocolRepository.save(protocol).getPid();
+//
+//            // Save activities
+//            subprojectRepository.save(saveLastActivityInfo(aid2, pid, activity1));
+//            subprojectRepository.save(saveNextActivityInfo(aid1, pid, activity2));
+//            projectRepository.save(project);
+//
+//            return ResultUtils.success(project);
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//    }
 
-            // Save the pathway
-            update.updateTo(project);
+//    @Override
+//    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
+//        try {
+//            // Confirm aid
+//            Optional optional = projectRepository.findById(update.getAid());
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
+//            Project project = (Project) optional.get();
+//            optional = subprojectRepository.findById(lastAid);
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Subproject activity1 = (Subproject) optional.get();
+//            optional = subprojectRepository.findById(nextAid);
+//            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Subproject activity2 = (Subproject) optional.get();
+//
+//            // Save the pathway
+//            update.updateTo(project);
+//
+//            // Save the last activity
+//            JSONArray nextActivities = activity1.getNext();
+//
+//            IntStream.range(0, nextActivities.size()).forEach(i -> {
+//                String aid = nextActivities.getJSONObject(i).getString("aid");
+//                if (aid.equals(nextAid)) {
+//                    nextActivities.remove(i);
+//                }
+//            });
+//            activity1.setNext(nextActivities);
+//
+//            // Save the next activity
+//            JSONArray lastActivities = activity2.getLast();
+//
+//            IntStream.range(0, lastActivities.size()).forEach(i -> {
+//                String aid = lastActivities.getJSONObject(i).getString("aid");
+//                if (aid.equals(lastAid)) {
+//                    lastActivities.remove(i);
+//                }
+//            });
+//            activity2.setLast(lastActivities);
+//
+//            // Save activities
+//            projectRepository.save(project);
+//            subprojectRepository.save(activity1);
+//            subprojectRepository.save(activity2);
+//
+//            return ResultUtils.success(project);
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//    }
 
-            // Save the protocol------------------------------------------------待完善----------------------------------
-            // String pid = protocolRepository.save(protocol).getPid();
+//    private Subproject saveLastActivityInfo(String aid, String pid, Subproject last) {
+//        JSONObject nextInfo = new JSONObject();
+//        nextInfo.put("aid", aid);
+//        nextInfo.put("protocolId", pid);
+//
+//        JSONArray nextActivities = last.getNext();
+//        if (nextActivities == null) nextActivities = new JSONArray();
+//        nextActivities.add(nextInfo);
+//        last.setNext(nextActivities);
+//
+//        return last;
+//    }
 
-            // Save activities
-            subprojectRepository.save(saveLastActivityInfo(aid2, pid, activity1));
-            subprojectRepository.save(saveNextActivityInfo(aid1, pid, activity2));
-            projectRepository.save(project);
-
-            return ResultUtils.success(project);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
-
-    @Override
-    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
-        try {
-            // Confirm aid
-            Optional optional = projectRepository.findById(update.getAid());
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
-            Project project = (Project) optional.get();
-            optional = subprojectRepository.findById(lastAid);
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Subproject activity1 = (Subproject) optional.get();
-            optional = subprojectRepository.findById(nextAid);
-            if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Subproject activity2 = (Subproject) optional.get();
-
-            // Save the pathway
-            update.updateTo(project);
-
-            // Save the last activity
-            JSONArray nextActivities = activity1.getNext();
-
-            IntStream.range(0, nextActivities.size()).forEach(i -> {
-                String aid = nextActivities.getJSONObject(i).getString("aid");
-                if (aid.equals(nextAid)) {
-                    nextActivities.remove(i);
-                }
-            });
-            activity1.setNext(nextActivities);
-
-            // Save the next activity
-            JSONArray lastActivities = activity2.getLast();
-
-            IntStream.range(0, lastActivities.size()).forEach(i -> {
-                String aid = lastActivities.getJSONObject(i).getString("aid");
-                if (aid.equals(lastAid)) {
-                    lastActivities.remove(i);
-                }
-            });
-            activity2.setLast(lastActivities);
-
-            // Save activities
-            projectRepository.save(project);
-            subprojectRepository.save(activity1);
-            subprojectRepository.save(activity2);
-
-            return ResultUtils.success(project);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
-
-    private Subproject saveLastActivityInfo(String aid, String pid, Subproject last) {
-        JSONObject nextInfo = new JSONObject();
-        nextInfo.put("aid", aid);
-        nextInfo.put("protocolId", pid);
-
-        JSONArray nextActivities = last.getNext();
-        if (nextActivities == null) nextActivities = new JSONArray();
-        nextActivities.add(nextInfo);
-        last.setNext(nextActivities);
-
-        return last;
-    }
-
-    private Subproject saveNextActivityInfo(String aid, String pid, Subproject next) {
-        JSONObject lastInfo = new JSONObject();
-        lastInfo.put("aid", aid);
-        lastInfo.put("protocolId", pid);
-
-        JSONArray lastActivities = next.getLast();
-        if (lastActivities == null) lastActivities = new JSONArray();
-        lastActivities.add(lastInfo);
-        next.setLast(lastActivities);
-
-        return next;
-    }
+//    private Subproject saveNextActivityInfo(String aid, String pid, Subproject next) {
+//        JSONObject lastInfo = new JSONObject();
+//        lastInfo.put("aid", aid);
+//        lastInfo.put("protocolId", pid);
+//
+//        JSONArray lastActivities = next.getLast();
+//        if (lastActivities == null) lastActivities = new JSONArray();
+//        lastActivities.add(lastInfo);
+//        next.setLast(lastActivities);
+//
+//        return next;
+//    }
 }

@@ -29,7 +29,7 @@ public interface SubprojectService{
 
     JsonResult quitSubproject(String aid, String userId);
 
-    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
-
-    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
+//    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
+//
+//    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
 }

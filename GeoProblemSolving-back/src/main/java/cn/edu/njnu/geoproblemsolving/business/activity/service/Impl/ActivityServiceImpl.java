@@ -79,31 +79,31 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    private Activity saveLastActivityInfo(String aid, String pid, Activity last) {
-        JSONObject nextInfo = new JSONObject();
-        nextInfo.put("aid", aid);
-        nextInfo.put("protocolId", pid);
+//    private Activity saveLastActivityInfo(String aid, String pid, Activity last) {
+//        JSONObject nextInfo = new JSONObject();
+//        nextInfo.put("aid", aid);
+//        nextInfo.put("protocolId", pid);
+//
+//        JSONArray nextActivities = last.getNext();
+//        if(nextActivities == null) nextActivities = new JSONArray();
+//        nextActivities.add(nextInfo);
+//        last.setNext(nextActivities);
+//
+//        return last;
+//    }
 
-        JSONArray nextActivities = last.getNext();
-        if(nextActivities == null) nextActivities = new JSONArray();
-        nextActivities.add(nextInfo);
-        last.setNext(nextActivities);
-
-        return last;
-    }
-
-    private Activity saveNextActivityInfo(String aid, String pid, Activity next) {
-        JSONObject lastInfo = new JSONObject();
-        lastInfo.put("aid", aid);
-        lastInfo.put("protocolId", pid);
-
-        JSONArray lastActivities = next.getLast();
-        if(lastActivities == null) lastActivities = new JSONArray();
-        lastActivities.add(lastInfo);
-        next.setLast(lastActivities);
-
-        return next;
-    }
+//    private Activity saveNextActivityInfo(String aid, String pid, Activity next) {
+//        JSONObject lastInfo = new JSONObject();
+//        lastInfo.put("aid", aid);
+//        lastInfo.put("protocolId", pid);
+//
+//        JSONArray lastActivities = next.getLast();
+//        if(lastActivities == null) lastActivities = new JSONArray();
+//        lastActivities.add(lastInfo);
+//        next.setLast(lastActivities);
+//
+//        return next;
+//    }
 
     private void updateActiveTime(Activity activity) {
         // Update active time
@@ -441,133 +441,133 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    @Override
-    public JsonResult findLast(String aid) {
-        try {
-            List<Activity> activities = new ArrayList();
-            Activity current = findActivityById(aid);
-            if (current == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//    @Override
+//    public JsonResult findLast(String aid) {
+//        try {
+//            List<Activity> activities = new ArrayList();
+//            Activity current = findActivityById(aid);
+//            if (current == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//
+//            JSONArray lastActivities = current.getLast();
+//            for (Object last : lastActivities) {
+//                if (last instanceof JSONObject) {
+//                    Activity lastActivity = findActivityById(((JSONObject) last).getString("aid"));
+//                    if (lastActivity == null) continue;
+//                    activities.add(lastActivity);
+//                }
+//            }
+//
+//            // Update active time
+//            updateActiveTime(current);
+//
+//            return ResultUtils.success(activities);
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//    }
+//
+//    @Override
+//    public JsonResult findNext(String aid) {
+//        try {
+//            List<Activity> activities = new ArrayList();
+//            Activity current = findActivityById(aid);
+//            if (current == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//
+//            JSONArray nextActivities = current.getNext();
+//            for (Object next : nextActivities) {
+//                if (next instanceof JSONObject) {
+//
+//                    Activity nextActivity = findActivityById(((JSONObject) next).getString("aid"));
+//                    if (nextActivity == null) continue;
+//                    activities.add(nextActivity);
+//                }
+//            }
+//
+//            // Update active time
+//            updateActiveTime(current);
+//
+//            return ResultUtils.success(activities);
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//
+//    }
 
-            JSONArray lastActivities = current.getLast();
-            for (Object last : lastActivities) {
-                if (last instanceof JSONObject) {
-                    Activity lastActivity = findActivityById(((JSONObject) last).getString("aid"));
-                    if (lastActivity == null) continue;
-                    activities.add(lastActivity);
-                }
-            }
 
-            // Update active time
-            updateActiveTime(current);
+//    @Override
+//    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
+//        try {
+//            // Confirm aid
+//            Activity activity1 = findActivityById(aid1);
+//            if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Activity activity2 = findActivityById(aid2);
+//            if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Activity activity = findActivityById(update.getAid());
+//            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//
+//            // Save the pathway
+//            update.updateTo(activity);
+//
+//            // Save the protocol------------------------------------------------待完善----------------------------------
+//            // String pid = protocolRepository.save(protocol).getPid();
+//
+//            // Save activities
+//            activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
+//            activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
+//            activityRepository.save(activity);
+//
+//            return ResultUtils.success("Success");
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//    }
 
-            return ResultUtils.success(activities);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
-
-    @Override
-    public JsonResult findNext(String aid) {
-        try {
-            List<Activity> activities = new ArrayList();
-            Activity current = findActivityById(aid);
-            if (current == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-
-            JSONArray nextActivities = current.getNext();
-            for (Object next : nextActivities) {
-                if (next instanceof JSONObject) {
-
-                    Activity nextActivity = findActivityById(((JSONObject) next).getString("aid"));
-                    if (nextActivity == null) continue;
-                    activities.add(nextActivity);
-                }
-            }
-
-            // Update active time
-            updateActiveTime(current);
-
-            return ResultUtils.success(activities);
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-
-    }
-
-
-    @Override
-    public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid) {
-        try {
-            // Confirm aid
-            Activity activity1 = findActivityById(aid1);
-            if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Activity activity2 = findActivityById(aid2);
-            if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Activity activity = findActivityById(update.getAid());
-            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-
-            // Save the pathway
-            update.updateTo(activity);
-
-            // Save the protocol------------------------------------------------待完善----------------------------------
-            // String pid = protocolRepository.save(protocol).getPid();
-
-            // Save activities
-            activityRepository.save(saveLastActivityInfo(aid2, pid, activity1));
-            activityRepository.save(saveNextActivityInfo(aid1, pid, activity2));
-            activityRepository.save(activity);
-
-            return ResultUtils.success("Success");
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
-
-    @Override
-    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
-        try {
-            // Confirm aid
-            Activity activity1 = findActivityById(lastAid);
-            if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Activity activity2 = findActivityById(nextAid);
-            if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-            Activity activity = findActivityById(update.getAid());
-            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
-
-            // Save the pathway
-            update.updateTo(activity);
-
-            // Save the last activity
-            JSONArray nextActivities = activity1.getNext();
-
-            IntStream.range(0, nextActivities.size()).forEach(i -> {
-                String aid = nextActivities.getJSONObject(i).getString("aid");
-                if (aid.equals(nextAid)) {
-                    nextActivities.remove(i);
-                }
-            });
-            activity1.setNext(nextActivities);
-
-            // Save the next activity
-            JSONArray lastActivities = activity2.getLast();
-
-            IntStream.range(0, lastActivities.size()).forEach(i -> {
-                String aid = lastActivities.getJSONObject(i).getString("aid");
-                if (aid.equals(lastAid)) {
-                    lastActivities.remove(i);
-                }
-            });
-            activity2.setLast(lastActivities);
-
-            // Save activities
-            activityRepository.save(activity);
-            activityRepository.save(activity1);
-            activityRepository.save(activity2);
-
-            return ResultUtils.success("Success");
-        } catch (Exception ex) {
-            return ResultUtils.error(-2, ex.toString());
-        }
-    }
+//    @Override
+//    public JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid) {
+//        try {
+//            // Confirm aid
+//            Activity activity1 = findActivityById(lastAid);
+//            if (activity1 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Activity activity2 = findActivityById(nextAid);
+//            if (activity2 == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//            Activity activity = findActivityById(update.getAid());
+//            if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+//
+//            // Save the pathway
+//            update.updateTo(activity);
+//
+//            // Save the last activity
+//            JSONArray nextActivities = activity1.getNext();
+//
+//            IntStream.range(0, nextActivities.size()).forEach(i -> {
+//                String aid = nextActivities.getJSONObject(i).getString("aid");
+//                if (aid.equals(nextAid)) {
+//                    nextActivities.remove(i);
+//                }
+//            });
+//            activity1.setNext(nextActivities);
+//
+//            // Save the next activity
+//            JSONArray lastActivities = activity2.getLast();
+//
+//            IntStream.range(0, lastActivities.size()).forEach(i -> {
+//                String aid = lastActivities.getJSONObject(i).getString("aid");
+//                if (aid.equals(lastAid)) {
+//                    lastActivities.remove(i);
+//                }
+//            });
+//            activity2.setLast(lastActivities);
+//
+//            // Save activities
+//            activityRepository.save(activity);
+//            activityRepository.save(activity1);
+//            activityRepository.save(activity2);
+//
+//            return ResultUtils.success("Success");
+//        } catch (Exception ex) {
+//            return ResultUtils.error(-2, ex.toString());
+//        }
+//    }
 
     @Override
     public JsonResult joinActivity(String aid, String userId) {

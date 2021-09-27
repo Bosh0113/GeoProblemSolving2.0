@@ -26,11 +26,11 @@ public interface ActivityService {
 
     JsonResult findLineage(String aid);
 
-    JsonResult findLast(String aid);
-
-    JsonResult findNext(String aid);
-
-    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
-
-    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
+//    JsonResult findLast(String aid);
+//
+//    JsonResult findNext(String aid);
+//
+//    JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid);
+//
+//    JsonResult separateActivities(UpdateActivityDTO update, String lastAid, String nextAid);
 }
