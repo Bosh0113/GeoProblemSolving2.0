@@ -490,7 +490,7 @@
     <Modal v-model="infoModal" title="Info of the toolset or tool" width="400">
       <div class="api">
         <table>
-          <thead>
+          <thead style="background-color:#f8f8f9; ">
             <tr>
               <th>Title</th>
               <th>Info</th>
@@ -607,7 +607,7 @@ export default {
   },
   methods: {
     stepToolModalShow() {
-      this.toolIdList = this.operationApi.getToollist();
+      this.toolIdList = this.activityInfo.toolList;
       this.getAllListInfo();
       this.typeSelected = "All";
       this.showMenuItem = "allToolsets";
@@ -693,27 +693,29 @@ export default {
       toolsShow = [];
       toolsetsShow = [];
       for (var i = this.personalTools.length - 1; i >= 0; i--) {
-        if (
-          this.personalTools[i].toolSet != undefined &&
-          this.personalTools[i].toolSet
-        ) {
-          if (this.isToolIdList(this.personalTools[i].tid) == false) {
+        if (this.personalTools[i].toolSet == true) {
+          if (this.isToolIdList(this.personalTools[i].tid) == false ) {
             toolsets.push(this.personalTools[i]);
-          } else {
+          } else if( this.isStepToolsetsShow(this.personalTools[i].tid) == false){
             toolsetsShow.push(this.personalTools[i]);
           }
         } else {
           if (this.isToolIdList(this.personalTools[i].tid) == false) {
             tools.push(this.personalTools[i]);
-          } else {
+          } else if(this.isStepToolsShow(this.personalTools[i].tid) == false) {
             toolsShow.push(this.personalTools[i]);
           }
         }
       }
       this.personalTools = tools;
       this.personalToolsets = toolsets;
-      this.stepToolsetsShow = toolsetsShow;
-      this.stepToolsShow = toolsShow;
+      if(toolsetsShow.length > 0){
+        this.stepToolsetsShow.push(toolsetsShow);
+      }
+      if(toolsShow.length > 0){
+        this.stepToolsShow.push(toolsShow);
+      }
+      
     },
     filterShowListByType() {
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
@@ -790,6 +792,7 @@ export default {
     },
     removeToolset(index) {
       var removeToolsetInfo = this.stepToolsetsShow[index];
+      consoles.log(removeToolsetInfo);
       this.stepToolsetsShow.splice(index, 1);
       if (removeToolsetInfo.privacy == "Public") {
         this.publicToolsets.push(removeToolsetInfo);
@@ -817,6 +820,7 @@ export default {
     },
     removeTool(index) {
       var removeToolInfo = this.stepToolsShow[index];
+      console.log(removeToolInfo);
       this.stepToolsShow.splice(index, 1);
       if (removeToolInfo.privacy == "Public") {
         this.publicTools.push(removeToolInfo);

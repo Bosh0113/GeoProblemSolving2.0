@@ -9,10 +9,6 @@
   box-shadow: 0px 0px 3px 1px #2d72f1;
 }
 
-.modelTitle {
-  /* margin-bottom: 5px; */
-}
-
 .modelName {
   font-weight: 600;
   overflow: hidden;
@@ -449,8 +445,6 @@ export default {
         ],
         description: [
           {
-            required: true,
-            message: "The tool description cannot be empty",
             trigger: "blur",
           },
         ],

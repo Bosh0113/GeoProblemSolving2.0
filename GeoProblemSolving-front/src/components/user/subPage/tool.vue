@@ -1110,89 +1110,91 @@ export default {
     },
     createTool: async function () {
       let createToolForm = this.toolInfo;
-      this.loading = true;
-      setTimeout(() => {
-        this.loading = false;
-      }, 2000);
-      createToolForm["provider"] = this.$store.getters.userId;
-      if (createToolForm.toolSet == true) {
-        let formData = {};
-        formData.toolName = createToolForm.toolsetName;
-        formData.toolImg = createToolForm.toolsetImg;
-        formData.recommendation = createToolForm.recomStep;
-        formData.toolList = [];
-        for (let i = 0; i < createToolForm.toolList.length; i++) {
-          formData.toolList.push(createToolForm.toolList[i].tid);
-        }
-        formData.toolSet = true;
-        formData.provider = createToolForm.provider;
-        formData.privacy = createToolForm.privacy;
-        formData.description = createToolForm.description;
-        formData.tags = createToolForm.categoryTag;
-        this.axios
-          .post("/GeoProblemSolving/tool/toolset", formData)
-          .then((res) => {
-            if (res.data.code == 0) {
-              this.createToolsetModal = false;
-              this.editToolInfo = {};
-              this.toolInfo = {};
-              let toolData = res.data.data;
-              if (toolData != null) {
-                if (toolData.privacy == "Public") {
-                  this.publicToolsets.push(toolData);
-                } else if (toolData.privacy == "Private") {
-                  this.privateToolsets.push(toolData);
-                }
-                this.currentStep = 0;
-                this.$Notice.success({ title: "Create successfully" });
-              } else {
-                this.$Notice.error({
-                  title: "Crate failed",
-                  desc: "No Corresponding service",
-                });
-              }
-            }
-          })
-          .catch((err) => {
-            this.$Notice.error({ title: "Create failed" });
-          });
+      console.log(createToolForm);
+      if (createToolForm.backendType == "" || createToolForm.toolName == "") {
+        this.$Notice.error({
+          title: "Crate failed",
+          desc: "Lack of necessary information",
+        });
       } else {
-        this.axios
-          .post("/GeoProblemSolving/tool", createToolForm)
-          .then((res) => {
-            // ？？？ 判断返回值，进行下一步操作
-            if (res.data.code == 0) {
-              this.createToolModal = false;
-              this.editToolInfo = {};
-              this.toolInfo = {};
-              let toolData = res.data.data;
-              this.personalToolsList.push(toolData);
-              if (toolData != null) {
-                if (toolData.privacy == "Public") {
-                  this.publicTools.push(toolData);
-                } else if (toolData.privacy == "Private") {
-                  this.privateTools.push(toolData);
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+        }, 2000);
+        createToolForm["provider"] = this.$store.getters.userId;
+        // let data = await post("/GeoProblemSolving/tool", createToolForm);
+        if (createToolForm.toolSet == true) {
+          let formData = {};
+          formData.toolName = createToolForm.toolsetName;
+          formData.toolImg = createToolForm.toolsetImg;
+          formData.recommendation = createToolForm.recomStep;
+          formData.toolList = [];
+          for (let i = 0; i < createToolForm.toolList.length; i++) {
+            formData.toolList.push(createToolForm.toolList[i].tid);
+          }
+          formData.toolSet = true;
+          formData.provider = createToolForm.provider;
+          formData.privacy = createToolForm.privacy;
+          formData.description = createToolForm.description;
+          formData.tags = createToolForm.categoryTag;
+          this.axios
+            .post("/GeoProblemSolving/tool/toolset", formData)
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.createToolsetModal = false;
+                this.editToolInfo = {};
+                this.toolInfo = {};
+                let toolData = res.data.data;
+                if (toolData != null) {
+                  if (toolData.privacy == "Public") {
+                    this.publicToolsets.push(toolData);
+                  } else if (toolData.privacy == "Private") {
+                    this.privateToolsets.push(toolData);
+                  }
+                  this.currentStep = 0;
+                  this.$Notice.success({ title: "Create successfully" });
+                } else {
+                  this.$Notice.error({
+                    title: "Crate failed",
+                    desc: "No Corresponding service",
+                  });
                 }
-                this.currentStep = 0;
-                this.$Notice.success({ title: "Create successfully" });
-              } else {
-                this.$Notice.error({
-                  title: "Crate failed",
-                  desc: "No Corresponding service",
-                });
               }
-              this.currentStep = 0;
-              this.$Notice.success({ title: "Create successfully" });
-            } else {
-              this.$Notice.error({
-                title: "Crate failed",
-                desc: "No Corresponding service",
-              });
-            }
-          })
-          .catch((err) => {
-            this.$Notice.error({ title: "Create failed" });
-          });
+            })
+            .catch((err) => {
+              this.$Notice.error({ title: "Create failed" });
+            });
+        } else {
+          this.axios
+            .post("/GeoProblemSolving/tool", createToolForm)
+            .then((res) => {
+              // ？？？ 判断返回值，进行下一步操作
+              if (res.data.code == 0) {
+                this.createToolModal = false;
+                this.editToolInfo = {};
+                this.toolInfo = {};
+                let toolData = res.data.data;
+                this.personalToolsList.push(toolData);
+                if (toolData != null) {
+                  if (toolData.privacy == "Public") {
+                    this.publicTools.push(toolData);
+                  } else if (toolData.privacy == "Private") {
+                    this.privateTools.push(toolData);
+                  }
+                  this.currentStep = 0;
+                  this.$Notice.success({ title: "Create successfully" });
+                } else {
+                  this.$Notice.error({
+                    title: "Crate failed",
+                    desc: "No Corresponding service",
+                  });
+                }
+              }
+            })
+            .catch((err) => {
+              this.$Notice.error({ title: "Create failed" });
+            });
+        }
       }
     },
     delTool: function (toolId, toolType, index, toolName, toolSet) {
@@ -1203,6 +1205,7 @@ export default {
       this.delToolInfo.delToolName = toolName;
       this.delToolInfo.delToolSet = toolSet;
     },
+
     confirmDelTool: function () {
       // "/GeoProblemSolving/tool/delete?tid=" + this.delToolInfo.delToolId
       if (this.delToolInfo.delToolSet == false) {
@@ -1311,7 +1314,7 @@ export default {
                 }
               }
             }
-            this.$Notice.success({ title: "Update successfully." });
+            // this.$Notice.success({ title: "Update successfully." });
           }
         })
         .catch((err) => {
@@ -1321,7 +1324,6 @@ export default {
     commitEdit: function () {
       // "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
       //   this.editToolInfo
-      // console.log(this.editToolInfo);
       if (this.editToolInfo.toolSet == false) {
         this.$axios
           .put("/GeoProblemSolving/tool", this.editToolInfo)
