@@ -2,10 +2,12 @@
 .link-protocol >>> .ivu-modal-body {
   padding: 0 16px 16px 16px;
 }
+
 .btnHoverGray:hover {
   background-color: #808695;
   color: white;
 }
+
 #steps {
   margin-top: 20px;
   padding: 15px;
@@ -13,6 +15,7 @@
   height: calc(100vh - 300px);
   width: calc(100vw - 400px);
 }
+
 .domain >>> .ti-input {
   display: inline-block;
   width: 655px;
@@ -28,9 +31,11 @@
   position: relative;
   cursor: text;
 }
+
 .domain >>> input {
   opacity: 0.5;
 }
+
 .res-protocol >>> .ti-input {
   display: inline-block;
   width: 267px;
@@ -46,8 +51,19 @@
   position: relative;
   cursor: text;
 }
+
 .res-protocol >>> input {
   opacity: 0.5;
+}
+
+.inBox {
+  position: relative;
+  top: 20vh;
+  right: 0;
+  z-index: 999;
+  background-color: red;
+  width: 50px;
+  height: 100px;
 }
 </style>
 <template>
@@ -66,6 +82,10 @@
             <span style="font-weight: bold; font-size: 16px"
               >Procedure of the current activity</span
             >
+            <!--            &lt;!&ndash;            todo: 添加头像&ndash;&gt;-->
+            <!--            <div style="display: inline-block">-->
+            <!--              <avatar-list :list="participants"></avatar-list>-->
+            <!--            </div>-->
             <!-- 右侧三个按钮-->
             <template
               v-if="
@@ -81,29 +101,29 @@
                 @click="editPosition()"
                 size="small"
                 icon="md-git-commit"
-                title="Adjust the postion of nodes"
+                title="Adjust the position of nodes"
                 style="float: right; margin-left: 10px"
-                >Move node</Button
-              >
+                >Move node
+              </Button>
               <Button
                 v-else-if="nodePositionBtn && !procedureDrag"
                 type="warning"
                 @click="editPosition()"
                 size="small"
                 icon="md-git-network"
-                title="Move the postion of procedure"
+                title="Move the position of procedure"
                 style="float: right; margin-left: 10px"
-                >Move procedure</Button
-              >
+                >Move procedure
+              </Button>
               <Button
                 v-else
                 type="default"
                 size="small"
                 icon="md-git-commit"
-                title="Adjust the postion of nodes"
+                title="Adjust the position of nodes"
                 style="float: right; margin-left: 10px; cursor: default"
-                >Move node</Button
-              >
+                >Move node
+              </Button>
               <!--link按钮-->
               <Button
                 v-if="removeLinkBtn"
@@ -113,8 +133,8 @@
                 icon="md-remove"
                 title="Remove links"
                 style="float: right; margin-left: 10px"
-                >Unlink</Button
-              >
+                >Unlink
+              </Button>
               <Button
                 v-else
                 type="default"
@@ -122,8 +142,8 @@
                 icon="md-remove"
                 title="Please click and select one node (activity)"
                 style="float: right; margin-left: 10px; cursor: default"
-                >Unlink</Button
-              >
+                >Unlink
+              </Button>
               <!--link-->
               <template v-if="childActivities.length > 1">
                 <Button
@@ -135,8 +155,8 @@
                   title="Start to link"
                   style="float: right; margin-left: 10px"
                   id="linkBegin"
-                  >Start to link</Button
-                >
+                  >Start to link
+                </Button>
                 <Button
                   v-if="linkBtn"
                   v-show="linkStep == 1"
@@ -147,8 +167,8 @@
                   title="Complete linking"
                   style="float: right; margin-left: 10px"
                   id="linkEnd"
-                  >Complete linking</Button
-                >
+                  >Complete linking
+                </Button>
                 <Button
                   v-else
                   v-show="linkStep == 1"
@@ -158,8 +178,8 @@
                   title="Complete linking"
                   style="float: right; margin-left: 10px; cursor: default"
                   id="linkEnd"
-                  >Complete linking</Button
-                >
+                  >Complete linking
+                </Button>
               </template>
               <template v-else>
                 <Button
@@ -169,15 +189,31 @@
                   title="Start to link"
                   style="float: right; margin-left: 10px; cursor: default"
                   id="linkBegin"
-                  >Start to link</Button
-                >
+                  >Start to link
+                </Button>
               </template>
             </template>
           </div>
           <div id="steps"></div>
+
+          <div v-if="collaborating">
+            <div
+              v-for="(item, index) in collaboratingInfoList"
+              style="margin-bottom: 10px; background-color: pink"
+            >
+              <avatar-list
+                v-if="item.collLinkUser.length > 0"
+                :list="item.collLinkUser"
+                :key="index"
+                @click.native="joinLinkCollaboration(index)"
+                style="cursor: pointer"
+              ></avatar-list>
+            </div>
+          </div>
         </Row>
       </div>
     </Col>
+
     <Modal v-model="activityInfoModal" title="Information of the activity">
       <div>
         <label style="margin-left: 20px">Activity name:</label>
@@ -197,26 +233,38 @@
       </div>
       <div slot="footer">
         <Button type="primary" @click="gotoActivity(showActivityInfo.aid)"
-          >Go to this workspace</Button
-        >
+          >Go to this workspace
+        </Button>
       </div>
     </Modal>
+    <!--    Link Protocol modal -->
     <Modal
       class="link-protocol"
       v-model="linkBuildModal"
       title="Set link protocol"
       width="800"
       :styles="{ top: '30px' }"
-      @on-ok="buildLink"
-      @on-cancel="cancelLink"
       ok-text="Link"
       cancel-text="Cancel"
     >
-      <Divider orientation="left">Acitivity link</Divider>
+      <div slot="footer">
+        <div style="display: inline-block; position: absolute; left: 10px">
+          <avatar-list
+            :list="collLinkUser"
+            v-if="collLinkUser.length > 1"
+          ></avatar-list>
+        </div>
+
+        <div>
+          <Button @click="cancelLink">Cancel</Button>
+          <Button type="primary" @click="buildLink">Link</Button>
+        </div>
+      </div>
+      <Divider orientation="left">Activity link</Divider>
       <div v-if="selectedActivities.length >= 2" style="margin: 0 20px">
         <div style="margin-bottom: 15px">
           <label>Type of activity relations: </label>
-          <RadioGroup v-model="protocalType" @on-change="changeProtocalType">
+          <RadioGroup v-model="protocolType" @on-change="changeProtocolType">
             <Radio label="Sequence" style="margin-left: 20px"></Radio>
             <Radio label="Branch" style="margin-left: 20px"></Radio>
             <Radio label="Merger" style="margin-left: 20px"></Radio>
@@ -224,11 +272,12 @@
           </RadioGroup>
         </div>
         <!-- sequence -->
-        <div v-if="protocalType == 'Sequence'">
+        <div v-if="protocolType == 'Sequence'">
           <template v-for="index in selectedActivities.length - 1">
             <div :key="index" style="margin-bottom: 5px">
               <span style="margin-right: 20px">
                 <label>Start activity: </label>
+
                 <Select
                   v-if="index == 1"
                   v-model="activityLinks[index - 1]"
@@ -248,6 +297,7 @@
                     >
                   </template>
                 </Select>
+
                 <Select
                   v-else
                   v-model="activityLinks[index - 1]"
@@ -292,7 +342,7 @@
           </template>
         </div>
         <!-- branch -->
-        <div v-else-if="protocalType == 'Branch'" style="display: flex">
+        <div v-else-if="protocolType == 'Branch'" style="display: flex">
           <div style="width: 275px">
             <label>Start activity: </label>
             <Select
@@ -303,15 +353,15 @@
               clearable
               @on-clear="activitySelectClear(0)"
             >
-              <template v-for="item in otherNodes"
-                ><Option
+              <template v-for="item in otherNodes">
+                <Option
                   :value="item.aid"
                   :key="item.id"
                   :class="item.aid"
                   :disabled="item.selected != undefined && item.selected"
-                  >{{ item.name }}</Option
-                ></template
-              >
+                  >{{ item.name }}
+                </Option>
+              </template>
             </Select>
           </div>
           <div style="width: 360px">
@@ -333,8 +383,8 @@
                       :key="item.id"
                       :class="item.aid"
                       :disabled="item.selected != undefined && item.selected"
-                      >{{ item.name }}</Option
-                    >
+                      >{{ item.name }}
+                    </Option>
                   </template>
                 </Select>
               </div>
@@ -342,7 +392,7 @@
           </div>
         </div>
         <!-- merger -->
-        <div v-else-if="protocalType == 'Merger'" style="display: flex">
+        <div v-else-if="protocolType == 'Merger'" style="display: flex">
           <div style="width: 335px">
             <template v-for="index in selectedActivities.length - 1">
               <div :key="index" style="margin-bottom: 5px">
@@ -361,8 +411,8 @@
                       :key="item.id"
                       :class="item.aid"
                       :disabled="item.selected != undefined && item.selected"
-                      >{{ item.name }}</Option
-                    >
+                      >{{ item.name }}
+                    </Option>
                   </template>
                 </Select>
                 <Icon type="md-arrow-forward" style="margin: 0 20px" />
@@ -379,20 +429,20 @@
               clearable
               @on-clear="activitySelectClear(0)"
             >
-              <template v-for="item in otherNodes"
-                ><Option
+              <template v-for="item in otherNodes">
+                <Option
                   :value="item.aid"
                   :key="item.id"
                   :class="item.aid"
                   :disabled="item.selected != undefined && item.selected"
-                  >{{ item.name }}</Option
-                ></template
-              >
+                  >{{ item.name }}
+                </Option>
+              </template>
             </Select>
           </div>
         </div>
         <!-- loop -->
-        <div v-else-if="protocalType == 'Loop'">
+        <div v-else-if="protocolType == 'Loop'">
           <template v-for="index in selectedActivities.length - 1">
             <div :key="index" style="margin-bottom: 5px">
               <span style="margin-right: 20px">
@@ -500,7 +550,7 @@
             Type of person protocol:
           </div>
           <Select
-            v-model="roleProtocol"
+            v-model="userProtocolForm.roleProtocol"
             style="width: 200px"
             placeholder="Select"
             @on-change="roleProtocolChange"
@@ -510,13 +560,14 @@
             <Option value="Constraints">Constraints</Option>
           </Select>
         </div>
-        <template v-if="roleProtocol === 'Constraints'">
+        <template v-if="userProtocolForm.roleProtocol === 'Constraints'">
           <div style="display: flex; margin-bottom: 15px">
             <div style="margin-top: 5px; width: 100px">Role:</div>
             <Select
-              v-model="linkRoles"
+              v-model="userProtocolForm.linkRoles"
               multiple
               placeholder="Which roles of participants could join the next activity?"
+              @on-change="roleChange"
             >
               <Option value="manager">Manager</Option>
               <Divider style="margin: 5px 0"></Divider>
@@ -532,46 +583,56 @@
               <Option value="ordinary-member">Ordinary-member</Option>
             </Select>
           </div>
-          <div style="margin-bottom: 15px; display: flex">
-            <div style="margin-top: 5px; width: 100px">Domains:</div>
-            <!--            <vue-tags-input-->
-            <!--              class="domain"-->
-            <!--              v-model="domain_tag"-->
-            <!--              :tags="linkDomains"-->
-            <!--              @tags-changed="(newTags) => (linkDomains = newTags)"-->
-            <!--            />-->
-            <Select v-model="selectUserDomain" multiple :max-tag-count="4" placeholder="Enter something...">
+          <div style="display: flex">
+            <div style="margin-top: 5px; width: 72px">Domains:</div>
+            <Select
+              v-model="userProtocolForm.selectUserDomain"
+              multiple
+              :max-tag-count="4"
+              placeholder="Which domains of participants could join the next activity?"
+              @on-change="domainChange"
+            >
               <Option
                 v-for="(item, index) in userDomain"
-                :value="item"
+                :value="item.name"
                 :key="index"
               ></Option>
             </Select>
           </div>
           <div style="display: flex">
-            <div style="margin-top: 5px; width: 100px">Organizations:</div>
-            <Select v-model="selectUserOrg" multiple :max-tag-count="4" placeholder="Enter something...">
+            <div style="margin-top: 5px; width: 72px">Organizations:</div>
+            <Select
+              v-model="userProtocolForm.selectUserOrg"
+              multiple
+              :max-tag-count="4"
+              placeholder="Which organizations of participants could join the next activity?"
+              @on-change="organizationChange"
+            >
               <Option
                 v-for="(item, index) in userOrganizations"
-                :value="item"
+                :value="item.name"
                 :key="index"
               ></Option>
             </Select>
           </div>
         </template>
       </div>
+
       <Divider orientation="left">Resource link</Divider>
       <div style="margin: 0 20px">
         <div style="display: flex; margin-bottom: 15px">
           <div style="width: 150px">Update automatically:</div>
-          <i-switch v-model="autoUpdate" />
+          <i-switch
+            v-model="resProtocolForm.autoUpdate"
+            @on-change="autoUpdateChange"
+          />
         </div>
         <div style="display: flex; margin-bottom: 15px">
           <div style="margin-top: 5px; width: 150px">
             Type of resource protocol:
           </div>
           <Select
-            v-model="resProtocol"
+            v-model="resProtocolForm.resProtocol"
             style="width: 200px"
             placeholder="Select"
             @on-change="resProtocolChange"
@@ -581,7 +642,7 @@
             <Option value="Constraints">Constraints</Option>
           </Select>
         </div>
-        <template v-if="resProtocol === 'Constraints'">
+        <template v-if="resProtocolForm.resProtocol === 'Constraints'">
           <div style="display: flex; margin-bottom: 15px">
             <div style="margin-top: 5px; width: 72px">Types:</div>
             <Select
@@ -590,6 +651,7 @@
               :max-tag-count="2"
               placeholder="Type of resources"
               style="width: 267px"
+              @on-change="resTypeChange"
             >
               <Option value="data">Data</Option>
               <Option value="paper">Papers</Option>
@@ -607,7 +669,7 @@
               class="res-protocol"
               v-model="formats_tag"
               :tags="resProtocolForm.formats"
-              @tags-changed="(newTags) => (resProtocolForm.formats = newTags)"
+              @tags-changed="formatChange"
             />
           </div>
           <div style="display: flex; margin-bottom: 15px">
@@ -616,7 +678,7 @@
               class="res-protocol"
               v-model="scales_tag"
               :tags="resProtocolForm.scales"
-              @tags-changed="(newTags) => (resProtocolForm.scales = newTags)"
+              @tags-changed="scaleChange"
             />
             <div style="margin-top: 5px; margin-left: 50px; width: 72px">
               References:
@@ -625,9 +687,7 @@
               class="res-protocol"
               v-model="references_tag"
               :tags="resProtocolForm.references"
-              @tags-changed="
-                (newTags) => (resProtocolForm.references = newTags)
-              "
+              @tags-changed="referenceChange"
             />
           </div>
           <div style="display: flex; margin-bottom: 15px">
@@ -636,7 +696,7 @@
               class="res-protocol"
               v-model="units_tag"
               :tags="resProtocolForm.units"
-              @tags-changed="(newTags) => (resProtocolForm.units = newTags)"
+              @tags-changed="unitChange"
             />
             <div style="margin-top: 5px; margin-left: 50px; width: 72px">
               Concepts:
@@ -645,7 +705,7 @@
               class="res-protocol"
               v-model="concepts_tag"
               :tags="resProtocolForm.concepts"
-              @tags-changed="(newTags) => (resProtocolForm.concepts = newTags)"
+              @tags-changed="conceptChange"
             />
           </div>
         </template>
@@ -657,61 +717,60 @@
     ></login-modal>
   </Row>
 </template>
+
+
 <script>
 // import "driver.js/dist/driver.min.css";
 import echarts from "echarts";
 import VueTagsInput from "@johmun/vue-tags-input";
 import loginModal from "../../../user/userState/loginModal.vue";
+import * as socketApi from "../../../../api/socket";
+import avatarList from "../../../common/AvatarList";
+
+import { sendSock } from "../../../../api/socket";
+import { del } from "../../../../axios";
 // import Driver from "driver.js";
 export default {
-  components: { VueTagsInput, loginModal },
+  components: { VueTagsInput, loginModal, avatarList },
   props: ["activityInfo", "childActivities", "userInfo", "projectInfo"],
   data() {
     return {
-      // driver
-      // driver: new Driver(),
-      // user
-      // userInfo: JSON.parse(sessionStorage.getItem("userInfo")),
       userRole: "visitor",
-      //userTag
-      selectUserDomain: [],
-      selectUserOrg: [],
       //button
       linkBtn: false,
       removeLinkBtn: false,
       nodePositionBtn: false,
       //link
       // relation
-      protocalType: "Sequence",
+      protocolType: "Sequence",
       linkStep: 0,
       otherNodes: [],
+      //连接节点的顺序
       activityLinks: [],
-      // linkRelations: [
-      //   {
-      //     start: "",
-      //     end: "",
-      //   },
-      // ],
-      // relationCount: 1,
-      // relationIndex: 0,
       linkBuildModal: false,
+      beginNode: {},
+      endNode: {},
       //恢复登录的模态框
       tempLoginModal: false,
 
-      roleProtocol: "None",
-      linkRoles: [],
-      domain_tag: "",
-      linkDomains: [],
+      userDomain: [],
+      userOrganizations: [],
+      userProtocolForm: {
+        roleProtocol: "None",
+        linkRoles: [],
+        selectUserDomain: [],
+        selectUserOrg: [],
+      },
+
       // resource
-      resProtocol: "None",
-      autoUpdate: false,
-      types_tag: "",
       formats_tag: "",
       scales_tag: "",
       references_tag: "",
       units_tag: "",
       concepts_tag: "",
       resProtocolForm: {
+        resProtocol: "None",
+        autoUpdate: false,
         types: [],
         formats: [],
         scales: [],
@@ -719,6 +778,7 @@ export default {
         units: [],
         concepts: [],
       },
+
       // 添加/编辑step
       stepInfo: {
         aid: "",
@@ -726,6 +786,7 @@ export default {
         description: "",
         purpose: "",
       },
+
       stepInfoRule: {
         name: [
           { required: true, message: "Please enter name...", trigger: "blur" },
@@ -761,10 +822,28 @@ export default {
       // activity 结构信息
       procedureDrag: true,
       nodeData: [],
-      userDomain: [],
-      userOrganizations: [],
+
       resTypes: [],
       resSuffixes: [],
+      socketId: "",
+      restriction: {},
+
+      // 是否有正在协同的内容
+      collaborating: false,
+      /*
+        正在协同 link 的数组, id 由所选活动的aid构成
+        linkId, activityLinks, otherNodes, linkRestriction
+         */
+      collaboratingInfoList: [],
+      //协同 Link 的 id 数组，用于判断是否相同[[aid1, .....], [aid2,.....], [] ,[] ]
+      collaboratingId: [],
+      collaIndex: -1,
+      // 正在进行 link 的活动
+      linkingId: "",
+      //processActivity 页面的成员
+      participants: [],
+      //正在 link 页面的成员
+      collLinkUser: [],
     };
   },
   created() {
@@ -776,13 +855,491 @@ export default {
     this.btnEnable();
     this.roleIdentity();
   },
-  beforeRouteLeave(next) {
-    next();
+  watch: {
+    activityInfo: {
+      immediate: true,
+      handler() {
+        this.socketId = `OperationServer/process${this.projectInfo.aid}/${this.activityInfo.aid}`;
+      },
+    },
+    userProtocolForm: {
+      immediate: true,
+      deep: true,
+      handler() {
+        this.restriction = {
+          userProtocol: this.userProtocolForm,
+          resProtocol: this.resProtocolForm,
+        };
+      },
+    },
+    resProtocolForm: {
+      immediate: true,
+      deep: true,
+      handler() {
+        this.restriction = {
+          userProtocol: this.userProtocolForm,
+          resProtocol: this.resProtocolForm,
+        };
+      },
+    },
+    collaboratingInfoList: {
+      deep: true,
+      handler() {
+        let linkIdArray = this.collaboratingInfoList.map((item) => {
+          return item.linkId;
+        });
+        //[[aid1, aid2, aid3], [aid4, aid5, aid6], []]
+        this.collaboratingId = linkIdArray.map((item) => {
+          return item.split(",");
+        });
+        if (this.collaboratingInfoList.length > 0) {
+          this.collaborating = true;
+        }
+      },
+    },
+    linkBuildModal() {
+      if (this.linkBuildModal) {
+        this.linkingId = this.selectedActivities
+          .map((item) => {
+            return item.aid;
+          })
+          .toString();
+        return;
+      }
+      let content = {
+        behavior: "exitCollLink",
+        linkingId: this.linkingId,
+        userId: this.userInfo.userId,
+      };
+      this.sendLinkSock(content);
+      //去除当前页面 collaborationInfoList 中的内容
+      this.computeCollIndex(this.linkingId);
+      if (this.collaIndex == -1) {
+        return;
+      }
+      this.collaboratingInfoList[this.collaIndex].collLinkUser =
+        this.collaboratingInfoList[this.collaIndex].collLinkUser.filter(
+          (item) => item.userId != tempUserId
+        );
+      if (
+        this.collaboratingInfoList[this.collaIndex].collLinkUser.length == 0
+      ) {
+        this.collaboratingInfoList.splice(this.collaIndex, 1);
+      }
+      this.initLinkForm();
+    },
   },
-  beforeDestroy: function () {},
+
+  beforeDestroy() {
+    if (socketApi.getSocketInfo(this.socketId).linked) {
+      socketApi.close(this.socketId);
+    }
+  },
   methods: {
+    computeCollIndex(collLinkId) {
+      let collLinkIdArr = collLinkId.split(",");
+      for (let i = 0; i < this.collaboratingId.length; i++) {
+        if (
+          collLinkIdArr.every((item) => this.collaboratingId[i].includes(item))
+        ) {
+          this.collaIndex = i;
+          return;
+        }
+      }
+      this.collaIndex = -1;
+    },
+    //定制化开发内容
+    sendLinkSock(content) {
+      //为每个正在协同的 link 活动添加 id
+      let sockMsg = {
+        sender: this.userInfo.userId,
+        senderName: this.userInfo.name,
+        type: "general",
+        content: content,
+      };
+      socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+    },
+    socketOnMessage: function (messageJson) {
+      let that = this;
+      let content = messageJson.content;
+      let type = messageJson.type;
+      let senderName = messageJson.senderName;
+      if (type == "general") {
+        let behavior = content.behavior;
+        if (behavior == "inActivities") {
+          this.$Notice.info({
+            title: `${senderName}  join the page of pathway.`,
+          });
+          //如果有人正在进行活动连接，则将内容发送过去
+          if (this.linkBuildModal) {
+            let senderId = messageJson.sender;
+            let initLinkInfo = {
+              behavior: "inLinkActivitiesInfo",
+              linkingId: this.linkingId,
+              activityLinks: this.activityLinks,
+              otherNodes: this.otherNodes,
+              selectActivities: this.selectedActivities,
+              linkRestriction: this.restriction,
+              collLinkUser: this.collLinkUser,
+            };
+            let sockMsg = {
+              sender: this.userInfo.userId,
+              senderName: this.userInfo.name,
+              type: "general",
+              receivers: [senderId],
+              content: initLinkInfo,
+            };
+            socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
+          }
+        } else if (behavior == "inLinkActivitiesInfo") {
+          let tempLinkId = content.linkingId;
+          delete content.linkingId;
+          delete content.behavior;
+          delete content.receivers;
+          content["linkId"] = tempLinkId;
+
+          this.computeCollIndex(tempLinkId);
+          if (this.collaIndex == -1) {
+            this.collaboratingInfoList.push(content);
+            return;
+          }
+          this.collaboratingInfoList.splice(this.collaIndex, 1, content);
+        } else if (behavior == "inLink") {
+          //将接收到的 inLink 请求入库
+          this.collaboratingInfoList.push(content.linkInfo);
+        } else if (behavior == "exitCollLink") {
+          let tempUserId = content.userId;
+          if (this.linkingId == content.linkingId) {
+            //todo: 测试是否正确
+            this.collLinkUser = this.collLinkUser.filter(
+              (item) => item.userId != tempUserId
+            );
+          } else {
+            this.computeCollIndex(content.linkingId);
+            if (this.collaIndex == -1) {
+              return;
+            }
+            this.collaboratingInfoList[this.collaIndex].collLinkUser =
+              this.collaboratingInfoList[this.collaIndex].collLinkUser.filter(
+                (item) => item.userId != tempUserId
+              );
+            if (
+              this.collaboratingInfoList[this.collaIndex].collLinkUser.length ==
+              0
+            ) {
+              this.collaboratingInfoList.splice(this.collaIndex, 1);
+            }
+          }
+        } else if (behavior == "joinCollLink") {
+          //加入协同
+          let tempCollLinker = content.collLinkUser;
+          if (this.linkingId == content.linkingId) {
+            this.collLinkUser = tempCollLinker;
+          } else {
+            this.computeCollIndex(content.linkingId);
+            if (this.collaIndex == -1) {
+              return;
+            }
+            this.collaboratingInfoList[this.collaIndex].collLinkUser =
+              tempCollLinker;
+          }
+        } else if (behavior == "bulk") {
+          if (this.linkingId == content.linkingId) {
+            this.processUpdate();
+            // this.newLinkStore(this.beginNode.aid, this.endNode.aid, content.protocolId);
+            //...
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //...
+            this.linkBuildModal = false;
+          } else {
+            this.computeCollIndex(content.linkingId);
+            if (this.collaIndex == -1) {
+              return;
+            }
+            //删除等待队列
+            this.collaboratingInfoList.splice(this.collaIndex, 1);
+          }
+        } else if (behavior == "setLink") {
+          let param = content.param;
+          switch (param) {
+            case "protocolType":
+              let tempType = content.protocolType;
+              let collLinkId = content.linkingId;
+              let tempSel = content.selectedActivities;
+              //是正在进行协同的
+              if (this.linkingId == collLinkId) {
+                this.protocolType = tempType;
+                this.otherNodes = JSON.parse(
+                  JSON.stringify(this.selectedActivities)
+                );
+                this.activityLinks = this.selectedActivities.map((item) => {
+                  return 0;
+                });
+              } else {
+                //协同等待
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[this.collaIndex].protocolType =
+                  tempType;
+                this.collaboratingInfoList[this.collaIndex].selectedActivities =
+                  tempSel;
+                this.collaboratingInfoList[this.collaIndex].otherNodes =
+                  JSON.parse(JSON.stringify(tempSel));
+                this.activityLinks = tempSel.map((item) => {
+                  return 0;
+                });
+              }
+              break;
+            case "activityLinks":
+              let tempLinks = content.activityLinks;
+              let tempOtherNodes = content.otherNodes;
+              if (this.linkingId == content.linkingId) {
+                this.activityLinks = tempLinks;
+                this.otherNodes = tempOtherNodes;
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[this.collaIndex].activityLinks =
+                  tempLinks;
+                this.collaboratingInfoList[this.collaIndex].otherNodes =
+                  tempOtherNodes;
+              }
+              break;
+            case "roleProtocol":
+              let tempRole = content.roleProtocol;
+              if (this.linkingId == content.linkingId) {
+                if (tempRole == "Constraints") {
+                  this.userDomain = content.userDomain;
+                  this.userOrganizations = this.userOrganizations;
+                }
+                this.$set(this.userProtocolForm, "roleProtocol", tempRole);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].userProtocolForm.roleProtocol = tempRole;
+                if (tempRole == "Constraints") {
+                  this.collaboratingInfoList[this.collaIndex].userDomains =
+                    content.userDomain;
+                  this.collaboratingInfoList[
+                    this.collaIndex
+                  ].userOrganizations = content.userOrganizations;
+                }
+              }
+              break;
+            case "userRole":
+              let tempRoles = content.userRole;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.userProtocolForm, "linkRoles", tempRoles);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].userProtocolForm.linkRoles = tempRoles;
+              }
+              break;
+            case "userDomain":
+              let tempSelectDomain = content.selectUserDomain;
+              if (this.linkingId == content.linkingId) {
+                this.$set(
+                  this.userProtocolForm,
+                  "selectUserDomain",
+                  tempSelectDomain
+                );
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].userProtocolForm.selectUserDomain = tempSelectDomain;
+              }
+              break;
+            case "userOrganization":
+              let tempSelectOrg = content.userSelectOrganization;
+              if (this.linkingId == content.linkingId) {
+                this.$set(
+                  this.userProtocolForm,
+                  "selectUserOrg",
+                  tempSelectOrg
+                );
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].userProtocolForm.selectUserOrg = tempOrg;
+              }
+              break;
+            case "autoUpdate":
+              let tempAuto = content.autoUpdate;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "autoUpdate", tempAuto);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.autoUpdate = tempAuto;
+              }
+              break;
+            case "resProtocol":
+              let tempProtocol = content.resProtocol;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "resProtocol", tempProtocol);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.resProtocol = tempProtocol;
+              }
+              break;
+            case "resType":
+              let tempTypes = content.resType;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "types", tempTypes);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.types = tempTypes;
+              }
+              break;
+            case "resFormat":
+              let tempFormat = content.resFormat;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "formats", tempFormat);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.formats = tempFormat;
+              }
+              break;
+            case "resScale":
+              let tempScale = content.resScale;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "scales", tempScale);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.scales = tempScale;
+              }
+              break;
+            case "resReference":
+              let tempReference = content.resReference;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "references", tempReference);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.references = tempReference;
+              }
+              break;
+            case "resUnit":
+              let tempUnit = content.resUnit;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "units", tempUnit);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.units = tempUnit;
+              }
+              break;
+            case "resConcept":
+              let tempConcept = content.resConcept;
+              if (this.linkingId == content.linkingId) {
+                this.$set(this.resProtocolForm, "concepts", tempConcept);
+              } else {
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                ].resProtocolForm.concepts = tempConcept;
+              }
+              break;
+          }
+        }
+      } else if (type == "members") {
+        this.participants = messageJson.participants;
+      }
+    },
+    joinLinkCollaboration(index) {
+      let collLink = this.collaboratingInfoList[index];
+      this.selectedActivities = collLink.selectActivities;
+      this.linkingId = this.selectedActivities
+        .map((item) => {
+          return item.aid;
+        })
+        .toString();
+      this.otherNodes = collLink.otherNodes;
+      this.activityLinks = collLink.activityLinks;
+      this.resProtocolForm = collLink.linkRestriction.resProtocol;
+      this.userProtocolForm = collLink.linkRestriction.userProtocol;
+      let joiner = this.participants.filter(
+        (item) => item.userId == this.userInfo.userId
+      );
+      this.collLinkUser = collLink.collLinkUser;
+      this.collLinkUser.push(joiner[0]);
+      let content = {
+        behavior: "joinCollLink",
+        linkingId: this.collaboratingInfoList[index].linkId,
+        collLinkUser: this.collLinkUser,
+      };
+      this.sendLinkSock(content);
+      this.linkBuildModal = true;
+    },
     init() {
-      window.addEventListener("resize", this.updateStepchart);
+      window.addEventListener("resize", this.updateStepChart);
     },
     roleIdentity() {
       this.userRole = this.userRoleApi.roleIdentify(
@@ -800,7 +1357,7 @@ export default {
     changeLoginModal(status) {
       this.tempLoginModal = status;
     },
-    updateStepchart() {
+    updateStepChart() {
       // 重新渲染
       this.stepChart.dispose();
       this.stepChart = null;
@@ -845,7 +1402,7 @@ export default {
         this.activityInfo.pathway = [];
         for (var i = 0; i < this.childActivities.length; i++) {
           // catagory of node
-          var nodeCategory = this.getStepCategroy(
+          var nodeCategory = this.getStepCategory(
             this.childActivities[i].purpose
           );
           // create step node
@@ -872,7 +1429,7 @@ export default {
           i++
         ) {
           // catagory of node
-          var nodeCategory = this.getStepCategroy(
+          var nodeCategory = this.getStepCategory(
             this.childActivities[i].purpose
           );
           // create step node
@@ -1116,7 +1673,7 @@ export default {
       }
       return purpose;
     },
-    getStepCategroy(purpose) {
+    getStepCategory(purpose) {
       let category;
       if (purpose == "Context definition & resource collection") {
         category = 0;
@@ -1234,7 +1791,7 @@ export default {
             this.$store.commit("userLogout");
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
-            this.updateStepchart();
+            this.updateStepChart();
             this.selectedActivities = [];
             // this.$Notice.info({
             //   desc: "Reshape pathway successfully!",
@@ -1298,11 +1855,46 @@ export default {
         });
       } else if (this.linkStep == 1) {
         if (this.selectedActivities.length >= 2) {
-          // operation
-          this.changeProtocalType();
-          this.linkBuildModal = true;
-          // record and end
-          this.linkStep = 0;
+          //正在进行连接的 id
+          this.linkingId = this.selectedActivities
+            .map((item) => {
+              return item.aid;
+            })
+            .toString();
+          let tempLinkId = this.linkingId;
+          this.computeCollIndex(tempLinkId);
+          if (this.collaIndex == -1) {
+            this.changeProtocolType();
+            this.linkBuildModal = true;
+            // record and end
+            this.linkStep = 0;
+
+            let content = {
+              behavior: "inLink",
+              linkInfo: {
+                linkId: tempLinkId,
+                activityLinks: this.activityLinks,
+                selectActivities: this.selectedActivities,
+                otherNodes: this.otherNodes,
+                linkRestriction: this.restriction,
+                userDomains: this.userDomain,
+                userOrganizations: this.userOrganizations,
+                collLinkUser: this.participants.filter(
+                  (item) => item.userId == this.userInfo.userId
+                ),
+              },
+            };
+            this.sendLinkSock(content);
+          } else {
+            //此几个选中的活动正在进行连接
+            let linkingInfo = this.collaboratingInfoList[this.collaIndex];
+            this.selectedActivities = linkingInfo.selectActivities;
+            this.activityLinks = linkingInfo.activityLinks;
+            this.otherNodes = linkingInfo.otherNodes;
+            this.userProtocolForm = linkingInfo.linkRestriction.userProtocol;
+            this.resProtocolForm = linkingInfo.linkRestriction.resProtocolForm;
+            this.collLinkUser = linkingInfo.collLinkUser;
+          }
         } else {
           this.$Notice.info({
             desc: "Please select two nodes and restart to link activities!",
@@ -1310,23 +1902,68 @@ export default {
         }
       }
     },
-    changeProtocalType() {
+    initLinkForm() {
       this.otherNodes = [];
-      // this.otherNodes = Object.assign([], this.selectedActivities);
       this.otherNodes = JSON.parse(JSON.stringify(this.selectedActivities));
 
       this.activityLinks = [];
       for (let i = 0; i < this.selectedActivities.length; i++) {
         this.activityLinks.push(0);
       }
+      this.userDomain = [];
+      this.userOrganizations = [];
+      this.userProtocolForm = {
+        roleProtocol: "None",
+        linkRoles: [],
+        selectUserDomain: [],
+        selectUserOrg: [],
+      };
+      this.resProtocolForm = {
+        resProtocol: "None",
+        autoUpdate: false,
+        types: [],
+        formats: [],
+        scales: [],
+        references: [],
+        units: [],
+        concepts: [],
+      };
     },
+    changeProtocolType() {
+      this.otherNodes = [];
+      this.otherNodes = JSON.parse(JSON.stringify(this.selectedActivities));
+
+      this.activityLinks = [];
+      for (let i = 0; i < this.selectedActivities.length; i++) {
+        this.activityLinks.push(0);
+      }
+      let content = {
+        behavior: "setLink",
+        param: "protocolType",
+        linkingId: this.linkingId,
+        protocolType: this.protocolType,
+        selectedActivities: this.selectedActivities,
+      };
+      this.sendLinkSock(content);
+    },
+    //活动选择
     activitySelect(index) {
+      //otherNodes 添加selected
       let slctActivityId = this.activityLinks[index];
       for (let i = 0; i < this.otherNodes.length; i++) {
         if (this.otherNodes[i].aid === slctActivityId) {
           this.otherNodes[i]["selected"] = true;
         }
       }
+
+      let content = {
+        behavior: "setLink",
+        param: "activityLinks",
+        linkingId: this.linkingId,
+        activityLinks: this.activityLinks,
+        otherNodes: this.otherNodes,
+      };
+      this.sendLinkSock(content);
     },
     activitySelectClear(index) {
       let slctActivityId = this.activityLinks[index];
@@ -1335,19 +1972,28 @@ export default {
           this.otherNodes[i]["selected"] = false;
         }
       }
+      let content = {
+        behavior: "setLink",
+        param: "activityLinks",
+        linkingId: this.linkingId,
+        activityLinks: this.activityLinks,
+        otherNodes: this.otherNodes,
+      };
+      this.sendLinkSock(content);
     },
     cancelLink() {
       // 重新渲染
-      this.updateStepchart();
+      this.updateStepChart();
       // clear
       this.selectedActivities = [];
       this.clearProtocolSetting();
       this.activityLinks = [];
+      this.linkBuildModal = false;
     },
     processUpdate() {
       let relations = [];
       // identify the relations
-      switch (this.protocalType) {
+      switch (this.protocolType) {
         case "Sequence": {
           for (let i = 0; i < this.activityLinks.length - 1; i++) {
             let relation = {
@@ -1442,13 +2088,13 @@ export default {
       //// normalize protocol
       let relation = {
         graphId: this.activityInfo.aid,
-        type: this.protocalType,
+        type: this.protocolType,
         nodes: this.activityLinks,
       };
 
       let restriction = {
-        resProtocol: this.resProtocol,
-        autoUpdate: this.autoUpdate,
+        resProtocol: this.resProtocolForm.resProtocol,
+        autoUpdate: this.resProtocolForm.autoUpdate,
         types: this.resProtocolForm.types,
         formats: this.filterTags(this.resProtocolForm.formats),
         concepts: this.filterTags(this.resProtocolForm.concepts),
@@ -1456,18 +2102,17 @@ export default {
         references: this.filterTags(this.resProtocolForm.references),
         units: this.filterTags(this.resProtocolForm.units),
 
-        roleProtocol: this.roleProtocol,
-        roles: this.linkRoles,
-        domains: this.selectUserDomain,
-        organizations: this.selectUserOrg,
+        roleProtocol: this.userProtocolForm.roleProtocol,
+        roles: this.userProtocolForm.linkRoles,
+        domains: this.userProtocolForm.selectUserDomain,
+        organizations: this.userProtocolForm.selectUserOrg,
       };
-
       let protocolForm = {
         relation: relation,
         restriction: restriction,
       };
 
-      //// save protocol
+      // save protocol
       this.axios
         .post("/GeoProblemSolving/activityDriven", protocolForm)
         .then((res) => {
@@ -1489,7 +2134,17 @@ export default {
                 protocolId
               );
             }
-            // this.newLinkStore(this.beginNode.aid, this.endNode.aid, protocolId);
+
+            // clear
+            this.selectedActivities = [];
+            let content = {
+              behavior: "bulk",
+              linkingId: this.linkingId,
+              protocolId: protocolId,
+            };
+            this.sendLinkSock(content);
+
+            this.linkBuildModal = false;
           } else {
             this.$Message.error("Fail to link activities.");
             console.log(res.data.msg);
@@ -1500,20 +2155,21 @@ export default {
         });
     },
     clearProtocolSetting() {
-      this.roleProtocol = "";
-      this.linkRoles = [];
-      this.domain_tag = "";
-      this.linkDomains = [];
+      this.userProtocolForm = {
+        roleProtocol: "None",
+        linkRoles: [],
+        selectUserDomain: [],
+        selectUserOrg: [],
+      };
 
-      this.resProtocol = "";
-      this.autoUpdate = false;
-      this.types_tag = "";
       this.formats_tag = "";
       this.scales_tag = "";
       this.references_tag = "";
       this.units_tag = "";
       this.concepts_tag = "";
       this.resProtocolForm = {
+        resProtocol: "",
+        autoUpdate: false,
         types: [],
         formats: [],
         scales: [],
@@ -1529,69 +2185,7 @@ export default {
       }
       return newtags;
     },
-    // newLinkStore(begin, end, pid) {
-    //   let updateurl = "";
-    //   if (this.activityInfo.level == 0) {
-    //     updateurl =
-    //       "/GeoProblemSolving/project/link/" +
-    //       begin +
-    //       "/" +
-    //       end +
-    //       "?pid=" +
-    //       pid;
-    //   } else if (this.activityInfo.level == 1) {
-    //     updateurl =
-    //       "/GeoProblemSolving/subproject/link/" +
-    //       begin +
-    //       "/" +
-    //       end +
-    //       "?pid=" +
-    //       pid;
-    //   } else if (this.activityInfo.level > 1) {
-    //     updateurl =
-    //       "/GeoProblemSolving/activity/link/" +
-    //       begin +
-    //       "/" +
-    //       end +
-    //       "?pid=" +
-    //       pid;
-    //   } else {
-    //     return;
-    //   }
-    //   let data = {
-    //     aid: this.activityInfo.aid,
-    //     pathway: this.processStructure,
-    //   };
 
-    //   this.axios
-    //     .post(updateurl, data)
-    //     .then((res) => {
-    //       if (res.data == "Offline") {
-    //         this.$store.commit("userLogout");
-    //         this.tempLoginModal = true;
-    //       } else if (res.data.code == 0) {
-    //         this.operationApi.processRecord(
-    //           this.activityInfo.aid,
-    //           "",
-    //           "link",
-    //           this.userInfo.userId,
-    //           begin,
-    //           end,
-    //           pid
-    //         );
-
-    //         this.$Notice.info({
-    //           desc: "Link activities successfully!",
-    //         });
-    //       } else {
-    //         this.$Message.error("Fail to link activities.");
-    //         console.log(res.data.msg);
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       throw err;
-    //     });
-    // },
     // seperate
     removeLink() {
       let beginNode = this.selectedActivities[0];
@@ -1619,7 +2213,7 @@ export default {
       }
 
       // 重新渲染
-      this.updateStepchart();
+      this.updateStepChart();
       // 更新pathway
       this.breakLink(beginNode.aid, endNode.aid);
       // this.delLinkStore(beginNode.aid, endNode.aid);
@@ -1628,7 +2222,9 @@ export default {
     },
     breakLink(beginNode, endNode) {
       this.axios
-        .post(`/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${beginNode}/${endNode}`)
+        .post(
+          `/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${beginNode}/${endNode}`
+        )
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
@@ -1646,51 +2242,6 @@ export default {
           throw err;
         });
     },
-    // delLinkStore(begin, end) {
-    //   let updateurl = "";
-    //   if (this.activityInfo.level == 0) {
-    //     updateurl = "/GeoProblemSolving/project/separate/" + begin + "/" + end;
-    //   } else if (this.activityInfo.level == 1) {
-    //     updateurl =
-    //       "/GeoProblemSolving/subproject/separate/" + begin + "/" + end;
-    //   } else if (this.activityInfo.level > 1) {
-    //     updateurl = "/GeoProblemSolving/activity/separate/" + begin + "/" + end;
-    //   } else {
-    //     return;
-    //   }
-    //   let data = {
-    //     aid: this.activityInfo.aid,
-    //     pathway: this.processStructure,
-    //   };
-
-    //   this.axios
-    //     .post(updateurl, data)
-    //     .then((res) => {
-    //       if (res.data == "Offline") {
-    //         this.$store.commit("userLogout");
-    //         this.tempLoginModal = true;
-    //       } else if (res.data.code == 0) {
-    //         this.operationApi.processRecord(
-    //           this.activityInfo.aid,
-    //           "",
-    //           "break",
-    //           this.userInfo.userId,
-    //           begin,
-    //           end,
-    //           ""
-    //         );
-    //         this.$Notice.info({
-    //           desc: "Seperate activities successfully!",
-    //         });
-    //       } else {
-    //         this.$Message.error("Fail to seperate activities.");
-    //         console.log(res.data.msg);
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       throw err;
-    //     });
-    // },
     gotoActivity(aid) {
       for (let i = 0; i < this.childActivities.length; i++) {
         if (this.childActivities[i].aid == aid) {
@@ -1722,8 +2273,23 @@ export default {
               });
             } else {
               let data = res.data.data;
-              this.userDomain = data.domains;
-              this.userOrganizations = data.organizations;
+
+              this.userDomain = data.domains.map((item) => {
+                return { name: item };
+              });
+              this.userOrganizations = data.organizations.map((item) => {
+                return { name: item };
+              });
+
+              let content = {
+                behavior: "setLink",
+                param: "roleProtocol",
+                linkingId: this.linkingId,
+                userDomain: this.userDomain,
+                userOrganization: this.userOrganizations,
+                roleProtocol: this.userProtocolForm.roleProtocol,
+              };
+              this.sendLinkSock(content);
             }
           })
           .catch((e) => {
@@ -1731,9 +2297,61 @@ export default {
               desc: "ERROR!",
             });
           });
+      } else {
+        let content = {
+          behavior: "setLink",
+          param: "roleProtocol",
+          linkingId: this.linkingId,
+          roleProtocol: this.userProtocolForm.roleProtocol,
+        };
+        this.sendLinkSock(content);
       }
     },
+    roleChange() {
+      let content = {
+        behavior: "setLink",
+        param: "userRole",
+        linkingId: this.linkingId,
+        userRole: this.userProtocolForm.linkRoles,
+      };
+      this.sendLinkSock(content);
+    },
+    domainChange() {
+      let content = {
+        behavior: "setLink",
+        param: "userDomain",
+        linkingId: this.linkingId,
+        selectUserDomain: this.userProtocolForm.selectUserDomain,
+      };
+      this.sendLinkSock(content);
+    },
+    organizationChange() {
+      let content = {
+        behavior: "setLink",
+        param: "userOrganization",
+        linkingId: this.linkingId,
+        userSelectOrganization: this.userProtocolForm.selectUserOrg,
+      };
+      this.sendLinkSock(content);
+    },
+    autoUpdateChange() {
+      let content = {
+        behavior: "setLink",
+        param: "autoUpdate",
+        linkingId: this.linkingId,
+        autoUpdate: this.resProtocolForm.autoUpdate,
+      };
+      this.sendLinkSock(content);
+    },
     resProtocolChange(val) {
+      let content = {
+        behavior: "setLink",
+        param: "resProtocol",
+        linkingId: this.linkingId,
+        resProtocol: this.resProtocolForm.resProtocol,
+      };
+      this.sendLinkSock(content);
+
       let aidList = [];
       this.selectedActivities.forEach((activity) => {
         aidList.push(activity.aid);
@@ -1761,6 +2379,66 @@ export default {
             });
           });
       }
+    },
+    resTypeChange() {
+      let content = {
+        behavior: "setLink",
+        param: "resType",
+        linkingId: this.linkingId,
+        resType: this.resProtocolForm.types,
+      };
+      this.sendLinkSock(content);
+    },
+    formatChange(newTag) {
+      this.resProtocolForm.formats = newTag;
+      console.log(newTag);
+      let content = {
+        behavior: "setLink",
+        param: "resFormat",
+        linkingId: this.linkingId,
+        resFormat: this.resProtocolForm.formats,
+      };
+      this.sendLinkSock(content);
+    },
+    scaleChange(newTag) {
+      this.resProtocolForm.scales = newTag;
+      let content = {
+        behavior: "setLink",
+        param: "resScale",
+        linkingId: this.linkingId,
+        resScale: this.resProtocolForm.scales,
+      };
+      this.sendLinkSock(content);
+    },
+    referenceChange(newTag) {
+      this.resProtocolForm.references = newTag;
+      let content = {
+        behavior: "setLink",
+        param: "resReference",
+        linkingId: this.linkingId,
+        resReference: this.resProtocolForm.references,
+      };
+      this.sendLinkSock(content);
+    },
+    unitChange(newTag) {
+      this.resProtocolForm.units = newTag;
+      let content = {
+        behavior: "setLink",
+        param: "resUnit",
+        linkingId: this.linkingId,
+        resUnit: this.resProtocolForm.units,
+      };
+      this.sendLinkSock(content);
+    },
+    conceptChange(newTag) {
+      this.resProtocolForm.concepts = newTag;
+      let content = {
+        behavior: "setLink",
+        param: "resConcept",
+        linkingId: this.linkingId,
+        resConcept: this.resProtocolForm.concepts,
+      };
+      this.sendLinkSock(content);
     },
   },
 };

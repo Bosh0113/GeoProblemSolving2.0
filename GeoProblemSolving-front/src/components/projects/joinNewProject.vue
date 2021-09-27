@@ -1,17 +1,23 @@
 <style scoped>
+.titleJoin{
+  text-align: center;
+  margin-top: 70px;
+}
 </style>
 
 <template>
   <div>
     <Row>
       <Col span="18" offset="3" :style="{ height: contentHeight }">
+        <div class="titleJoin">
+          <h1 >Join the project</h1>
+        </div>
         <div
           style="
             display: flex;
             justify-content: center;
-            margin-top: 100px;
             height: 100%;
-            padding: 100px;
+            padding: 80px;
           "
         >
           <Form :label-width="120">
@@ -29,7 +35,7 @@
             <FormItem label="Email">
               <Input v-model="email" disabled style="width: 600px"></Input>
             </FormItem>
-            <br/>
+            
             <div
               v-if="registeredHintShow"
               style="
@@ -44,15 +50,15 @@
                 :size="30"
                 color="yellowGreen"
               />
-              <span style="font-size: 10px">
+              <span style="font-size: 10px;margin-left:10px">
                 {{ this.registeredHint }}
-                <br/>Now you need to click the
+                <br/>Now you need to enter your password and click the
                 <strong style="font-weight: bold; color: blue">Join</strong>
                 button for becoming a member of the project.
               </span>
             </div>
             <div
-              v-else
+              v-if="passwordInputShow"
               style="
                 margin-left: 120px;
                 display: flex;
@@ -65,7 +71,7 @@
                 :size="30"
                 color="red"
               />
-              <span style="font-size: 10px">
+              <span style="font-size: 10px;margin-left:10px">
                 {{ this.unregisteredHint }}
                 <br/>If you input your password here and click the
                 <strong style="font-weight: bold; color: blue"
@@ -92,7 +98,7 @@
               >
                 <span style="font-weight: bold; font-size: 1.2em">Join</span>
               </Button>
-              <Button type="default" @click="registerAndJoin()" v-else>
+              <Button type="default" @click="registerAndJoin()" v-if="passwordInputShow">
                 <span style="font-weight: bold; font-size: 1.2em"
                 >Register and join</span
                 >
@@ -140,7 +146,7 @@
       // navigation页面的
       this.getProjectInfo();
       this.headerWidth = window.innerWidth + "px";
-      this.contentHeight = window.innerHeight - 120 + "px";
+      this.contentHeight = window.innerHeight - 180 + "px";
       this.projectId = this.$route.params.id;
       this.email = this.$route.params.email;
       this.judgeMailRegister();
@@ -173,6 +179,7 @@
 
         //有登录状态,直接 T 就行，反正不管是不是被邀请这都是要输入密码的
         //判断此账户是否注册，若未注册则快速注册
+        
         if (this.$store.getters.userState) {
           this.axios
             .get("/GeoProblemSolving/user/logout")
@@ -188,6 +195,7 @@
         this.axios
           .get("/GeoProblemSolving/user/registered/" + this.email)
           .then((res) => {
+            console.log(res);
             //已被注册
             if (res.data.code == 0) {
               this.registeredHintShow = true;

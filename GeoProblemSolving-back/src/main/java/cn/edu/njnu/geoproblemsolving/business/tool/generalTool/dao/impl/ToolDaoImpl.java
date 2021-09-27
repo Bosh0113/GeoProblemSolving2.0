@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -74,5 +75,18 @@ public class ToolDaoImpl implements ToolDao {
     @Override
     public Tool saveTool(Tool tool) {
         return mongoTemplate.save(tool);
+    }
+
+    @Override
+    public List<Tool> findByFields(Query query) {
+        return mongoTemplate.find(query, Tool.class);
+    }
+
+    @Override
+    public List<Tool> findToolByIds(HashSet<String> ids) {
+        Query query = new Query();
+        Criteria criteria = new Criteria("tid").in(ids);
+        query.addCriteria(criteria);
+        return mongoTemplate.find(query, Tool.class);
     }
 }

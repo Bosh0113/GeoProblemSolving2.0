@@ -1,10 +1,16 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service;
 
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.ToolSetVo;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public interface ToolService {
@@ -28,6 +34,14 @@ public interface ToolService {
 
     Tool createTool(JSONObject tool) throws UnsupportedEncodingException;
 
+    ToolSetVo addToolInToolSet(String tid, ArrayList<String> tids);
+
+    ToolSetVo delToolInToolSet(String tid, ArrayList<String> tids);
+
+    ToolSetVo createToolSet(Tool toolSet);
+
+    List<Tool> queryTool(ArrayList<String> key, ArrayList<String> value);
+
     List<Tool> getToolByProviderService(String provider);
 
     Tool getToolByTid(String tid);
@@ -37,8 +51,12 @@ public interface ToolService {
     //将工具标记为删除
     void delToolService(String tid);
 
-    List<Tool> getToolByIds(ArrayList<String> ids);
+    List<Tool> getToolByIds(HashSet<String> ids);
 
     Object emptyProviderService(String tid);
 
+    JsonResult uploadToolImg(HttpServletRequest req) throws IOException, ServletException;
+
+
+    List<Tool> getRelevantPurposeTool(String purpose);
 }

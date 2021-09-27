@@ -3,10 +3,13 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
@@ -21,6 +24,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,13 +43,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final FolderDaoImpl folderDao;
+    private final ProjectUtil projectUtil;
+    private final ToolService toolService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.folderDao = folderDao;
+        this.projectUtil = projectUtil;
+        this.toolService = toolService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -220,6 +228,20 @@ public class ProjectServiceImpl implements ProjectService {
             if (update.getPrivacy() != null && update.getPrivacy().equals(project.getPrivacy())) {
                 updateProjectListPage = isUpdateProjectListStaticPage(aid, !project.getPrivacy().equals("Private"));
             }
+
+            //补充绑定对于 purpose 的工具
+            ActivityType activityType = update.getType();
+            String oldPurpose = project.getPurpose();
+            String purpose = update.getPurpose();
+            if ("Activity_Unit".equals(activityType) && !oldPurpose.equals(purpose)){
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for(Tool tool : relevantPurposeTool){
+                    toolSet.add(tool.getTid());
+                }
+                project.setToolList(toolSet);
+            }
+
             update.updateTo(project);
             projectRepository.save(project);
 
@@ -227,6 +249,8 @@ public class ProjectServiceImpl implements ProjectService {
             if (updateProjectListPage) {
                 staticPagesBuilder.projectListPageBuilder(findProjectsByPage(1, 18));
             }
+
+
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
@@ -500,6 +524,9 @@ public class ProjectServiceImpl implements ProjectService {
             //save
             projectRepository.save(project);
             userRepository.save(user);
+
+            //退出子活动
+            projectUtil.quitSubProject(aid, userId, 0);
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {

@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.entity;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
@@ -9,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Data
 @Document(collection = "Activities")
@@ -68,17 +71,15 @@ public class Activity implements Serializable {
     private String activeTime;
 
 
-    /**
-     * The horizontal relationships:
-     * last, next (list of aid and protocolId)
-     * protocol: definition of relationship
-     */
-    private JSONArray last;
-    private JSONArray next;
-    private String protocolId;
+//    /**
+//     * The horizontal relationships:
+//     * last, next (list of aid and protocolId)
+//     * protocol: definition of relationship
+//     */
+//    private JSONArray last;
+//    private JSONArray next;
+//    private String protocolId;
 
-    // // Temp
-    // private List<String> toolList;
-    // private List<String> toolsetList;
+    private HashSet<String> toolList;
 }
 

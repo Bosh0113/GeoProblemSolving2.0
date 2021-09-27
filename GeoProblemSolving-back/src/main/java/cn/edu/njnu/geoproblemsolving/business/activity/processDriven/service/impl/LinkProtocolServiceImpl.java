@@ -1,10 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl;
 
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.ProtocolService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityLinkProtocolRepository;
-import cn.edu.njnu.geoproblemsolving.business.collaboration.compute.util.CommonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +32,7 @@ public class LinkProtocolServiceImpl implements ProtocolService {
             return null;
         }
         ActivityLinkProtocol preProtocol = byId.get();
-        CommonUtil commonUtil = new CommonUtil();
-        String[] nullPropertyNames = commonUtil.getNullPropertyNames(protocol);
+        String[] nullPropertyNames = CommonUtil.getNullPropertyNames(protocol);
         //完成协议的更新
         BeanUtils.copyProperties(protocol, preProtocol, nullPropertyNames);
 

@@ -428,6 +428,11 @@ export default {
         "Decision making",
       ],
       toolInfoRule: {
+        backendType: [
+          {
+            required: true,
+          }
+        ],
         toolName: [
           {
             required: true,

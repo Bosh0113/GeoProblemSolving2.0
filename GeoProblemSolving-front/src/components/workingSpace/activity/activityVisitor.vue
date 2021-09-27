@@ -26,7 +26,7 @@
               <Label>Total participants:</Label>
               <span style="margin-left: 10px">{{ participants.length }}</span>
             </div>
-            <div style="margin: 10px 0">
+            <!-- <div style="margin: 10px 0">
               <Label>Total child activities:</Label>
               <span
                 v-if="activityInfo.children != undefined"
@@ -38,7 +38,7 @@
                 style="margin-left: 10px; cursor: pointer; color: #2d8cf0"
                 >0</span
               >
-            </div>
+            </div> -->
           </div>
           <div style="heigth: 50%; width: 50%; float: left">
             <div style="margin: 10px 0">

@@ -165,11 +165,9 @@
                           >{{ file.name }}</span
                           >
                           <span v-if="useFileItemSize" class="fileItemSize">{{file.fileSize | filterSizeType}}</span>
-                          <!-- <span style="width: 20%; margin-left: 20%; ">
-                            {{
-                            // file.uploadTime
-                            file.uploadTime.substring(0, 10)}}
-                          </span> -->
+                          <span v-if="useFileItemSize" style="width: 10%; margin-left: 10%">{{
+                             file.uploadTime | filterTimeStyle
+                          }}</span>
 
                           <!--                使用资源-->
                           <div style="float: right">
@@ -203,6 +201,15 @@
 
                             <!--                  管理资源-->
                             <template>
+                              <Button
+                                @click="fileMoveModalShow(file)"
+                                shape="circle"
+                                icon="md-locate"
+                                title="File move"
+                                size="small"
+                                class="fileBtnHoverBlue"
+                                type="text"
+                              ></Button>
                               <Button
                                 @click="fileEditModelShow(file)"
                                 shape="circle"
@@ -435,7 +442,41 @@
                   >
                 </div>
               </Modal>
-
+              <!--    点击文件移动-->
+              <Modal v-model="fileMoveModal" title="File Move" >
+                <Card style="height:300px;" dis-hover>
+                  <vue-scroll :ops="scrollOps" style=" height: 270px;">
+                    <Tree :data="folderTree" :render="renderStyle" style="width:400px"></Tree>
+                  </vue-scroll>
+                </Card>
+                
+                <div slot="footer">
+                  <Button type="warning" icon="md-add" style="float:left;" @click="addNewFolderModalShow()">Add new folder</Button>
+                  <Button  @click="fileMoveModalClose()">Cancel</Button>
+                  <Button type="primary" @click="fileMove()">Move</Button>
+                </div>
+              </Modal>
+              <Modal v-model="addNewFolderModal" title="New folder">
+                <Form
+                  ref="newValidate"
+                  :model="newValidate"
+                  :rules="newRuleValidate"
+                  :label-width="80"
+                  @submit.native.prevent
+                >
+                  <FormItem label="Set name" prop="setName">
+                    <Input
+                      v-model="newValidate.setName"
+                      :rows="4"
+                      placeholder="Enter the name for folder..."
+                    />
+                  </FormItem>
+                </Form>
+                <div slot="footer">
+                  <Button @click="newFolderModal = false">Cancel</Button>
+                  <Button type="success" @click="createNewFolder('newValidate')">New</Button>
+                </div>
+              </Modal>
           <!--    <Modal v-model="shareModal" width="800" title="Share Project">-->
           <!--      <Form>-->
           <!--        <FormItem>-->
@@ -469,6 +510,11 @@
     name: "resourceList",
     data() {
       return {
+        scrollOps: {
+          bar: {
+            background: "lightgrey",
+          },
+        },
         userInfo: {
           userState: false,
           name: 'visitor',
@@ -507,8 +553,14 @@
         //文件夹path,存储
         folderPath: [{uid: "0"}],
         pathStr: "",
+        //文件移动
+        folderTree: [],
+        slctFolder: {},
+        slctFile: {},
+        folderInfo: {},
         //新建文件夹Model
         newFolderModal: false,
+        addNewFolderModal: false,
         newValidate: {
           setName: ""
         },
@@ -610,6 +662,7 @@
         toUploadFiles: [],
         //选择的fileInfo内容
         fileInfoModal: false,
+        fileMoveModal: false,
         selectedFileColumns: [
           {
             title: "key",
@@ -643,7 +696,7 @@
         // } else {
         //   this.contentHeight = 675 - 120 + "px";
         // }
-        if (window.innerWidth < 800) {
+        if (window.innerWidth < 1050) {
           this.useFileItemSize = false;
         } else {
           this.useFileItemSize = true;
@@ -658,8 +711,8 @@
               this.$router.push({ name: "Login" });
             } else if (res.data.code == 0) {
               let rootRes = res.data.data;
-              console.log(rootRes);
               this.resToCurrentFolder(rootRes);
+              this.updataFolderTree(rootRes,"init");
             }
           })
           .catch()
@@ -675,6 +728,102 @@
             this.currentFolder.files.push(rootRes[i]);
           }
         }
+      },
+      updataFolderTree(rootRes,options){
+        if(options == "init"){
+          
+            let allFolder = {
+              name: "All Folder",
+              folder: true,
+              uid: '0',
+              children: [],
+              path: ['0'],
+              level: 0,
+              expand: true,
+            };
+            if(this.folderTree.length == 0){
+              this.folderTree.push(allFolder);
+            }
+            let folderTreeTemp = rootRes;
+            //递归清理其中不是文件夹的child
+            this.recursiveTree(folderTreeTemp);
+            this.folderTree[0].children = folderTreeTemp;
+          
+          
+        } else if (options == "add"){
+          //待补充
+        }
+      },
+      recursiveTree(tree){
+        for( let i = 0 ; i < tree.length ; i++ ){
+          if(tree[i].folder == false){
+            tree.splice(i,1);
+            i--;
+          } else {
+            if(tree[i].children.length > 0){
+              this.recursiveTree(tree[i].children);
+            }
+          }
+        }
+      },
+      renderStyle(h, { root, node, data }) {
+        let props = {};
+        let style = {};
+        let on = {};
+        let name = data.name;
+        if (this.slctFolder.uid !== data.uid && data.folder == true) {
+          style = {
+            border: "0px",
+          };
+          on = {
+            click: () => {
+              this.slctFolder = data;
+            },
+          };
+        } else if (data.folder == true) {
+          style = {
+            backgroundColor: "lightblue",
+            cursor: "default",
+          };
+        }
+        return h('span', {
+            style: {
+              display: 'inline-block',
+              width: '100%'
+            },
+            
+          }, [
+            h('span', [
+              h(
+                "Button",
+                {
+                  props: props,
+                  style: style,
+                  on: on,
+                  attrs: { title: name },
+                },[
+                  h('Icon', {
+                    props: {
+                      type: 'ios-folder-open'
+                    },
+                    style: {
+                      marginRight: '8px',
+                    }
+                  }),
+                  h("span",
+                    {
+                      style: {
+                        overflow: "hidden",
+                        maxWidth: "120px",
+                        textOverflow: "ellipsis",
+                        fontSize: "15px",
+                      },
+                    },
+                    name
+                  )
+                ])
+            ]),
+        ]); 
       },
       handleCheckAll() {
         if (this.indeterminate) {
@@ -729,7 +878,7 @@
           // },
           {
             key: "Upload Time",
-            value: file.uploadTime,
+            value: this.$options.filters['filterTimeStyle'](file.uploadTime),
           },
           // {
           //   key: "Path",
@@ -761,7 +910,6 @@
           }
         }
         this.pathStr = pathStrTemp;
-        console.log("reversePathToStr: " + this.pathStr)
       },
       changeFolder: function (folder, operationType) {
         let delCount = this.folderStack.length - this.switchIndex - 1;
@@ -785,7 +933,6 @@
               this.resToCurrentFolder(folderInfo);
               if (operationType == "enter") {
                 this.folderStack.push({uid: folder.uid, name: folder.name});
-                console.log(this.currentFolder)
               } else if (operationType == "back") {
                 this.folderStack.pop();
               } else if (operationType == "switch") {
@@ -841,7 +988,6 @@
               foldersId = ["0"];
             }
             this.reversePathToStr(foldersId);
-            console.log(this.pathStr)
             this.axios
               .post("/GeoProblemSolving/res/folder/" + this.pathStr, folderObj)
               .then(res => {
@@ -850,6 +996,7 @@
                   this.$router.push({ name: "Login" });
                 } else if (res.data.code == 0) {
                   this.currentFolder.folders.push(res.data.data);
+                  // this.updataFolderTree(res.data.data,this.pathStr,"add");
                   this.newFolderModal = false;
                 } else {
                   this.$Message.warning("New folder fail.");
@@ -882,6 +1029,7 @@
                     break;
                   }
                 }
+                // this.updataFolderTree(folder,temp.toString(),"del");
               } else {
                 this.$Message.warning("Delete folder fail.");
               }
@@ -899,7 +1047,11 @@
       renameFolder: function (name) {
         this.$refs[name].validate(valid => {
           if (valid) {
-            this.reversePathToStr(this.folderPath);
+            let foldersPath = this.folderIdStack;
+            if (foldersPath.length == 0) {
+              foldersPath = ["0"];
+            }
+            this.reversePathToStr(foldersPath);
             let folderId = this.renameForeInfo.uid;
             let newName = this.renameValidate.newName;
             let folderJson = {
@@ -924,6 +1076,7 @@
                       break;
                     }
                   }
+                  // this.updataFolderTree(newFolder,this.pathStr,"rename");
                 } else {
                   this.$Message.warning("Rename fail.");
                 }
@@ -1002,7 +1155,6 @@
                 },
                 data: formData
               }).then(res => {
-                console.log(res);
                 if (res.data == "Offline"){
                   this.$store.commit("userLogout");
                   this.$router.push({ name: "Login" });
@@ -1123,6 +1275,17 @@
         //   });
         // }
       },
+      fileMoveModalShow(fileInfo){
+        this.slctFolder = {};
+        this.slctFile = {};
+        this.fileMoveModal = true;
+        this.slctFile = fileInfo;
+      },
+      fileMoveModalClose(){
+        this.fileMoveModal = false;
+        this.slctFolder = {};
+        this.slctFile = {};
+      },
       fileEditModelShow: function (fileInfo) {
         this.putFileInfo = fileInfo;
         this.editFileValidate.name = fileInfo.name;
@@ -1171,7 +1334,109 @@
               })
           }
         })
-      }
+      },
+      fileMove(){
+        //fileInfo
+        let moveFile = this.slctFile;
+        //oldPath
+        let oldPath = ""; 
+        let foldersPath = this.folderIdStack;
+        if (foldersPath.length == 0) {
+          foldersPath = ["0"];
+        }
+        this.reversePathToStr(foldersPath);
+        oldPath = this.pathStr;
+        //newPath
+        let newPath = [];
+        if(this.slctFolder.folder != true){
+          this.$Message.warning("Please select a folder directory.");
+        } else {
+          this.findFolderPath(this.slctFolder,newPath);
+          this.reversePathToStr(newPath);
+        }
+        this.axios
+              .put("/GeoProblemSolving/res/file/" + this.pathStr + '/' + oldPath, moveFile)
+              .then(res => {
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data.code == 0) {
+                  this.$Notice.info({ title: "File move", desc: "Success!" });
+                  this.folderStack = [{uid: 0, name: "Home"}];
+                  this.folderIdStack = [];
+                  this.resToCurrentFolder(res.data.data);
+                  this.fileMoveModalClose();
+                } else {
+                  this.$Message.warning("Move fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.warning("Move fail.");
+              })
+      },
+      findFolderPath(slctFolder,path){
+        let tree =  this.folderTree[0].children;
+        let folder = slctFolder;
+        if(slctFolder.uid != "0"){
+          path.push(slctFolder.uid);
+          while(folder.parent != "0"){
+            path.push(folder.parent);
+            this.getFolderByUid(tree,folder.parent);
+            folder = this.folderInfo;
+          }
+        } else {
+          path.push(slctFolder.uid);
+        }
+        
+      },
+      getFolderByUid(tree,uid){
+        for(let i =0 ; i < tree.length ; i++){
+          if(tree[i].uid == uid){
+            this.folderInfo = tree[i];
+          }
+          if(tree[i].children.length > 0){
+            this.getFolderByUid(tree[i].children,uid);
+          }
+        }
+      },
+      addNewFolderModalShow: function () {
+        this.newValidate.setName = "";
+        if(this.slctFolder.folder != true){
+          this.$Message.warning("Please select a folder directory.");
+        } else {
+          this.addNewFolderModal = true;
+        }
+        
+      },
+      createNewFolder: function (name) {
+        this.$refs[name].validate(valid => {
+          if (valid) {
+            let folderObj = {
+              name: this.newValidate.setName
+            };
+            let newPath = [];
+            this.findFolderPath(this.slctFolder,newPath);
+            this.reversePathToStr(newPath);
+            this.axios
+              .post("/GeoProblemSolving/res/folder/" + this.pathStr, folderObj)
+              .then(res => {
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data.code == 0) {
+                  this.getResList();
+                  // this.updataFolderTree(res.data.data,"add");
+                  this.addNewFolderModal = false;
+                } else {
+                  this.$Message.warning("New folder fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.warning("New folder fail.");
+              })
+          }
+        });
+      },
     },
     mounted() {
       this.resizeContent();
@@ -1191,6 +1456,10 @@
         let sizes = ["B","KB","MB","GB"];
         let i = Math.floor(Math.log(value) / Math.log(k));
         return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
+      },
+      filterTimeStyle(str){
+        let result = str.split('.')[0];
+        return result.replace('T'," ");
       }
     },
   }
@@ -1199,6 +1468,25 @@
 <style scoped>
   .customCard{
     opacity: 0.95;
+  }
+
+  .res-content {
+    width: 95px;
+    height: 90px;
+    float: left;
+    margin: 5px;
+    cursor: pointer;
+  }
+  .res-content-image {
+    margin-left: 10px;
+  }
+  .res-content-text{
+    width:60px; 
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-align: center;
+    
   }
 
   .fileSpace{

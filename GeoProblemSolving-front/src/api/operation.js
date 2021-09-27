@@ -418,7 +418,7 @@ export function getTaskList() {
     return tasks;
 }
 
-export function getTaksDependencies() {
+export function getTaskDependencies() {
     if (xmlDoc === null) {
         alert("Failed to record operation. Please load activity document first!");
         return;
@@ -734,7 +734,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
         let operations = Task.childNodes;
         for (var i = 0; i < operations.length; i++) {
 
-            let oid = operations[i].getAttribute("id");
+            let oid = operations[i].getAttribute("idRef");
             let operationNode = xmlDoc.getElementById(oid);
             if (operationNode != null && operationNode.localName != "Operation") {
                 operationNode.setAttribute("task", "");
@@ -1042,24 +1042,37 @@ export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo
 
     //ToolBox
     if (behavior === "add") {
-
         let Tool = xmlDoc.getElementById(toolInfo.tid);
         if (Tool === null || Tool.localName != "Tool") {
             Tool = xmlDoc.createElement('Tool');
             Tool.setAttribute("id", toolInfo.tid);
             Tool.setAttribute("name", toolInfo.toolName);
-            Tool.setAttribute("type", toolInfo.isToolset ? "toolset" : "tool");
+            Tool.setAttribute("toolSet", toolInfo.toolSet);
+            if (!toolInfo.toolSet && toolInfo.toolSetId != undefined){
+              Tool.setAttribute("toolSetRef", toolInfo.toolSetId)
+            }
             Tool.setAttribute("function", toolInfo.description);
             Tool.setAttribute("provider", toolInfo.provider);
             Tool.setAttribute("href", toolInfo.toolUrl);
             Tool.setAttribute("state", "accessible");
 
             let ToolBox = xmlDoc.getElementsByTagName("ToolBox")[0];
-            if (ToolBox == undefined) return;
+            if (ToolBox == undefined) {
+              let activityElement = xmlDoc.getElementById(aid);
+              let activityType = activityElement.getAttribute("type");
+              if (activityType == "Activity_Unit"){
+                ToolBox = xmlDoc.createElement("ToolBox");
+                activityElement.appendChild(ToolBox);
+              }
+            }
             ToolBox.appendChild(Tool);
         } else {
+            //修改
             Tool.setAttribute("name", toolInfo.toolName);
-            Tool.setAttribute("type", toolInfo.isToolset ? "toolset" : "tool");
+            Tool.setAttribute("toolSet", toolInfo.toolSet);
+            if (!toolInfo.toolSet && toolInfo.toolSetId != undefined){
+              Tool.setAttribute("toolSetRef", toolInfo.toolSetId)
+            }
             Tool.setAttribute("function", toolInfo.description);
             Tool.setAttribute("provider", toolInfo.provider);
             Tool.setAttribute("href", toolInfo.toolUrl);
@@ -1074,8 +1087,13 @@ export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo
 
     //OperationRecords
     let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
-    if (OperationRecords == undefined) return;
+    if (OperationRecords == undefined) {
+      let activityElement = xmlDoc.getElementById("Activity");
+      OperationRecords = xmlDoc.createElement("OperationRecords");
+      activityElement.appendChild(OperationRecords);
+    };
 
+    //生成 operation
     let operationId = (oid === "") ? guid() : oid;
     let Operation = xmlDoc.getElementById(operationId);
     if (Operation !== null && Operation.localName == "Operation") return;

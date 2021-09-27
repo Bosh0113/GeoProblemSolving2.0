@@ -36,7 +36,6 @@ import javax.servlet.http.Part;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -46,7 +45,7 @@ import java.util.*;
  * @Date 2021/4/20
  **/
 @Service
-public class ActivityResServiceImpl implements ActivityResService {
+public class ActivityResServiceImpl<num> implements ActivityResService {
     @Autowired
     UserDaoImpl userDao;
 
@@ -841,5 +840,25 @@ public class ActivityResServiceImpl implements ActivityResService {
         return publicResource;
     }
 
+
+    @Override
+    public Map<String, ArrayList<ResourceEntity>>  getAllFileInProjects(HashSet<String> aids) {
+        HashMap<String, ArrayList<ResourceEntity>> projectFile = new HashMap<>();
+        try {
+            Iterator<String> iterator = aids.iterator();
+            while (iterator.hasNext()){
+                String aid = iterator.next();
+                List<ResourceEntity> resList = activityResDao.queryByAid(aid);
+                ArrayList<ResourceEntity> fileList = Lists.newArrayList();
+                if (resList != null) gallFileInProject(resList, fileList);
+                projectFile.put(aid, fileList);
+            }
+            return projectFile;
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return null;
+        }
+
+    }
 }
 

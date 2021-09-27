@@ -113,6 +113,7 @@
         :rules="toolInfoRule"
         :label-width="110"
         class="toolForm"
+        v-if="selectTool.toolSet == false"
       >
         <div v-show="this.currentStep === 0">
           <FormItem label="Name:" prop="toolName">
@@ -154,19 +155,7 @@
             />
           </FormItem>
 
-          <!--          <FormItem label="Url:" prop="toolUrl">-->
-          <!--            <Input-->
-          <!--              v-model="selectedTool.toolUrl"-->
-          <!--              placeholder="Enter the url of your tool"-->
-          <!--            />-->
-          <!--            <p style="font-style: italic">-->
-          <!--              If you copy the doi from Open Geographic Modeling System, please-->
-          <!--              enter the ... first-->
-          <!--            </p>-->
-          <!--          </FormItem>-->
-
-          <!--          :label-width="140"-->
-          <FormItem label="Step:" prop="recommendation">
+          <FormItem label="Step:" prop="recommendation" >
             <Select
               v-model="selectedTool.recommendation"
               multiple
@@ -230,9 +219,154 @@
             </div>
             <div>
               <span>Example:</span>
-              <Tag style="cursor: default">vector</Tag>
-              <Tag style="cursor: default">raster</Tag>
-              <Tag style="cursor: default">evaluation</Tag>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('vector')">vector</Tag>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('raster')">raster</Tag>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('evaluation')">evaluation</Tag>
+            </div>
+          </FormItem>
+
+          <FormItem label="Privacy:" prop="privacy">
+            <RadioGroup v-model="selectedTool.privacy">
+              <Radio label="Public">Public</Radio>
+              <Radio label="Private">Private</Radio>
+            </RadioGroup>
+          </FormItem>
+
+          <FormItem label="Image:" prop="toolImg">
+            <div class="inline_style">
+              <div class="demo-upload-list" v-if="selectedTool.toolImg != ''">
+                <template>
+                  <img :src="selectedTool.toolImg" />
+                  <div class="demo-upload-list-cover">
+                    <Icon
+                      type="ios-eye-outline"
+                      @click.native="handleView()"
+                    ></Icon>
+                    <Icon
+                      type="ios-trash-outline"
+                      @click.native="handleRemove()"
+                    ></Icon>
+                  </div>
+                </template>
+              </div>
+              <div class="uploadBox">
+                <Icon
+                  type="ios-camera"
+                  size="20"
+                  style="position: absolute; margin: 18px"
+                ></Icon>
+                <input
+                  id="choosePicture"
+                  @change="uploadPhoto($event)"
+                  type="file"
+                  class="uploadAvatar"
+                  accept="image/*"
+                />
+              </div>
+              <Modal title="View Image" v-model="visible">
+                <img :src="img" v-if="visible" style="width: 100%" />
+              </Modal>
+                <!-- <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :format="['jpg', 'jpeg', 'png', 'gif']"
+                  :max-size="2048"
+                  :before-upload="handleBeforeUpload"
+                  action
+                  style="display: inline-block; width: 58px"
+                  type="drag"
+                >
+                  <div style="width: 58px; height: 58px; line-height: 58px">
+                    <Icon type="ios-camera" size="20"></Icon>
+                  </div>
+                </Upload> -->      
+            </div>
+          </FormItem>
+        </div>
+        <div v-show="this.currentStep === 1">
+          <FormItem label="Detail:" prop="detail" :label-width="0">
+            <tinymce ref="editor" v-model="selectedTool.detail" :height="300" />
+          </FormItem>
+        </div>
+      </Form>
+
+      <Form
+        ref="selectedTool"
+        :model="selectedTool"
+        :rules="toolsetInfoRule"
+        :label-width="110"
+        class="toolForm"
+        v-else
+      >
+        <div v-show="this.currentStep === 0">
+          <FormItem label="Name:" prop="toolName">
+            <Input v-model="selectedTool.toolName" disabled></Input>
+          </FormItem>
+          <FormItem label="Description:" prop="description" :label-width="110">
+            <Input
+              v-model="selectedTool.description"
+              type="textarea"
+              placeholder="Enter description of your tool"
+            />
+          </FormItem>
+          <FormItem label="Tool List:" prop="toolList" >
+            <Card style="height:70px;" :padding="0" dis-hover>
+              <vue-scroll :ops="ops" style="height:65px;">
+                <Tag
+                  color="#ff9900"
+                  style="margin-left: 7px"
+                  v-for="(item, index) in toolList"
+                  :key="index"
+                  >{{ item.toolName }}</Tag
+                >
+              </vue-scroll>
+            </Card>
+          </FormItem>
+          <FormItem label="Step:" prop="recommendation" >
+            <Select
+              v-model="selectedTool.recommendation"
+              multiple
+              placeholder="Select the recommended step of your tool"
+            >
+              <Option
+                v-for="item in stepList"
+                :key="item.index"
+                :value="item"
+                >{{ item }}</Option
+              >
+            </Select>
+          </FormItem>
+
+          <FormItem label="tag:" prop="tags">
+            <Input
+              v-model="inputToolTag"
+              placeholder="Enter some tag to classify your tools"
+              style="width: 400px"
+              @keyup.enter.native="addCreateToolTag(inputToolTag)"
+            />
+            <Button
+              icon="ios-add"
+              type="dashed"
+              size="small"
+              @click="addCreateToolTag(inputToolTag)"
+              style="margin-left: 2.5%"
+              >Add tag</Button
+            >
+            <div>
+              <Tag
+                color="primary"
+                v-for="(item, index) in this.selectedTool.tags"
+                :key="index"
+                closable
+                @on-close="deleteCreateToolTag(index)"
+                >{{ item }}</Tag
+              >
+            </div>
+            <div>
+              <span>Example:</span>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('vector')">vector</Tag>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('raster')">raster</Tag>
+              <Tag style="cursor: default" @click.native="addCreateToolTag('evaluation')">evaluation</Tag>
             </div>
           </FormItem>
 
@@ -321,6 +455,11 @@ export default {
   },
   data() {
     return {
+      ops: {
+        bar: {
+          background: "#808695",
+        },
+      },
       selectedTool: this.selectTool,
       toolInfoRule: {
         toolName: [
@@ -353,8 +492,33 @@ export default {
           },
         ],
       },
+      toolsetInfoRule: {
+        toolName: [
+          {
+            required: true,
+            message: "The name cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        description: [
+          {
+            required: true,
+            message: "The tool description cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        privacy: [
+          {
+            required: true,
+            message: "Is this tool can be used by public or not?",
+            trigger: "change",
+          },
+        ],
+      },
       userId: "testUserId",
       inputToolTag: "",
+      personalToolList: [],
+      toolNameList: [],
       visible: false,
       createToolFlag: null,
       pageParams: { pageId: "", userId: "", userName: "" },
@@ -373,18 +537,51 @@ export default {
       ],
     };
   },
+  created() {
+    this.querryTools();
+  },
   methods: {
     addCreateToolTag(tag) {
-      if (tag != "") {
+      if(this.selectedTool.toolSet == false){
+        if (tag != "") {
         this.selectedTool.tags.push(tag);
         this.inputToolTag = "";
+        }
+      } else {
+        if (tag != "") {
+        this.selectedTool.tags.push(tag);
+        this.inputToolTag = "";
+        }
       }
     },
 
     deleteCreateToolTag(index) {
-      this.selectedTool.tags.splice(index, 1);
+      if(this.selectedTool.toolSet == false){
+        this.selectedTool.tags.splice(index, 1); 
+      } else {
+        this.selectedTool.tags.splice(index, 1);
+      }    
     },
-
+    querryTools: function () {
+      this.axios
+        .get("/GeoProblemSolving/tool/provider/" + this.$store.getters.userId )
+        .then((res) => {
+          if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+          } else if (res.data.code == 0){
+            let tools =  res.data.data;
+            for( let i = 0 ; i < tools.length ; i++){
+              if(tools[i].toolSet == false){
+                this.personalToolList.push(tools[i]);
+              }
+            } 
+          }
+        })
+        .catch((err) => {
+          this.$Message.error("Fail");
+        });
+    },
     uploadPhoto(e) {
       // 利用fileReader对象获取file
       var file = e.target.files[0];
@@ -399,7 +596,11 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           this.img = e.target.result;
-          this.selectedTool.toolImg = this.img;
+          if(this.selectedTool.toolSet == false){
+            this.selectedTool.toolImg = this.img; 
+          } else {
+            this.selectedTool.toolImg = this.img;
+          }
         };
       }
     },
@@ -410,7 +611,11 @@ export default {
 
     handleRemove() {
       this.img = "";
-      this.selectedTool.toolImg = "";
+      if(this.selectedTool.toolSet == false){
+        this.selectedTool.toolImg =""; 
+      } else {
+        this.selectedTool.toolImg ="";
+      }
     },
 
     addEditToolTag(tag) {
@@ -422,8 +627,23 @@ export default {
     deleteEditToolTag(index) {
       this.selectedTool.tags.splice(index, 1);
     },
-  },
 
+  },
+  computed:{
+    toolList(){
+      let toolsInToolset = [];
+      if(this.selectTool.toolList){
+        for(let i = 0 ; i < this.selectedTool.toolList.length ; i++){
+          for(let j = 0 ; j < this.personalToolList.length ; j++){
+            if(this.selectedTool.toolList[i] == this.personalToolList[j].tid){
+              toolsInToolset.push(this.personalToolList[j]);
+            }
+          }
+        }
+      }
+      return toolsInToolset;
+    }
+  },
   watch: {
     //监听step切换
     step: {

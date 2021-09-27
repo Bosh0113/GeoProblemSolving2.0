@@ -84,7 +84,7 @@
         >
         <Button
           v-if="
-            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor'
+            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor' 
           "
           icon="md-log-in"
           size="small"
@@ -460,6 +460,14 @@ export default {
     changeLoginModal(status) {
       this.tempLoginModal = status;
     },
+    // isJoinedFatherActivity(){
+    //   let fatherActivityRole = this.roleIdentity(this.parentActivity);
+    //   if(fatherActivityRole == "visitor"){
+    //     return false;
+    //   } else {
+    //     return true;
+    //   }
+    // },
     roleIdentity(activity) {
       return this.userRoleApi.roleIdentify(
         activity.members,
@@ -733,13 +741,16 @@ export default {
       this.activityTree = [];
       this.nameConfirm = [];
       // child activities normalization
-      if (children.length > 0) {
+      let role = this.roleIdentity(ancestors[0]);
+      if (children.length > 0 && role != 'visitor' ) {
         for (var i = 0; i < children.length; i++) {
           children[i].children = [];
           this.nameConfirm.push(children[i].name);
         }
         ancestors[0].children = children;
         ancestors[0]["expand"] = true;
+      } else {
+        ancestors[0].children = [];
       }
 
       // brother activities normalization

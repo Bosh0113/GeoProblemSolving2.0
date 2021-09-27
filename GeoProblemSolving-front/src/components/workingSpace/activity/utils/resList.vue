@@ -32,7 +32,11 @@
           <!-- <Option value="toolData">Results</Option> -->
         </Select>
         <Button
-          v-if="userRole != 'visitor'"
+          v-if="permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'upload_resource'
+            )"
           shape="circle"
           size="small"
           icon="md-cloud-outline"
@@ -41,7 +45,11 @@
           title="Get resources from your personal space"
         ></Button>
         <Button
-          v-if="userRole != 'visitor'"
+          v-if="permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'upload_resource'
+            )"
           shape="circle"
           size="small"
           icon="md-shuffle"
@@ -50,7 +58,11 @@
           title="Get resources from the previous activities"
         ></Button>
         <Button
-          v-if="userRole != 'visitor'"
+          v-if="permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'upload_resource'
+            )"
           shape="circle"
           size="small"
           icon="md-cloud-upload"
@@ -58,7 +70,12 @@
           @click="dataUploadModalShow"
           title="Upload resources"
         ></Button>
-        <template v-if="userRole != 'visitor'">
+        <template v-if="permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'manage_resource'
+            )"
+        >
           <Button
             v-if="!resEdit"
             shape="circle"
@@ -81,10 +98,16 @@
       </div>
       <div style="display: flex; justify-content: space-between">
         <div style="width: 100%">
-          <Card class="res-content" v-if="fileList.length == 0">
-            <div>There is no resource.</div>
-          </Card>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 245px)" v-else>
+          <div style="text-align: center" v-if="fileList.length == 0">
+            <h2 style="color: #808695">No resource</h2>
+            <small style="color: #dcdee2" v-if="permissionIdentity( activityInfo.permission,userRole,'upload_resource' )"
+              >*Click the button to add resource.</small
+            >
+            <small style="color: #dcdee2" v-else
+              >*You do not have permission to manage resource.</small
+            >
+          </div>
+          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px)" v-else>
             <Card class="res-content"
               ><Icon
                 type="ios-add"
@@ -93,7 +116,7 @@
                 @click="addFolderModalShow"
             /></Card>
             <div v-for="(item, index) in fileList" :key="index">
-              <Card class="res-content" v-if="!resEdit">
+              <Card class="res-content" v-if="!resEdit && item.fromParents == undefined">
                 <div
                   class="res-content-image"
                   v-if="item.folder"
@@ -115,6 +138,51 @@
                       height="42px"
                       width="42px"
                       :title="item.type"
+                    />
+                  </template>
+                  <template v-else>
+                    <img :src="item.thumbnail" height="42px" width="42px" />
+                  </template>
+                </div>
+                <div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name"
+                    v-if="item.folder"
+                  >
+                    {{ item.name }}
+                  </div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name + item.suffix"
+                    v-else
+                  >
+                    {{ item.name + item.suffix }}
+                  </div>
+                </div>
+              </Card>
+              <Card class="res-content-parents" v-else-if="!resEdit && item.fromParents != undefined">
+                <div
+                  class="res-content-image"
+                  v-if="item.folder"
+                  @click="enterFolder(item)"
+                >
+                  <img
+                    :src="folderUrl"
+                    height="42px"
+                    width="42px"
+                    title="Folder"
+                  />
+                </div>
+                <div class="res-content-image" @click="checkData(item)" :title="item.fromParents" v-else>
+                  <template
+                    v-if="item.thumbnail == '' || item.thumbnail == undefined"
+                  >
+                    <img
+                      :src="getImageUrl(item.type)"
+                      height="42px"
+                      width="42px"
+                      :title="item.type + ' | ' + item.fromParents"
                     />
                   </template>
                   <template v-else>
@@ -212,7 +280,23 @@
                 :title="file.name"
                 v-if="canBeShare(file.uid)"
               >
-                <strong>{{ file.name }}</strong>
+                <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                <p style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 100px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                ">
+                  <strong>{{ file.name }}</strong>
+                </p>
+                <!-- <span ><strong>{{ file.name }}</strong></span> -->
               </Checkbox>
               <Checkbox
                 :label="file.uid"
@@ -221,16 +305,43 @@
                 disabled
                 v-else
               >
-                <strong>{{ file.name }}</strong>
+                <Icon v-if="file.type === 'data'" type="ios-podium-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'image'" type="ios-image-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'paper'" type="ios-paper-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'document'" type="ios-document-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'model'" type="ios-construct-outline" class="itemIcon" size="25"/>
+                <Icon v-else-if="file.type === 'video'" type="ios-videocam-outline" class="itemIcon" size="25"/>
+                <p style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 100px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                ">
+                  <strong>{{ file.name }}</strong>
+                </p>
+                <!-- <strong>{{ file.name }}</strong> -->
               </Checkbox>
-              <span
+              <p :title="file.description" style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 200px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  margin-left:50px;
+                ">
+                  {{ file.description }}
+              </p>
+              <!-- <span
                 class="personalFileDes"
-                style="width: 150px"
+                style="width: 150px;margin-left:50px"
                 :title="file.description"
                 >{{ file.description }}</span
-              >
-              <span style="display: inline-block; vertical-align: top">{{
-                file.fileSize
+              > -->
+              <span style="display: inline-block; vertical-align: top;float:right;">{{
+                file.fileSize | filterSizeType
               }}</span>
             </Card>
           </CheckboxGroup>
@@ -359,7 +470,7 @@
         </div>
         <div class="dataInfo">
           <Label class="dataLabel">File size:</Label>
-          <span class="dataContent">{{ selectData.fileSize }}</span>
+          <span class="dataContent">{{ selectData.fileSize | filterSizeType }}</span>
           <Label class="dataLabel">Created time:</Label>
           <span class="dataContent">{{
             dateFormat(selectData.uploadTime)
@@ -632,6 +743,8 @@ export default {
       activityDataList: [], //data in the activity
       relatedResList: [], //related materials in the activity
       // toolDataList: [], //data from tools in the activity
+      parentActivitiesID: [],
+      parentActivitiesName: [],
       dataListStyle: false, // 数据列表展示样式
       // 资源avatar 图片路径
       dataUrl: require("@/assets/images/data.png"),
@@ -739,6 +852,7 @@ export default {
   created() {},
   mounted() {
     this.getResList();
+    this.getParentActivities();
 
     Date.prototype.Format = function (fmt) {
       var o = {
@@ -832,6 +946,66 @@ export default {
       }
       return url;
     },
+    getParentActivities(){
+      this.parentActivitiesID = [];
+      this.parentActivitiesName = [];
+      if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined){
+        let url = "";
+        let aid = this.activityInfo.aid;
+        if(this.activityInfo.level == 1){
+          url = "/GeoProblemSolving/subproject/" + aid + "/lineage";
+        } else if (this.activityInfo.level > 1){
+          url = "/GeoProblemSolving/activity/" + aid + "/lineage";
+        }
+        this.$axios.get(url)
+          .then((res) => {
+            if (res.data.code == 0) {
+              let list = res.data.data.ancestors;
+              for(let i = 1 ; i < list.length ; i++){
+                this.parentActivitiesID.push(list[i].aid);
+                this.parentActivitiesName.push("From " + list[i].name);
+              }
+              this.getParentActivitiesFile();
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      }
+    },
+    getParentActivitiesFile(){
+      if(this.parentActivitiesID != undefined && this.parentActivitiesID.length > 0){
+        this.$axios.get("/GeoProblemSolving/rip/file/" + this.parentActivitiesID.toString())
+        .then((res) => {
+            if (res.data.code == 0) {
+              let parentsFilesList = res.data.data;
+              let fileList = JSON.parse(JSON.stringify(this.fileList));
+              for(let i = 0 ; i < this.parentActivitiesID.length ; i++){
+                for(let j = 0 ; j < parentsFilesList[this.parentActivitiesID[i]].length ; j++){
+                  parentsFilesList[this.parentActivitiesID[i]][j].fromParents = this.parentActivitiesName[i];
+                  fileList.push(parentsFilesList[this.parentActivitiesID[i]][j]);
+                }
+              }
+              console.log(fileList);
+              this.$set(this, "activityResList", fileList);
+              this.filterData();
+              this.filterRelatedRes();
+              // this.filterToolData();
+
+              // show resources
+              this.$set(this, "fileList", fileList);
+
+            } else {
+              console.log(res.data.msg);
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      }
+    },
     getResList() {
       if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
         this.axios
@@ -843,12 +1017,6 @@ export default {
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               let list = res.data.data;
-              this.$set(this, "activityResList", list);
-              this.filterData();
-              this.filterRelatedRes();
-              // this.filterToolData();
-
-              // show resources
               this.$set(this, "fileList", list);
             }
           })
@@ -1217,20 +1385,20 @@ export default {
     },
     getPreActivities() {
       this.preActivities = [];
-      // parent
-      if (
-        this.activityInfo.parent != undefined &&
-        this.activityInfo.parent != ""
-      ) {
-        this.preActivities.push({ aid: this.activityInfo.parent });
-      }
+      // // parent
+      // if (
+      //   this.activityInfo.parent != undefined &&
+      //   this.activityInfo.parent != ""
+      // ) {
+      //   this.preActivities.push({ aid: this.activityInfo.parent });
+      // }
       // last activities
       if (this.activityInfo.last != undefined) {
         for (var i = 0; i < this.activityInfo.last.length; i++) {
           this.preActivities.push(this.activityInfo.last[i]);
         }
-        this.getInheritResource();
       }
+      this.getInheritResource();
     },
     getInheritResource() {
       this.existingResources = this.getMockData();
@@ -1242,7 +1410,6 @@ export default {
       // 前驱步骤的资源
       for (var i = 0; i < this.preActivities.length; i++) {
         let activityId = this.preActivities[i].aid;
-        let activityName = this.preActivities[i].name;
 
         this.axios
           .get("/GeoProblemSolving/rip/" + activityId + "/0")
@@ -1253,15 +1420,12 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
+              console.log(res.data.data);
               selectedRes = res.data.data;
               for (var j = 0; j < selectedRes.length; j++) {
-                mockData.push({
-                  key: mockData.length.toString(),
-                  name: selectedRes[j].name,
-                  type: selectedRes[j].type,
-                  uid: selectedRes[j].uid,
-                  source: activityName,
-                });
+                selectedRes[j].key = mockData.length.toString();
+                selectedRes[j].source = activityId;
+                mockData.push(selectedRes[j]);
               }
             } else {
               selectedRes = [];
@@ -1278,13 +1442,7 @@ export default {
       let mockData = [];
       if (this.existingResources.length > 0) {
         for (var i = 0; i < this.targetKeys.length; i++) {
-          mockData.push({
-            key: this.targetKeys[i],
-            name: this.existingResources[this.targetKeys[i]].name,
-            type: this.existingResources[this.targetKeys[i]].type,
-            uid: this.existingResources[this.targetKeys[i]].uid,
-            source: this.existingResources[this.targetKeys[i]].source,
-          });
+          mockData.push(this.existingResources[this.targetKeys[i]]);
         }
       }
       return mockData;
@@ -1305,11 +1463,13 @@ export default {
       for (var i = 0; i < selectResource.length; i++) {
         addFileList.push(selectResource[i].uid);
       }
-
       let tempPath = this.folderIdStack;
       if (tempPath.length == 0) {
         tempPath = ["0"];
       }
+      console.log(selectResource);
+      console.log(addFileList);
+
       this.axios
         .get(
           "/GeoProblemSolving/rip/shareToProject/" +
@@ -1320,16 +1480,19 @@ export default {
             tempPath.toString()
         )
         .then((res) => {
-          this.inheritResModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
-            this.getResList();
-
+            console.log(res.data.data);
+            this.inheritResModal = false;
+            // this.getResList();
             let resList = res.data.data;
             for (let i = 0; i < resList.length; i++) {
+              this.activityResList.push(resList[i]);
+              this.activityDataList.push(resList[i]);
+
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
                 "",
@@ -1339,6 +1502,7 @@ export default {
                 resList[i]
               );
             }
+            this.$Message.success("Shared file success!");
           } else {
             this.$Message.error(
               "Failed to get resources from previous activities."
@@ -1372,42 +1536,47 @@ export default {
       if (temp.length == 0) {
         temp = ["0"];
       }
-      this.axios
-        .get(
-          "/GeoProblemSolving/rip/" +
-            this.activityInfo.aid +
-            "/" +
-            temp.toString()
-        )
-        .then((res) => {
-          if (res.data == "Offline") {
-            // confirm("You are offline, please login again.");
-            this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
-            this.tempLoginModal = true;
-          } else if (res.data.code == 0) {
-            let list = res.data.data;
+      if(temp[0] == "0"){
+        this.getResList();
+        this.getParentActivities();
+      } else {
+        this.axios
+          .get(
+            "/GeoProblemSolving/rip/" +
+              this.activityInfo.aid +
+              "/" +
+              temp.toString()
+          )
+          .then((res) => {
+            if (res.data == "Offline") {
+              // confirm("You are offline, please login again.");
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              let list = res.data.data;
 
-            this.$set(this, "activityResList", list);
-            this.filterData();
-            this.filterRelatedRes();
-            // this.filterToolData();
+              this.$set(this, "activityResList", list);
+              this.filterData();
+              this.filterRelatedRes();
+              // this.filterToolData();
 
-            // show resources
-            this.$set(this, "fileList", list);
+              // show resources
+              this.$set(this, "fileList", list);
 
-            if (operationType == "enter") {
-              this.folderStack.push({ uid: folder.uid, name: folder.name });
-            } else if (operationType == "back") {
-              this.folderStack.pop();
+              if (operationType == "enter") {
+                this.folderStack.push({ uid: folder.uid, name: folder.name });
+              } else if (operationType == "back") {
+                this.folderStack.pop();
+              }
+            } else {
+              this.$Message.warning("Get folder info fail.");
             }
-          } else {
+          })
+          .catch((err) => {
             this.$Message.warning("Get folder info fail.");
-          }
-        })
-        .catch((err) => {
-          this.$Message.warning("Get folder info fail.");
-        });
+          });
+      }
     },
     addFolderModalShow() {
       this.newValidate.setName = "";
@@ -1689,6 +1858,16 @@ export default {
           console.log(err.data);
         });
     },
+    canBeShare(fileId) {
+      //判断项目中是否由此文件，如果有，则不能共享
+      let result = true;
+      for (let i = 0; i < this.activityResList.length; i++) {
+        if (this.activityResList[i].uid == fileId) {
+          result = false;
+        }
+      }
+      return result;
+    },
     shareResources() {
       let addFileList = this.selectedFilesToShare;
       let tempPath = this.folderIdStack;
@@ -1705,16 +1884,15 @@ export default {
             tempPath.toString()
         )
         .then((res) => {
-          this.shareModal = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
+            this.shareModal = false;
             let sharedFile = res.data.data;
 
             for (let i = 0; i < sharedFile.length; i++) {
-              this.activityResList.push(sharedFile[i]);
               this.activityResList.push(sharedFile[i]);
               this.activityDataList.push(sharedFile[i]);
 
@@ -1724,7 +1902,7 @@ export default {
                 "",
                 "upload",
                 this.userInfo.userId,
-                resList[i]
+                sharedFile[i]
               );
             }
 
@@ -1735,11 +1913,20 @@ export default {
           }
         })
         .catch((err) => {
-          this.$Message.error("Shared file fail!");
+          this.$Message.error("Shared file fail!!!");
         });
     },
     dataVisualize() {},
   },
+  filters: {
+      filterSizeType(value){
+        if(value === 0) return "0 B";
+        let k = 1024;
+        let sizes = ["B","KB","MB","GB"];
+        let i = Math.floor(Math.log(value) / Math.log(k));
+        return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
+      },
+  }
 };
 </script>
 <style scoped>
@@ -1749,6 +1936,14 @@ export default {
   float: left;
   margin: 5px;
   cursor: pointer;
+}
+.res-content-parents {
+  width: 90px;
+  height: 85px;
+  float: left;
+  margin: 5px;
+  cursor: pointer;
+  background-color:	#CCEEFF;
 }
 .res-content-edit {
   width: 90px;

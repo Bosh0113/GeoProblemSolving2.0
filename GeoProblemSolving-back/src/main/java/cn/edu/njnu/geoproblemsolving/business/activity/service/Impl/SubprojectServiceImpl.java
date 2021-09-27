@@ -1,10 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
@@ -31,13 +34,17 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
     private final FolderDaoImpl folderDao;
+    private final ProjectUtil projectUtil;
+    private final ToolService toolService;
 
-    public SubprojectServiceImpl(SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
         this.folderDao = folderDao;
+        this.projectUtil = projectUtil;
+        this.toolService = toolService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -88,6 +95,15 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setType(subproject.getType());
             if (subproject.getType().equals(ActivityType.Activity_Group)) {
                 subproject.setChildren(new ArrayList<>());
+            }else if (subproject.getType().equals(ActivityType.Activity_Unit)){
+                //Bind the relevant tool
+                String purpose = subproject.getPurpose();
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : relevantPurposeTool){
+                    toolSet.add(tool.getTid());
+                }
+                subproject.setToolList(toolSet);
             }
 
             // folder
@@ -141,6 +157,16 @@ public class SubprojectServiceImpl implements SubprojectService {
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
 
             Subproject subproject = (Subproject) result.get();
+            String purpose = update.getPurpose();
+            if (subproject.getType().equals(ActivityType.Activity_Group) && purpose != null){
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : relevantPurposeTool){
+                    toolSet.add(tool.getTid());
+                }
+                subproject.setToolList(toolSet);
+            }
+
             update.updateTo(subproject);
 
             // Update active time
@@ -328,6 +354,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Optional optional = subprojectRepository.findById(aid);
             if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
             UserEntity user = findByUserId(userId);
+            // UserEntity user = projectUtil.getUserInfoFromUserServer(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
             // add user info to subproject
@@ -423,11 +450,15 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //退出activity
+            projectUtil.quitSubProject(aid, userId, 1);
+
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
+
 
     @Override
     public JsonResult linkActivities(UpdateActivityDTO update, String aid1, String aid2, String pid){

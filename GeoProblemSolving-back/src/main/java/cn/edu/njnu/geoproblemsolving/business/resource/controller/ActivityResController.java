@@ -12,7 +12,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 项目中资源，这一块属于是参与式平台自己的部分
@@ -158,11 +160,13 @@ public class ActivityResController {
         return ResultUtils.error(-2, "fail");
     }
 
+
     /**
      * 将用户资源分享到项目中
-     *
      * @param req
-     * @param uids
+     * @param aid 项目id
+     * @param uids 资源id
+     * @param paths 路径
      * @return
      */
     @RequestMapping(value = "/shareToProject/{aid}/{uids}/{paths}", method = RequestMethod.GET)
@@ -212,6 +216,13 @@ public class ActivityResController {
         return ResultUtils.success(allFileInProject);
     }
 
+    @RequestMapping(value = "/file/{aids}", method = RequestMethod.GET)
+    public JsonResult getAllFileInProject(@PathVariable HashSet<String> aids){
+        Map<String, ArrayList<ResourceEntity>> allFileInProjects = resService.getAllFileInProjects(aids);
+        if (allFileInProjects == null) return ResultUtils.error(-2, "Fail");
+        return ResultUtils.success(allFileInProjects);
+    }
+
     /**
      * 更改资源所对应的资源实体
      * @param aid 活动id
@@ -235,5 +246,6 @@ public class ActivityResController {
     public JsonResult getAllPublicRes(){
         return ResultUtils.success(resService.getAllPublicService());
     }
+
 
 }

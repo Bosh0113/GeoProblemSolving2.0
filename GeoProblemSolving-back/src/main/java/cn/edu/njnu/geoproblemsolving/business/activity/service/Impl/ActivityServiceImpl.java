@@ -4,6 +4,9 @@ import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
@@ -34,18 +37,26 @@ public class ActivityServiceImpl implements ActivityService {
     private final SubprojectRepository subprojectRepository;
     private final ProjectRepository projectRepository;
 
+    private final ProjectUtil projectUtil;
+    private final ToolService toolService;
+
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
                                UserRepository userRepository,
                                SubprojectRepository subprojectRepository,
                                MongoTemplate mongoTemplate,
-                               FolderDaoImpl folderDao, ProjectRepository projectRepository) {
+                               FolderDaoImpl folderDao,
+                               ProjectRepository projectRepository,
+                               ProjectUtil httpUtil,
+                               ToolService toolService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
         this.folderDao = folderDao;
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
+        this.projectUtil = httpUtil;
+        this.toolService = toolService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -146,6 +157,14 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setType(activity.getType());
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
+            }else if (activity.getType().equals(ActivityType.Activity_Unit)){
+                String purpose = activity.getPurpose();
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : relevantPurposeTool){
+                    toolSet.add(tool.getTid());
+                }
+                activity.setToolList(toolSet);
             }
 
             // tools and toolsets
@@ -218,6 +237,16 @@ public class ActivityServiceImpl implements ActivityService {
             Optional result = activityRepository.findById(aid);
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) result.get();
+
+            if (activity.getType().equals(ActivityType.Activity_Unit)){
+                String purpose = activity.getPurpose();
+                List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
+                HashSet<String> toolSet = new HashSet<>();
+                for (Tool tool : tools){
+                    toolSet.add(tool.getTid());
+                }
+                activity.setToolList(toolSet);
+            }
 
             update.updateTo(activity);
 
@@ -546,6 +575,7 @@ public class ActivityServiceImpl implements ActivityService {
             // confirm
             Activity activity = findActivityById(aid);
             if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+            //从用户服务器读取该用户，还需将他注册到这参与式平台
             UserEntity user = findByUserId(userId);
             if (user == null) return ResultUtils.error(-1, "Fail: user does not exist.");
 
@@ -563,13 +593,14 @@ public class ActivityServiceImpl implements ActivityService {
             userInfo.put("userId", user.getUserId());
             userInfo.put("role", "ordinary-member");
             members.add(userInfo);
-            activity.setMembers(members);
+            // activity.setMembers(members);
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -590,19 +621,23 @@ public class ActivityServiceImpl implements ActivityService {
                     break;
                 }
             }
-            activity.setMembers(members);
+            // activity.setMembers(members);
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            //完成当前项目的退出，需要将子项目推出
+            projectUtil.quitSubProject(aid, userId, 2);
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
         }
     }
+
+
 
     @Override
     public JsonResult updateMemberRole(String aid, String userId, String role){

@@ -187,7 +187,7 @@ const routes = [
             component: resolve =>
               require([
                 "@/components/workingSpace/activity/singleActivity"
-              ], resolve)
+              ], resolve),
           },
           {
             path: "info",

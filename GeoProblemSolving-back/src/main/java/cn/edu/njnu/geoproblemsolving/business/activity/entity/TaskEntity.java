@@ -9,8 +9,8 @@ import java.util.Date;
 @Data
 @Document(collection = "Task")
 public class TaskEntity {
-    private String aid; //task 所属 activity
     private String taskId;
+    private String aid; //task 所属 activity
     private String name;
     private String description;
     private Date startTime;
