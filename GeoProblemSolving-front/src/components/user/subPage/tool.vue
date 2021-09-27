@@ -1324,6 +1324,12 @@ export default {
     commitEdit: function () {
       // "/GeoProblemSolving/tool/update/" + this.editToolInfo.tid,
       //   this.editToolInfo
+      //...
+      //
+      //
+      //
+      //
+      //...接口未定
       if (this.editToolInfo.toolSet == false) {
         this.$axios
           .put("/GeoProblemSolving/tool", this.editToolInfo)
