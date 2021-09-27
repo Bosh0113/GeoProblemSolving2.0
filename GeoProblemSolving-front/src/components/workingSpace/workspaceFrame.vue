@@ -264,7 +264,7 @@
           >Think again...
         </Button>
         <Button @click="delActivity" style="float: right; margin-right: 15px"
-          >yes
+          >Yes
         </Button>
       </div>
     </Modal>
@@ -303,7 +303,6 @@ export default {
       projectInfo: {},
       userInfo: {},
       slctActivity: {},
-      rootActivity: {},
       childActivities: [],
       parentActivity: {},
       // grandchildren: [],
@@ -606,7 +605,7 @@ export default {
       // load activity doc
       let result = this.operationApi.getActivityDoc(aid);
       if (result === "empty") {
-        this.operationApi.activityDocInit(activity, this.userInfo.userId);
+        this.operationApi.activityDocInit(activity, this.userInfo);
       }
 
       if (level > 1) {
@@ -791,10 +790,7 @@ export default {
       // load activity doc
       let result = this.operationApi.getActivityDoc(this.slctActivity.aid);
       if (result === "empty") {
-        this.operationApi.activityDocInit(
-          this.slctActivity,
-          this.userInfo.userId
-        );
+        this.operationApi.activityDocInit(this.slctActivity, this.userInfo);
       }
       this.setContent(this.slctActivity);
 
@@ -803,8 +799,9 @@ export default {
         this.cascader.push(ancestors[i].name);
       }
     },
-    typeChanged(type) {
-      this.slctActivity.type = type;
+    typeChanged(data) {
+      this.slctActivity.type = data.type;
+      this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
     setContent(activity) {
@@ -873,7 +870,11 @@ export default {
             }
             // update activity doc
             this.operationApi.activityUpdate("type", this.editActivityForm);
-            this.updatePathway("type", this.editActivityForm.type);
+            this.updatePathway("type", this.editActivityForm.purpose);
+          } else if (
+            this.editActivityForm.purpose != this.slctActivity.purpose
+          ) {
+            this.updatePathway("type", this.editActivityForm.purpose);
           } else {
             // update activity doc
             this.operationApi.activityUpdate("other", this.editActivityForm);
@@ -928,21 +929,26 @@ export default {
       });
     },
     updatePathway(type, content) {
-      if (type === "name") {
-        for (let i = 0; i < this.parentActivity.pathway.length; i++) {
-          if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
-            this.parentActivity.pathway[i].name = content;
+      if (this.parentActivity.pathway != undefined) {
+        if (type === "name") {
+          let pathway = JSON.stringify(this.parentActivity.pathway);
+          // let faceName = new RegExp(this.slctActivity.name, "g");
+          // pathway.replace(faceName, content);
+          let newpathway = pathway.replaceAll(
+            '"' + this.slctActivity.name + '"',
+            '"' + content + '"'
+          );
+          this.parentActivity.pathway = JSON.parse(newpathway);
+        } else if (type === "type") {
+          for (let i = 0; i < this.parentActivity.pathway.length; i++) {
+            if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+              this.parentActivity.pathway[i].category =
+                this.getStepCategroy(content);
+            }
           }
+        } else if (type === "delete") {
+          this.removePathwayNode(content);
         }
-      } else if (type === "type") {
-        for (let i = 0; i < this.parentActivity.pathway.length; i++) {
-          if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
-            this.parentActivity.pathway[i].category =
-              this.getStepCategroy(content);
-          }
-        }
-      } else if (type === "delete") {
-        this.removePathwayNode(content);
       }
 
       // url
@@ -1095,7 +1101,7 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
-            this.enterActivity(this.rootActivity);
+            this.enterActivity(this.slctActivity);
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
@@ -1157,8 +1163,8 @@ export default {
     },
     delActivity() {
       if (this.userInfo.userId !== this.slctActivity.creator) return;
-      let url = "";
       let aid = this.slctActivity.aid;
+      let url = "";
       if (this.slctActivity.level == 1) {
         url = "/GeoProblemSolving/subproject?aid=" + aid;
       } else if (this.slctActivity.level > 1) {

@@ -427,7 +427,6 @@ function getSocketComputation(data) {
                         console.log(e);
                     }
                 });
-                loadResultTiff(el.url);
             }
         });
         $("#waitting").hide();
@@ -989,11 +988,9 @@ function onRunModel() {
     var height = $("#ROIHeight").val();
     var northWestPoint = selectROI.ROI.getBounds().getNorthWest();
     var southEastPoint = selectROI.ROI.getBounds().getSouthEast();
-    // console.log("1");
-    $("#mapid").css("cursor", "wait");
     var upperLeftPoint = proj4("EPSG:4326", "EPSG:2437", [northWestPoint.lng, northWestPoint.lat]);
     var lowerRightPoint = proj4("EPSG:4326", "EPSG:2437", [southEastPoint.lng, southEastPoint.lat]);
-    // resultBounds = [[lowerRightPoint[1],upperLeftPoint[0]],[upperLeftPoint[1],lowerRightPoint[0]]];
+    $("#mapid").css("cursor", "wait");
     $.ajax({
         // async:false,
         type: "post",
@@ -1007,10 +1004,6 @@ function onRunModel() {
             right: lowerRightPoint[0],
             bottom: lowerRightPoint[1],
             left: upperLeftPoint[0],
-            maxLat: northWestPoint.lat,
-            maxLon: southEastPoint.lng,
-            minLat: southEastPoint.lat,
-            minLon: northWestPoint.lng,
             sampleSize: sampleSize,
             height: height
         },
@@ -1039,19 +1032,19 @@ function onRunModel() {
                     statename: "LoadVariables",
                     event: "InputRoadCenterLineData",
                     tag: "InputRoadCenterLineData",
-                    url: roadData.address
+                    url: result.road
                 });
                 inputs.push({
                     statename: "LoadVariables",
                     event: "InputBuildingData",
                     tag: "InputBuildingData",
-                    url: buildingData.address
+                    url: result.building
                 });
                 inputs.push({
                     statename: "LoadVariables",
                     event: "InputBarrierData",
                     tag: "InputBarrierData",
-                    url: barrierData.address
+                    url: result.barrier
                 });
                 inputs.push({
                     statename: "LoadVariables",
@@ -1081,7 +1074,7 @@ function onRunModel() {
                     content: "run-start",
                 });
 
-                window.parent.sendModelOperation(window.parent.activityInfo.aid, "572c20572cb1a512cee896f06b419ed4", "172.21.213.105", "8061", inputs, outputs);
+                window.parent.sendModelOperation(window.parent.activityInfo.aid, "33eabfc9fa8fad6c35c862c48c0c3349", "172.21.213.105", "8061", inputs, outputs);
 
             } else {
                 $("#waitting").hide();

@@ -406,8 +406,8 @@ export function getTaskList() {
             endTime: time[1],
             operations: []
         }
-        if(taskDoc[i].getAttribute("state") === "removed"){
-          continue;
+        if (taskDoc[i].getAttribute("state") === "removed") {
+            continue;
         }
         let operations = taskDoc[i].childNodes;
         for (var j = 0; j < operations.length; j++) {
@@ -743,7 +743,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
 
     } else if (behavior === "update") {
         let Task = xmlDoc.getElementById(taskInfo.taskId);
-        if (operationNode != null && operationNode.localName == "Operation") {
+        if (Task != null && Task.localName == "Task") {
             Task.setAttribute("name", taskInfo.name);
             Task.setAttribute("purpose", taskInfo.description);
             Task.setAttribute("timerange", timerange);
@@ -1271,10 +1271,14 @@ export function activityRecord(oid, behavior, userId, childInfo) {
         }
 
     } else if (behavior === "remove") {
+        ////////
+        // save parent activity document
+        getActivityDoc(childInfo.parent);
+
         let Child = xmlDoc.getElementById(childInfo.aid);
         if (Child !== null && Child.localName == "Child") {
             Child.setAttribute("state", "removed");
-        }
+        }      
     }
 
     //OperationRecords
@@ -1412,7 +1416,7 @@ function clearTempOperations(aid) {
             }
         }
     }
-    if(isRemoved) {
+    if (isRemoved) {
         updateActivityDoc(aid);
     }
 }

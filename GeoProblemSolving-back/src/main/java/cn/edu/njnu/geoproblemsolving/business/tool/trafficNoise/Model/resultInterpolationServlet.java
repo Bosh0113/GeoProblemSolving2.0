@@ -111,27 +111,74 @@ public class resultInterpolationServlet extends HttpServlet {
             WGS84.SetWellKnownGeogCS("WGS84");
             CoordinateTransformation transformation = new CoordinateTransformation(projectionReference, WGS84);
 
+            // 实际最大最小值
             double maxX, maxY, minX, minY;
+            double y1, x1, y2, x2;
             maxX = maxY = -1;
             minX = minY = 99999999;
-            double[] latLng = new double[2];
-//                    double maxLat, maxLon, minLat, minLon;
-//                    maxLat = maxLon = -360;
-//                    minLat = minLon = 360;
+            y1 = x1 = y2 = x2 = 0;
+
             Feature feature = layer.GetNextFeature();
+            while (feature != null) {
+                Geometry geometry = feature.GetGeometryRef();
+                double x = geometry.GetX();
+                double y = geometry.GetY();
+                if (x > maxX) {
+                    maxX = x;
+                    y1 = y;
+                }
+                if (y > maxY) {
+                    maxY = y;
+                    x1 = x;
+                }
+                if (x < minX) {
+                    minX = x;
+                    y2 = y;
+                }
+                if (y < minY) {
+                    minY = y;
+                    x2 = x;
+                }
+
+                feature = layer.GetNextFeature();
+            }
+
+            double[] latLng1 = transformation.TransformPoint(maxX, y1);
+            double[] latLng2 = transformation.TransformPoint(x1, maxY);
+            double[] latLng3 = transformation.TransformPoint(minX, y2);
+            double[] latLng4 = transformation.TransformPoint(x2, minY);
+            double[] origin1 = latLng1;
+            origin1 = origin1[0] > latLng2[0] ? latLng2 : origin1;
+            origin1 = origin1[0] > latLng3[0] ? latLng3 : origin1;
+            origin1 = origin1[0] > latLng4[0] ? latLng4 : origin1;
+            double[] origin2 = latLng1;
+            origin2 = origin2[1] > latLng2[1] ? latLng2 : origin2;
+            origin2 = origin2[1] > latLng3[1] ? latLng3 : origin2;
+            origin2 = origin2[1] > latLng4[1] ? latLng4 : origin2;
+            double[] origin3 = latLng1;
+            origin3 = origin3[1] < latLng2[1] ? latLng2 : origin3;
+            origin3 = origin3[1] < latLng3[1] ? latLng3 : origin3;
+            origin3 = origin3[1] < latLng4[1] ? latLng4 : origin3;
+
+            double[] targetMin = {Double.parseDouble(minLat), Double.parseDouble(minLon)};
+            double[] targetMax = {Double.parseDouble(maxLat), Double.parseDouble(maxLon)};
+
+
+            // 生成points.csv
+            layer.ResetReading();
+            feature = layer.GetNextFeature();
+            double[] latLng = new double[2];
             while (feature != null) {
                 Geometry geometry = feature.GetGeometryRef();
                 double noiseValue = feature.GetFieldAsDouble("noise_10");
                 double x = geometry.GetX();
                 double y = geometry.GetY();
-                maxX = x > maxX ? x : maxX;
-                maxY = y > maxY ? y : maxY;
-                minX = x < minX ? x : minX;
-                minY = y < minY ? y : minY;
-
                 latLng = transformation.TransformPoint(x, y);
-                double lon = latLng[0];
-                double lat = latLng[1];
+
+                double[] newLatlng = customizedTransformation(origin1, origin2, origin3, targetMin, targetMax, latLng);
+                double lat = newLatlng[0];
+                double lon = newLatlng[1];
+
                 stringBuffer.append(lon + " ," + lat + " ," + noiseValue + "\n");
                 pointOutputStream.write(stringBuffer.toString().getBytes("utf-8"));
                 stringBuffer.setLength(0);
@@ -176,7 +223,7 @@ public class resultInterpolationServlet extends HttpServlet {
             finished.createNewFile();
 
         } catch (Exception e) {
-//                直接返回错误代码JSON
+            // 直接返回错误代码JSON
             System.out.println(e.getMessage());
             respJson.put("respCode", "0");
             respJson.put("msg", "failed.");
@@ -193,5 +240,31 @@ public class resultInterpolationServlet extends HttpServlet {
     @RequestMapping(method = RequestMethod.GET)
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        super.doGet(req,resp);
+    }
+
+    private double[] customizedTransformation(double[] origin1, double[] origin2, double[] origin3, double[] targetMin, double[] targetMax, double[] coordinate) {
+        double[] result = new double[2];
+
+        result[0] = coordinate[0];
+        result[1] = coordinate[1];
+
+//        // 旋转
+//        double angel = Math.atan((origin1[1] - origin2[1]) / (origin2[0] - origin1[0]));
+//        result[0] = (result[0] - origin1[0]) * Math.cos(angel) - (result[1] - origin1[1]) * Math.sin(angel) + origin1[0];
+//        result[1] = (result[1] - origin1[1]) * Math.cos(angel) + (result[0] - origin1[0]) * Math.sin(angel) + origin1[1];
+//
+//        // 缩放
+//        double latR = (targetMax[0] - targetMin[0]) / Math.sqrt((origin2[0] - origin1[0]) * (origin2[0] - origin1[0]) + (origin2[1] - origin1[1]) * (origin2[1] - origin1[1]));
+//        double lngR = (targetMax[1] - targetMin[1]) / Math.sqrt((origin3[0] - origin1[0]) * (origin3[0] - origin1[0]) + (origin3[1] - origin1[1]) * (origin3[1] - origin1[1]));
+//        result[0] = (result[0] - origin1[0]) * latR + origin1[0];
+//        result[1] = (result[1] - origin1[1]) * lngR + origin1[1];
+
+        // 平移
+        double offsetLat = targetMin[0] - origin1[0];
+        double offsetLon = targetMin[1] - origin1[1];
+        result[0] = result[0] + offsetLat;
+        result[1] = result[1] + offsetLon;
+
+        return result;
     }
 }

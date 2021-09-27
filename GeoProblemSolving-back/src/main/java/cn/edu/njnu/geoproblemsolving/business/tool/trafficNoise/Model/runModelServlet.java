@@ -89,7 +89,6 @@ public class runModelServlet extends HttpServlet {
         String boundBoxValue = left + ", " + bottom + ", " + right + ", " + top;
         String resultName = "";
 
-
         genHeightUdxData(resultDir, height);
         genSamplingSizeUdxData(resultDir, sampleSize);
         genBoundBoxUdxData(resultDir, boundBoxValue);

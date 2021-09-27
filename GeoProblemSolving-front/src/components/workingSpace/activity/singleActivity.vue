@@ -29,7 +29,7 @@
             :ops="scrollOps"
             style="height: calc(100vh - 225px); margin-top: 5px"
           >
-            <context-res
+            <!-- <context-res
               v-if="
                 activityInfo.purpose ==
                 'Context definition & resource collection'
@@ -78,6 +78,11 @@
             ></decision-making>
             <universal-space
               v-else
+              :activityInfo="activityInfo"
+              :participants="participants"
+              :projectInfo="projectInfo"
+            ></universal-space> -->
+            <universal-space
               :activityInfo="activityInfo"
               :participants="participants"
               :projectInfo="projectInfo"

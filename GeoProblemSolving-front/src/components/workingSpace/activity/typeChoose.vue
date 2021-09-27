@@ -204,7 +204,7 @@ export default {
               this.activityInfo = res.data.data;
             }
             this.operationApi.activityUpdate("type", this.activityInfo);
-            this.$emit("typeChanged", this.selectType);
+            this.$emit("typeChanged", {type: this.selectType, purpose: this.purpose});
           } else {
             this.$Notice.info({ title: "Result", desc: res.data.msg });
           }

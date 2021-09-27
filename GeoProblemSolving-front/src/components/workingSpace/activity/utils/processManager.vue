@@ -540,7 +540,7 @@
             <!--              :tags="linkDomains"-->
             <!--              @tags-changed="(newTags) => (linkDomains = newTags)"-->
             <!--            />-->
-            <Select v-model="selectUserDomain" multiple :max-tag-count="4">
+            <Select v-model="selectUserDomain" multiple :max-tag-count="4" placeholder="Enter something...">
               <Option
                 v-for="(item, index) in userDomain"
                 :value="item"
@@ -550,7 +550,7 @@
           </div>
           <div style="display: flex">
             <div style="margin-top: 5px; width: 100px">Organizations:</div>
-            <Select v-model="selectUserOrg" multiple :max-tag-count="4">
+            <Select v-model="selectUserOrg" multiple :max-tag-count="4" placeholder="Enter something...">
               <Option
                 v-for="(item, index) in userOrganizations"
                 :value="item"
@@ -906,9 +906,9 @@ export default {
             this.removePathwayNode(this.activityInfo.pathway[i].aid);
           }
         }
+        this.updatePathway();
       }
       this.processStructure = this.activityInfo.pathway;
-      this.updatePathway();
     },
     showSteps() {
       let option = {

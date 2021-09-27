@@ -328,7 +328,7 @@ export default {
                 this.createProjectInfo = res.data.data;
                 this.operationApi.activityDocInit(
                   res.data.data,
-                  this.$store.getters.userId
+                  {userId: this.$store.getters.userId, name: this.$store.getters.userName}
                 );
                 this.addHistoryEvent(this.createProjectInfo.aid);
               }

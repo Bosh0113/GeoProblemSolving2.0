@@ -749,7 +749,7 @@ export default {
           //检查是否已经存在
           for (let i = 0; i < this.nameConfirm.length; i++) {
             if (this.nameConfirm[i] == this.activityForm.name) {
-              this.$Message.error("Repeated naming in the same project.");
+              this.$Message.error("Repeated activity naming.");
               return;
             }
           }
@@ -773,7 +773,7 @@ export default {
                 );
                 this.operationApi.activityDocInit(
                   res.data.data,
-                  this.userInfo.userId
+                  this.userInfo
                 );
 
                 this.$emit('enterActivity', res.data.data);

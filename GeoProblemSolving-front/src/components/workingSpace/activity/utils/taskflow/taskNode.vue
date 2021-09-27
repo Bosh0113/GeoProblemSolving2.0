@@ -87,97 +87,88 @@
                 </div>
               </div>
               <div class="content" v-else-if="record.type === 'tool'">
-                <p class="time">{{ record.time }}</p>
-                <div class="content">
-                  Tool operation:
-                  <span class="behavior">{{ record.behavior }}</span>
-                  <div>
-                    <img
-                      :src="toolUrl"
-                      height="36px"
-                      width="36px"
-                      :title="record.tool.name"
-                      class="tool"
-                    />
-                  </div>
-                  <div class="participant">
-                    <span style="margin-right: 5px">People: </span>
-                    <avatar
-                      class="person"
-                      :username="record.operator.name"
-                      :size="16"
-                      :rounded="true"
-                      :title="record.operator.name"
-                    />
-                  </div>
+                Tool operation:
+                <span class="behavior">{{ record.behavior }}</span>
+                <div>
+                  <img
+                    :src="toolUrl"
+                    height="42px"
+                    width="42px"
+                    :title="record.tool.name"
+                    class="tool"
+                  />
+                </div>
+                <div class="participant">
+                  <span style="margin-right: 5px">People: </span>
+                  <avatar
+                    class="person"
+                    :username="record.operator.name"
+                    :size="16"
+                    :rounded="true"
+                    :title="record.operator.name"
+                  />
                 </div>
               </div>
               <div class="content" v-else-if="record.type === 'communication'">
-                <p class="time">{{ record.time }}</p>
-                <div class="content">
-                  <span class="behavior">Communication</span>
-                  <div>
-                    <img
-                      :src="chatUrl"
-                      height="36px"
-                      width="36px"
-                      title="Communication records"
-                      class="resource"
-                    />
-                  </div>
-                  <div class="participant">
-                    <span style="margin-right: 5px">People: </span>
-                    <avatar
-                      v-for="person in record.personRef"
-                      :key="person.id"
-                      class="person"
-                      :username="person.name"
-                      :size="16"
-                      :rounded="true"
-                      :title="person.name"
-                    />
-                  </div>
+                <span class="behavior">Communication</span>
+                <div>
+                  <img
+                    :src="chatUrl"
+                    height="42px"
+                    width="42px"
+                    title="Communication records"
+                    class="resources"
+                  />
+                </div>
+                <div class="participant">
+                  <span style="margin-right: 5px">People: </span>
+                  <avatar
+                    v-for="person in record.participants"
+                    :key="person.id"
+                    class="person"
+                    :username="person.name"
+                    :size="16"
+                    :rounded="true"
+                    :title="person.name"
+                  />
                 </div>
               </div>
               <div class="content" v-else-if="record.type === 'geo-analysis'">
-                <p class="time">{{ record.time }}</p>
-                <div class="content">
-                  <span class="behavior">Geo-analysis by using tools</span>
-                  <div>
-                    <img
-                      :src="toolUrl"
-                      height="36px"
-                      width="36px"
-                      :title="record.tool.name"
-                      class="resource"
-                    />
-                    <Divider
-                      type="vertical"
-                      style="height: 36px; margin-top: -30px"
-                    />
-                    <img
-                      v-for="result in record.resRef.outputs"
-                      :key="result.uid"
-                      :src="dataUrl"
-                      height="36px"
-                      width="36px"
-                      style="margin-right: 5px"
-                      title="Result"
-                      class="resource"
-                    />
-                  </div>
-                  <div class="participant">
-                    <span style="margin-right: 5px">People: </span>
-                    <avatar
-                      v-for="person in record.personRef"
-                      :key="person.id"
-                      class="person"
-                      :username="person.name"
-                      :size="16"
-                      :rounded="true"
-                      :title="person.name"
-                    />
-                  </div>
+                <span class="behavior">Geo-analysis by using tools</span>
+                <div>
+                  <img
+                    :src="toolUrl"
+                    height="36px"
+                    width="36px"
+                    :title="record.tool.name"
+                    class="resources"
+                  />
+                  <Divider
+                    type="vertical"
+                    style="height: 42px; margin-top: -30px"
+                  />
+                  <img
+                    v-for="result in record.outputs"
+                    :key="result.uid"
+                    :src="dataUrl"
+                    height="36px"
+                    width="36px"
+                    style="margin-right: 5px"
+                    title="Result"
+                    class="resources"
+                  />
+                </div>
+                <div class="participant">
+                  <span style="margin-right: 5px">People: </span>
+                  <avatar
+                    v-for="person in record.participants"
+                    :key="person.id"
+                    class="person"
+                    :username="person.name"
+                    :size="16"
+                    :rounded="true"
+                    :title="person.name"
+                  />
                 </div>
               </div>
               <Divider />
@@ -192,7 +183,7 @@
                     height="36px"
                     width="36px"
                     title="Data"
-                    class="resource"
+                    class="resources"
                   />
                 </div>
                 <div class="participant">
@@ -218,7 +209,7 @@
                     height="36px"
                     width="36px"
                     title="Data"
-                    class="resource"
+                    class="resources"
                   />
                 </div>
                 <div class="participant">
@@ -244,7 +235,7 @@
                     height="36px"
                     width="36px"
                     title="Data"
-                    class="resource"
+                    class="resources"
                   />
                 </div>
                 <div class="participant">
@@ -279,7 +270,7 @@
                     height="36px"
                     width="36px"
                     title="Tool"
-                    class="resource"
+                    class="resources"
                   />
                   <Divider
                     type="vertical"
@@ -290,7 +281,7 @@
                     height="36px"
                     width="36px"
                     title="Result"
-                    class="resource"
+                    class="resources"
                   />
                 </div>
                 <div class="participant">
@@ -330,9 +321,7 @@
       <div style>
         <div class="dataInfo">
           <Label class="dataLabel">Name:</Label>
-          <span class="dataText">{{
-            selectData.name
-          }}</span>
+          <span class="dataText">{{ selectData.name }}</span>
         </div>
         <div class="dataInfo">
           <Label class="dataLabel">Type:</Label>
@@ -374,13 +363,12 @@ export default {
       otherUrl: require("@/assets/images/otherfile.png"),
       // 工具avatar 图片路径
       toolUrl: require("@/assets/images/toolbox.png"),
-      chatUrl: require("@/assets/images/chat.png"),      
-      checkDataModal: false,      
+      chatUrl: require("@/assets/images/chat.png"),
+      checkDataModal: false,
       selectData: {},
     };
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     operationShow() {
       this.unfold = true;
@@ -407,7 +395,6 @@ export default {
               operation.operator
             );
             operation.operator = operatorInfo;
-
           } else if (operation.type === "communication") {
             // communication
             let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
@@ -422,8 +409,7 @@ export default {
               );
               participants.push(personInfo);
             }
-            operation.personRef = participants;
-
+            operation.participants = participants;
           } else if (operation.type === "geo-analysis") {
             // geo-analysis
             let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
@@ -436,16 +422,16 @@ export default {
               );
               participants.push(operatorInfo);
             }
-            operation.personRef = participants;
+            operation.participants = participants;
             // results
             let results = [];
-            for (var j = 0; j < operation.resources.outputs.length; j++) {
+            for (var j = 0; j < operation.resesRef.outputs.length; j++) {
               let resInfo = this.operationApi.getResInfo(
-                operation.resources.outputs[j]
+                operation.resesRef.outputs[j]
               );
               results.push(resInfo);
             }
-            operation.resources.outputs = results;
+            operation.outputs = results;
           }
           this.operationRecords.push(operation);
         }
@@ -474,7 +460,7 @@ export default {
 .tool {
   cursor: pointer;
 }
-.resource {
+.resources {
   cursor: pointer;
 }
 .participant {
