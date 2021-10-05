@@ -988,7 +988,6 @@ export default {
                   fileList.push(parentsFilesList[this.parentActivitiesID[i]][j]);
                 }
               }
-              console.log(fileList);
               this.$set(this, "activityResList", fileList);
               this.filterData();
               this.filterRelatedRes();

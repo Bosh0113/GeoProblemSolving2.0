@@ -233,7 +233,7 @@ public class ProjectServiceImpl implements ProjectService {
             ActivityType activityType = update.getType();
             String oldPurpose = project.getPurpose();
             String purpose = update.getPurpose();
-            if ("Activity_Unit".equals(activityType) && !oldPurpose.equals(purpose)){
+            if (purpose != null && activityType.equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for(Tool tool : relevantPurposeTool){

@@ -157,11 +157,11 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setType(activity.getType());
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
-            }else if (activity.getType().equals(ActivityType.Activity_Unit)){
+            } else if (activity.getType().equals(ActivityType.Activity_Unit)) {
                 String purpose = activity.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool){
+                for (Tool tool : relevantPurposeTool) {
                     toolSet.add(tool.getTid());
                 }
                 activity.setToolList(toolSet);
@@ -238,11 +238,11 @@ public class ActivityServiceImpl implements ActivityService {
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) result.get();
 
-            if (activity.getType().equals(ActivityType.Activity_Unit)){
-                String purpose = activity.getPurpose();
+            String purpose = update.getPurpose();
+            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !activity.getPurpose().equals(purpose)) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : tools){
+                for (Tool tool : tools) {
                     toolSet.add(tool.getTid());
                 }
                 activity.setToolList(toolSet);
@@ -638,9 +638,8 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
 
-
     @Override
-    public JsonResult updateMemberRole(String aid, String userId, String role){
+    public JsonResult updateMemberRole(String aid, String userId, String role) {
         try {
             // check
             Optional optional = activityRepository.findById(aid);

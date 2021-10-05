@@ -331,6 +331,7 @@ export default {
                   {userId: this.$store.getters.userId, name: this.$store.getters.userName}
                 );
                 this.addHistoryEvent(this.createProjectInfo.aid);
+                this.$router.go(-1);
               }
             })
             .catch((err) => {
