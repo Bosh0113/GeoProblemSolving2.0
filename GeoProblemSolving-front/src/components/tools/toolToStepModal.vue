@@ -594,7 +594,10 @@ export default {
   mounted() {},
   methods: {
     stepToolModalShow() {
-      this.toolIdList = this.activityInfo.toolList != undefined? this.activityInfo.toolList: [];
+      this.toolIdList =
+        this.activityInfo.toolList != undefined
+          ? this.activityInfo.toolList
+          : [];
       this.getAllListInfo();
       this.typeSelected = "All";
       this.showMenuItem = "allToolsets";
@@ -626,14 +629,14 @@ export default {
         return false;
       }
     },
-    isStepToolsetsShow(tid) {      
+    isStepToolsetsShow(tid) {
       if (this.stepToolsetsShow != undefined) {
         return this.stepToolsetsShow.contains(tid);
       } else {
         return false;
       }
     },
-    isStepToolsShow(tid) {   
+    isStepToolsShow(tid) {
       if (this.stepToolsShow != undefined) {
         return this.stepToolsShow.contains(tid);
       } else {
@@ -661,10 +664,10 @@ export default {
           }
         }
       }
-      this.publicTools = tools;
-      this.publicToolsets = toolsets;
-      this.stepToolsetsShow = toolsetsShow;
-      this.stepToolsShow = toolsShow;
+      this.publicTools = Object.assign([], tools);
+      this.publicToolsets = Object.assign([], toolsets);
+      this.stepToolsetsShow = Object.assign([], toolsetsShow);
+      this.stepToolsShow = Object.assign([], toolsShow);
 
       // personal tools and toolsets
       tools = [];
@@ -691,11 +694,16 @@ export default {
       this.personalTools = tools;
       this.personalToolsets = toolsets;
       if (toolsetsShow.length > 0) {
-        this.stepToolsetsShow.push(toolsetsShow);
+        this.stepToolsetsShow = this.stepToolsetsShow.concat(toolsetsShow);
       }
       if (toolsShow.length > 0) {
-        this.stepToolsShow.push(toolsShow);
+        this.stepToolsShow = this.stepToolsShow.concat(toolsShow);
       }
+      this.stepToolsetsShow = this.unique(this.stepToolsetsShow);
+      this.stepToolsShow = this.unique(this.stepToolsShow);
+    },
+    unique(arr) {
+      return Array.from(new Set(arr));
     },
     filterShowListByType() {
       this.publicToolsetsShow = this.getFilterResult(this.publicToolsets);
