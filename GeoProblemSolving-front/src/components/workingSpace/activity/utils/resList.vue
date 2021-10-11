@@ -272,6 +272,12 @@
     >
       <div>
         <vue-scroll :ops="ops" style="height: 300px">
+          <Card dis-hover v-if="userResourceList.length == 0" style="text-align: center; border: transparent; margin-top: 70px">
+            <h2 style="color: #808695">No Resource</h2>
+            <small style="color: #dcdee2"
+              >*You do not have any personal resource.</small
+            >
+          </Card>
           <CheckboxGroup v-model="selectedFilesToShare">
             <Card dis-hover v-for="file in userResourceList" :key="file.index">
               <Checkbox

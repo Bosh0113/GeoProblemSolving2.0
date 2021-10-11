@@ -124,6 +124,7 @@ export default {
     return {
       selectType: "Activity_Default",
       selectTypeModal: false,
+      slctActivityInfo: this.activityInfo,
       //恢复登录的模态框
       tempLoginModal: false,
       userRole: "visitor",
@@ -177,17 +178,17 @@ export default {
     },
     setType() {
       let url = "";
-      let aid = this.activityInfo.aid;
-      let data = this.preEditting(this.activityInfo);
+      let aid = this.slctActivityInfo.aid;
+      let data = this.preEditting(this.slctActivityInfo);
       data.type = this.selectType;
       if (this.selectType == "Activity_Group") {
         data.children = [];
       } else if (this.selectType == "Activity_Unit") {
         data.purpose = this.purpose;
       }
-      if (this.activityInfo.level == 1) {
+      if (this.slctActivityInfo.level == 1) {
         url = "/GeoProblemSolving/subproject/" + aid;
-      } else if (this.activityInfo.level > 1) {
+      } else if (this.slctActivityInfo.level > 1) {
         url = "/GeoProblemSolving/activity/" + aid;
       } else {
         url = "/GeoProblemSolving/project/" + aid;
@@ -201,9 +202,10 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             if(res.data.data.level == 0){
-              this.activityInfo = res.data.data;
+              this.slctActivityInfo = res.data.data;
             }
-            this.operationApi.activityUpdate("type", this.activityInfo);
+            this.operationApi.activityUpdate("type", this.slctActivityInfo);
+            this.$emit("activityInfo",this.slctActivityInfo);
             this.$emit("typeChanged", {type: this.selectType, purpose: this.purpose});
           } else {
             this.$Notice.info({ title: "Result", desc: res.data.msg });

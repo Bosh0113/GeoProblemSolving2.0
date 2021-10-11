@@ -1654,19 +1654,19 @@ export default {
           this.$Message.error("Copy file fail.");
         });
     },
-    filters: {
-      filterSizeType(value){
-        if(value === 0) return "0 B";
-        let k = 1024;
-        let sizes = ["B","KB","MB","GB"];
-        let i = Math.floor(Math.log(value) / Math.log(k));
-        return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
-      },
-      filterTimeStyle(str){
-        let result = str.split('.')[0];
-        return result.replace('T'," ");
-      }
+  },
+  filters: {
+    filterSizeType(value){
+      if(value === 0) return "0 B";
+      let k = 1024;
+      let sizes = ["B","KB","MB","GB"];
+      let i = Math.floor(Math.log(value) / Math.log(k));
+      return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
     },
-    },
-  };
+    filterTimeStyle(str){
+      let result = str.split('.')[0];
+      return result.replace('T'," ");
+    }
+  },
+};
 </script>

@@ -451,6 +451,8 @@ public class ToolServiceImpl implements ToolService {
         Query query = new Query();
         Criteria criteria = new Criteria("privacy").is("Public");
         Criteria inCriteria = new Criteria("recommendation").in("All", purpose);
+        Criteria presentCriteria = new Criteria("present").is(true);
+        query.addCriteria(presentCriteria);
         query.addCriteria(criteria);
         query.addCriteria(inCriteria);
         return toolDao.findByFields(query);
