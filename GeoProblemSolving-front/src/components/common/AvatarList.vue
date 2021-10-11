@@ -14,7 +14,6 @@
     },
     watch: {
       list: {
-        immediate: true,
         deep: true,
         handler(val, oldVal){
           let newVal = JSON.parse(JSON.stringify(val));

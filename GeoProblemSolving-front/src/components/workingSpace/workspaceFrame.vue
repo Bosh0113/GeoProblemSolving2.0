@@ -84,7 +84,7 @@
         >
         <Button
           v-if="
-            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor' 
+            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor'
           "
           icon="md-log-in"
           size="small"
@@ -124,14 +124,14 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         @typeChanged="typeChanged"
-        :key="slctActivity.aid"
+        :key="contentId"
       ></type-choose>
       <single-activity
         v-else-if="contentType == 1"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         :projectInfo="projectInfo"
-        :key="slctActivity.aid"
+        :key="contentId"
       ></single-activity>
       <multi-activity
         v-else-if="contentType == 2"
@@ -140,7 +140,7 @@
         :projectInfo="projectInfo"
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
-        :key="slctActivity.aid"
+        :key="contentId"
         v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></multi-activity>
@@ -148,7 +148,7 @@
         v-else-if="contentType == 3"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
-        :key="slctActivity.aid"
+        :key="contentId"
       ></activity-visitor>
     </Card>
     <!-- edit project -->
@@ -296,6 +296,7 @@ export default {
           background: "lightgrey",
         },
       },
+      contentId: "",
       treeFold: false,
       cascader: [],
       nameConfirm: [],
@@ -816,15 +817,15 @@ export default {
       this.setContent(this.slctActivity);
     },
     setContent(activity) {
-      //更改当前页面的url，且不刷新页面
-      var originUrl = window.location.href;
+      //更改当前页面的url,且不刷新页面
+      let originUrl = window.location.href;
       var valiable = originUrl.split("?")[0];
       window.history.pushState(
         null,
         null,
         valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       );
-
+      this.contentId = Math.random();
       if (
         this.roleIdentity(activity) == "visitor" &&
         !this.permissionIdentity(

@@ -52,6 +52,7 @@ function loadActivityDoc() {
     }
 }
 
+
 //guid
 function guid() {
     function S4() {
@@ -246,6 +247,28 @@ export function getResInfo(resId) {
     }
 
     return resource;
+}
+
+export function getResMetaInfo(aids) {
+  let result;
+  $.ajax({
+    url: "/GeoProblemSolving/activityDoc/" + aids.toString(),
+    type: "GET",
+    async: false,
+    success: function (data) {
+      result = data;
+    },
+    error: function (err) {
+      throw err;
+    }
+  })
+
+  if (result.code == 0){
+    let docs = result.data;
+
+  }else {
+    throw new Error(result.msg)
+  }
 }
 
 export function getMemberInfo(pid) {
@@ -1296,7 +1319,7 @@ export function activityRecord(oid, behavior, userId, childInfo) {
         let Child = xmlDoc.getElementById(childInfo.aid);
         if (Child !== null && Child.localName == "Child") {
             Child.setAttribute("state", "removed");
-        }      
+        }
     }
 
     //OperationRecords
