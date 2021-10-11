@@ -124,12 +124,7 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         @typeChanged="typeChanged"
-<<<<<<< HEAD
-        @activityInfo="activityInfo"
-        :key="slctActivity.aid"
-=======
         :key="contentId"
->>>>>>> zz
       ></type-choose>
       <single-activity
         v-else-if="contentType == 1"

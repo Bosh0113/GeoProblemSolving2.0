@@ -198,7 +198,7 @@
 
           <div v-if="collaborating">
             <div
-              v-for="(item, index) in collaboratingInfoList"
+              v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
             >
               <avatar-list
