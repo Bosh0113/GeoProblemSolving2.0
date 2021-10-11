@@ -3,7 +3,7 @@
     <div id="title">
       <h1 style="text-align: center; margin-top: 10px">Tool</h1>
       <h3 style="text-align: center; margin-bottom: 10px">
-        you can manage your tools here
+        You can manage your tools here
       </h3>
     </div>
     <Row>

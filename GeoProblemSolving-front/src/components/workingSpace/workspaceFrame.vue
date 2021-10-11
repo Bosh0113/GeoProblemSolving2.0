@@ -362,9 +362,10 @@ export default {
     next((vm) => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });
+      } else {
+        next();
       }
     });
-    next();
   },
   created() {
     this.initInfo();
@@ -817,15 +818,16 @@ export default {
       this.setContent(this.slctActivity);
     },
     setContent(activity) {
-      //更改当前页面的url,且不刷新页面
-      let originUrl = window.location.href;
-      var valiable = originUrl.split("?")[0];
-      window.history.pushState(
-        null,
-        null,
-        valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
-      );
-      this.contentId = Math.random();
+      //更改当前页面的url，且不刷新页面
+      // var originUrl = window.location.href;
+      // var valiable = originUrl.split("?")[0];
+      // window.history.pushState(
+      //   null,
+      //   null,
+      //   valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
+      // );
+      this.$router.push({name: "workspaceContent", params: {projectId: this.projectInfo.aid}, query:{aid: activity.aid, level: activity.level }});
+
       if (
         this.roleIdentity(activity) == "visitor" &&
         !this.permissionIdentity(

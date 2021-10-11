@@ -2,7 +2,7 @@
   <div>
     <div id="title">
       <h1 style="text-align: center;margin-top: 10px;">Todo List</h1>
-      <h3 style="text-align: center;margin-bottom: 10px;">you can manage your todo list here</h3>
+      <h3 style="text-align: center;margin-bottom: 10px;">You can manage your tasks here</h3>
     </div>
     <Row>
       <Col span="22" offset="1">

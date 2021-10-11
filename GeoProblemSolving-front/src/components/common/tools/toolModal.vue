@@ -52,7 +52,7 @@
 
         <el-card shadow="never" class="card_contain">
           <div class="container_back">
-            Tools you have <br />sent to <br />the chatroom
+            Tools that you <br />have sent to <br />the chatroom
           </div>
           <vue-scroll :ops="ops" style="height: 480px">
             <div v-for="(tool, index) in sentTools" :key="tool.index">

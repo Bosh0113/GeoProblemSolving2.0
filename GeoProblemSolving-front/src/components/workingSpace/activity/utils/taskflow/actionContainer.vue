@@ -102,7 +102,6 @@ export default {
   watch: {
     activityTasks(newVal, oldVal) {
       if (newVal.length > 0) {
-
         for (let i = 0; i < newVal.length; i++) {
           let data = newVal[i];
 
@@ -121,7 +120,6 @@ export default {
     },
     tempOperations(newVal, oldVal) {
       if (newVal.length > 0) {
-
         for (let i = 0; i < newVal.length; i++) {
           let data = newVal[i];
 
@@ -450,10 +448,7 @@ export default {
         this.selcetedOid,
         this.selectedTask
       );
-      this.$store.commit("updateTempOperations", {
-        behavior: "remove",
-        operation: this.selcetedOperation,
-      });
+      this.refreshTempOperations();
     },
     operationRemove() {
       this.operationModal = false;
@@ -461,10 +456,14 @@ export default {
         this.activityInfo.aid,
         this.selcetedOid
       );
-      this.$store.commit("updateTempOperations", {
-        behavior: "remove",
-        operation: this.selcetedOperation,
-      });
+      this.refreshTempOperations();
+    },
+    refreshTempOperations() {
+      for (var i = 0; i < this.operations.length; i++) {
+        this.removeOperationNode(this.operations[i]);
+      }
+      this.operations = this.operationApi.getTempOperations();
+      this.loadAllOperationNodes();
     },
   },
 };
