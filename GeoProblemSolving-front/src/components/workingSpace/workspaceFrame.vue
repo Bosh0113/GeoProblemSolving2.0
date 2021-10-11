@@ -84,7 +84,7 @@
         >
         <Button
           v-if="
-            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor' 
+            slctActivity.level > 0 && roleIdentity(slctActivity) == 'visitor'
           "
           icon="md-log-in"
           size="small"
@@ -124,15 +124,19 @@
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         @typeChanged="typeChanged"
+<<<<<<< HEAD
         @activityInfo="activityInfo"
         :key="slctActivity.aid"
+=======
+        :key="contentId"
+>>>>>>> zz
       ></type-choose>
       <single-activity
         v-else-if="contentType == 1"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
         :projectInfo="projectInfo"
-        :key="slctActivity.aid"
+        :key="contentId"
       ></single-activity>
       <multi-activity
         v-else-if="contentType == 2"
@@ -141,7 +145,7 @@
         :projectInfo="projectInfo"
         :childActivities="childActivities"
         :nameConfirm="nameConfirm"
-        :key="slctActivity.aid"
+        :key="contentId"
         v-on:enterActivity="enterActivity"
         v-on:enterRootActivity="enterRootActivity"
       ></multi-activity>
@@ -149,7 +153,7 @@
         v-else-if="contentType == 3"
         :activityInfo="slctActivity"
         :userInfo="userInfo"
-        :key="slctActivity.aid"
+        :key="contentId"
       ></activity-visitor>
     </Card>
     <!-- edit project -->
@@ -297,6 +301,7 @@ export default {
           background: "lightgrey",
         },
       },
+      contentId: "",
       treeFold: false,
       cascader: [],
       nameConfirm: [],
@@ -368,9 +373,10 @@ export default {
     });
   },
   created() {
+    this.initInfo();
   },
   mounted() {
-    this.initInfo();
+    // this.initInfo();
     // this.locateActivity();
     window.addEventListener("resize", this.reSize);
 
