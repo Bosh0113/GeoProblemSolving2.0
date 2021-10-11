@@ -211,7 +211,7 @@ const routes = [
     path: "/chat",
     name: "chatUtil",
     component: resolve =>
-      require(["@/components/tools/entity/chatroom"], resolve)
+      require(["@/components/tools/entity/chatroom/chatroom.vue"], resolve)
   },
   {
     path: "/draw",

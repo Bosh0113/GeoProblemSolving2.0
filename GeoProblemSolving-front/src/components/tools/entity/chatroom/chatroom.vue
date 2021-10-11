@@ -69,7 +69,7 @@
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
 }
-.send_tool {
+.chatbox_btn {
   /* text-align: center; */
   width: 25px;
   margin: 7px 10px 0 0;
@@ -114,6 +114,32 @@
   text-align: center;
   margin: 10px 0;
 }
+
+.memberImg {
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memberName {
+  height: 20px;
+  padding: 0px 10px;
+  width: 100%;
+}
+
+.memberDetail {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.memberRole {
+  height: 20px;
+  padding: 0px 10px;
+  width: 100%;
+}
 </style>
 <template>
   <Row>
@@ -122,7 +148,7 @@
         <div
           class="contentBody"
           ref="contentBody"
-          style="height: calc(100vh - 280px)"
+          style="height: calc(100vh - 160px)"
         >
           <div v-for="(list, index) in msglist" :key="index">
             <template v-if="list.type == 'members'">
@@ -140,7 +166,7 @@
           <Row>
             <Col :span="24">
               <Row>
-                <Col :span="14" style="display: flex;">
+                <Col :span="14" style="display: flex">
                   <div class="send_emoji">
                     <twemoji-picker
                       :emojiData="emojiDataAll"
@@ -151,7 +177,7 @@
                       title="Emoji"
                     ></twemoji-picker>
                   </div>
-                  <div class="send_tool">
+                  <div class="chatbox_btn">
                     <Icon
                       type="md-time"
                       @click.native="showRecords()"
@@ -160,12 +186,21 @@
                       class="send_icon"
                     />
                   </div>
-                  <div class="send_tool" title="Send image">
+                  <div class="chatbox_btn" title="Send image">
                     <Upload multiple :before-upload="beforeUploadPic" action>
                       <Icon type="md-image" size="25" class="send_icon" />
                     </Upload>
                   </div>
-                  <div class="send_tool">
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-body"
+                      size="25"
+                      class="send_icon"
+                      title="Online participants"
+                      @click.native="showParticipants()"
+                    />
+                  </div>
+                  <div class="chatbox_btn">
                     <Icon
                       type="md-hammer"
                       size="25"
@@ -174,8 +209,7 @@
                       @click.native="toolModalShow = true"
                     />
                   </div>
-
-                  <div class="send_tool">
+                  <div class="chatbox_btn">
                     <Icon
                       type="md-water"
                       size="25"
@@ -185,7 +219,7 @@
                     />
                   </div>
 
-                  <div class="send_tool">
+                  <div class="chatbox_btn">
                     <Icon
                       type="md-send"
                       @click.native="sendMsg"
@@ -195,7 +229,7 @@
                     />
                   </div>
                 </Col>
-                <Col :span="10" style="width: 250px;display: flex">
+                <Col :span="10" style="width: 250px; display: flex">
                   <div class="send_people">
                     <div class="sent_to_tip">Send to</div>
                   </div>
@@ -229,7 +263,47 @@
         </div>
       </div>
 
-      <div class="extendedPanel" v-show="extendedPanelShow">
+      <div class="extendedPanel" v-show="extendedPeopleShow">
+        <Tabs type="card">
+          <TabPane label="Participants">
+            <Card
+              v-for="(participant, index) in participants"
+              :key="'online' + index"
+              style="margin: 2.5%"
+              :padding="5"
+            >
+              <div style="display: flex; align-items: center">
+                <div class="memberImg" style="position: relative">
+                  <img
+                    v-if="
+                      participant.avatar != '' &&
+                      participant.avatar != 'undefined'
+                    "
+                    :src="avatarUrl(participant.avatar)"
+                    style="width: 40px; height: 40px"
+                  />
+                  <avatar
+                    v-else
+                    :username="participant.name"
+                    :size="40"
+                    :rounded="false"
+                  ></avatar>
+                </div>
+                <div class="memberDetail">
+                  <div class="memberName">
+                    <span>{{ participant.name }}</span>
+                  </div>
+                  <div class="memberRole">
+                    <span>{{ participant.role }}</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </TabPane>
+        </Tabs>
+      </div>
+
+      <div class="extendedPanel" v-show="extendedRecordShow">
         <Tabs type="card">
           <TabPane label="Records">
             <records
@@ -239,7 +313,6 @@
             ></records>
           </TabPane>
         </Tabs>
-        <!-- 日期选择器 -->
       </div>
 
       <div class="extendedPanel" v-show="extendedConceptsShow">
@@ -254,7 +327,6 @@
             ></conceptMap>
           </TabPane>
         </Tabs>
-        <!-- 日期选择器 -->
       </div>
 
       <Modal v-model="toolModalShow" width="820" footer-hide>
@@ -287,7 +359,6 @@ import concepts from "./components/concepts";
 import conceptMap from "./components/conceptMap";
 
 export default {
-  props: ["activityInfo", "participants"],
   components: {
     Avatar,
     toolModal,
@@ -313,13 +384,17 @@ export default {
 
   data() {
     return {
+      activityInfo: {},
+      userInfo: {},
+      participants: [],
       message: "",
       msglist: [],
       panelHeight: 0,
       panelWidth: 0,
 
       windowStatus: "focus", //监听浏览器失焦事件
-
+      //在线成员
+      extendedPeopleShow: false,
       //工具对话框
       toolModalShow: false,
       //语义概念库
@@ -335,8 +410,7 @@ export default {
       sendToMemberId: "All",
       // msgRecords: [],
       //聊天记录
-      extendedPanelShow: false,
-      showTabs: true,
+      extendedRecordShow: false,
       msgConcepts: [],
       msgConceptMap: [],
     };
@@ -346,6 +420,7 @@ export default {
     window.addEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus, true); //监听浏览器失焦事件
     window.addEventListener("resize", this.initSize, true);
+    window.addEventListener("message", this.getActivityInfo, false);
 
     this.init();
     this.supportNotify();
@@ -354,6 +429,18 @@ export default {
     async init() {
       this.initSize();
       this.startWebSocket();
+    },    
+    avatarUrl(url) {
+      let avatarUrl = this.$store.state.UserServer + url;
+      return avatarUrl;
+    },
+    getActivityInfo(event) {
+      if (event.data.type === "activity") {
+        this.activityInfo = event.data.activity;
+        this.userInfo = event.data.user;
+        console.log(this.userInfo)
+        this.participants.push(this.userInfo);
+      }
     },
     initSize() {
       $("#app").css("min-width", "0");
@@ -370,7 +457,11 @@ export default {
         receivers: [this.$store.getters.userId],
         geoConcepts: false,
       };
-      this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, send_msg, this.getSocketConnect);
+      this.socketApi.sendSock(
+        "MsgServer/" + this.activityInfo.aid,
+        send_msg,
+        this.getSocketConnect
+      );
     },
 
     sendMsg() {
@@ -419,8 +510,15 @@ export default {
       }
 
       // send
-      if (this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid).linked) {
-        this.socketApi.sendSock("MsgServer/" + this.activityInfo.aid, message, this.getSocketConnect); //连接后台onopen方法
+      if (
+        this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid)
+          .linked
+      ) {
+        this.socketApi.sendSock(
+          "MsgServer/" + this.activityInfo.aid,
+          message,
+          this.getSocketConnect
+        ); //连接后台onopen方法
 
         message["status"] = "sending";
         message["sender"] = {
@@ -494,7 +592,7 @@ export default {
           // }
         }
       } else if (chatMsg.type == "message-store") {
-        this.operationApi.communicationRecord(
+        let operationId = this.operationApi.communicationRecord(
           this.activityInfo.aid,
           "",
           "",
@@ -502,6 +600,18 @@ export default {
           chatMsg.time,
           chatMsg.participants
         );
+        // 生成临时操作记录
+        let resOperation = {
+          id: operationId,
+          type: "communication",
+          resRef: resList[i].uid,
+          operator: chatMsg.participants,
+        };
+        this.$store.commit("updateTempOperations", {
+          behavior: "add",
+          operation: resOperation,
+        });
+
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have the only person in the meeting.";
         this.msglist.push(chatMsg);
@@ -539,20 +649,25 @@ export default {
           this.selectReceiver.push(user);
         }
       }
+      if (participants != undefined && participants.length > 1) {
+        this.participants = participants;
+      }
     },
 
     showRecords() {
-      this.extendedPanelShow = !this.extendedPanelShow;
-      if (this.extendedPanelShow) {
-        this.extendedConceptsShow = false;
-      }
-      this.showTabs = true;
+      this.extendedRecordShow = !this.extendedRecordShow;
+      this.extendedConceptsShow = false;
+      this.extendedPeopleShow = false;
     },
     showConcepts() {
       this.extendedConceptsShow = !this.extendedConceptsShow;
-      if (this.extendedConceptsShow) {
-        this.extendedPanelShow = false;
-      }
+      this.extendedRecordShow = false;
+      this.extendedPeopleShow = false;
+    },
+    showParticipants() {
+      this.extendedPeopleShow = !this.extendedPeopleShow;
+      this.extendedRecordShow = false;
+      this.extendedConceptsShow = false;
     },
 
     //notice
@@ -636,6 +751,7 @@ export default {
     window.removeEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.removeEventListener("focus", this.winFocus, true); //监听浏览器失焦事件
     window.removeEventListener("resize", this.initSize, true);
+    window.removeEventListener("message", this.getActivityInfo, false);
   },
 
   beforeRouteEnter: (to, from, next) => {

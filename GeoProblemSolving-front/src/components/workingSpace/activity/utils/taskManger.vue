@@ -1700,6 +1700,19 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
+            
+            // update activity doc
+            this.operationApi.taskUpdate(
+              this.activityInfo.aid,
+              "remove",
+              this.taskList[this.selectTaskIndex]
+            );
+            this.$store.commit("updateActivityTasks", {
+              behavior: "remove",
+              task: this.taskList.splice(this.selectTaskIndex, 1)[0],
+            });
+            
+            // 协同
             let sockMsg = {};
             sockMsg["type"] = "task";
             sockMsg["behavior"] = "remove";
@@ -1709,16 +1722,6 @@ export default {
             };
             sockMsg["sender"] = this.userInfo.userId;
             socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
-            // update activity doc
-            this.operationApi.taskUpdate(
-              this.activityInfo.aid,
-              "remove",
-              this.taskList[this.selectTaskIndex]
-            );
-            this.$store.commit("updateActivityTasks", {
-              behavior: "remove",
-              task: this.taskList.splice(this.selectTaskIndex, 1),
-            });
           } else {
             this.$Message.error("Fail!");
           }

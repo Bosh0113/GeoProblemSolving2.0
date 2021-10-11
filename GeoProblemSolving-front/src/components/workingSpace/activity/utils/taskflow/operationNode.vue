@@ -94,6 +94,15 @@
         v-else-if="temOperation.resource.type == 'others'"
       />
       <span class="behavior">Resource {{ temOperation.behavior }}</span>
+    </div>      
+    <div class="content" v-else-if="temOperation != undefined && temOperation.type === 'tool'">      
+      <img
+        :src="toolUrl"
+        height="24px"
+        width="24px"
+        :title="temOperation.tool.name"
+      />
+      <span class="behavior">Tool {{ temOperation.behavior }}</span>
     </div>
   </div>
 </template>
@@ -140,37 +149,41 @@ export default {
           let personInfo = this.operationApi.getMemberInfo(
             operation.operators[j]
           );
-          if(personInfo == null) return;
+          if (personInfo == null) return;
           participants.push(personInfo);
         }
         operation.participants = participants;
-
       } else if (operation.type === "geo-analysis") {
         // geo-analysis
         let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
-        if(toolInfo == null) return;
+        if (toolInfo == null) return;
         operation.tool = toolInfo;
-        
+
         // participants
         let participants = [];
         for (var j = 0; j < operation.personRef.length; j++) {
           let operatorInfo = this.operationApi.getMemberInfo(
             operation.personRef[j]
           );
-          if(operatorInfo == null) return;
+          if (operatorInfo == null) return;
           participants.push(operatorInfo);
         }
         operation.participants = participants;
-
       } else if (operation.type === "resource") {
         // resource
         let resInfo = this.operationApi.getResInfo(operation.resRef);
-        if(resInfo == null) return;
+        if (resInfo == null) return;
 
         operation.resource = resInfo;
         operation.operator = this.operationApi.getMemberInfo(
           operation.operator
         );
+      } else if (operation.type === "tool") {
+        // tool
+        let toolInfo = this.operationApi.getToolInfo(operation.toolRef);
+        operation.tool = toolInfo;
+        let operatorInfo = this.operationApi.getMemberInfo(operation.operator);
+        operation.operator = operatorInfo;
       }
       this.temOperation = operation;
     },

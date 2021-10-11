@@ -2,7 +2,7 @@
   <div class="fileSpace">
     <div id="title">
       <h1 style="text-align: center;margin-top: 10px;">Resource</h1>
-      <h3 style="text-align: center;margin-bottom: 10px;">you can manage your resources here</h3>
+      <h3 style="text-align: center;margin-bottom: 10px;">You can manage your resources here</h3>
     </div>
     <Row>
       <Col span="22" offset="1">
@@ -65,7 +65,7 @@
                             class="fileBtnHoverGray"
                           ></Button>
                         </Tooltip>
-                        <Tooltip content="Upload files" placement="bottom" class="fileBtn">
+                        <Tooltip content="Upload files" placement="left" class="fileBtn">
                           <Button
                             @click="uploadModalShow"
                             shape="circle"

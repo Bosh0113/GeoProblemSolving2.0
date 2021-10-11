@@ -832,7 +832,10 @@ export default {
       // add 只能添加工具集和工具，不能单独添加工具集中的工具
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {
         if (this.isToolIdList(this.stepToolsetsShow[i].tid) == false) {
-          this.operationApi.toolOperationRecord(
+          this.toolIdList.push(this.stepToolsetsShow[i].tid);
+
+          // 操作记录
+          let operationId = this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
             "",
@@ -840,12 +843,25 @@ export default {
             this.userInfo.userId,
             this.stepToolsetsShow[i]
           );
+          // 生成临时操作记录
+          let toolOperation = {
+            id: operationId,
+            type: "tool",
+            toolRef: this.stepToolsetsShow[i].tid,
+            operator: this.userInfo.userId,
+          };
+          this.$store.commit("updateTempOperations", {
+            behavior: "add",
+            operation: toolOperation,
+          });
         }
-        this.toolIdList.push(this.stepToolsetsShow[i].tid);
       }
       for (let i = 0; i < this.stepToolsShow.length; i++) {
         if (this.isToolIdList(this.stepToolsShow[i].tid) == false) {
-          this.operationApi.toolOperationRecord(
+          this.toolIdList.push(this.stepToolsShow[i].tid);
+
+          // 操作记录
+          let operationId = this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
             "",
@@ -853,7 +869,17 @@ export default {
             this.userInfo.userId,
             this.stepToolsShow[i]
           );
-          this.toolIdList.push(this.stepToolsShow[i].tid);
+          // 生成临时操作记录
+          let toolOperation = {
+            id: operationId,
+            type: "tool",
+            toolRef: this.stepToolsShow[i].tid,
+            operator: this.userInfo.userId,
+          };
+          this.$store.commit("updateTempOperations", {
+            behavior: "add",
+            operation: toolOperation,
+          });
         }
       }
       // remove
@@ -862,7 +888,10 @@ export default {
           this.isStepToolsetsShow(this.toolIdList[i]) == false &&
           this.isStepToolsShow(this.toolIdList[i]) == false
         ) {
-          this.operationApi.toolOperationRecord(
+          this.toolIdList.splice(i, 1);
+
+          // 操作记录
+          let operationId = this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
             "",
             "",
@@ -870,7 +899,17 @@ export default {
             this.userInfo.userId,
             { tid: this.toolIdList[i] }
           );
-          this.toolIdList.splice(i, 1);
+          // 生成临时操作记录
+          let toolOperation = {
+            id: operationId,
+            type: "tool",
+            toolRef: this.toolIdList[i],
+            operator: this.userInfo.userId,
+          };
+          this.$store.commit("updateTempOperations", {
+            behavior: "add",
+            operation: toolOperation,
+          });
         }
       }
       this.updateToolist();

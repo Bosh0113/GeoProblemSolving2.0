@@ -165,10 +165,11 @@ public class CollaborationBehavior {
 
     public void sendStoredMsgRecords(HashMap<String, CollaborationUser> participants, MsgRecords msgRecords) {
         try {
-
             JSONObject messageObject = new JSONObject();
             messageObject.put("type", "message-store");
-            messageObject.put("content", msgRecords);
+            messageObject.put("time", msgRecords.getCreatedTime());
+            messageObject.put("recordId", msgRecords.getRecordId());
+            messageObject.put("participants", msgRecords.getParticipants());
 
             for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 CollaborationUser receiver = participant.getValue();
@@ -184,20 +185,18 @@ public class CollaborationBehavior {
         // save each message
         ArrayList<String> msgList = new ArrayList<>();
         ArrayList<String> memberIds = new ArrayList<>();
-        ArrayList<JSONObject> participants = new ArrayList<>();
 
         for (ChatMsg message : records) {
             msgList.add(message.getMessageId());
 
             if (!memberIds.contains(message.getSender().getUserId())) {
                 memberIds.add(message.getSender().getUserId());
-                participants.add(message.getSender().getUserInfo());
             }
 
             chatMsgRepository.save(message);
         }
         // save message records
-        MsgRecords msgRecords = (MsgRecords) msgRecordsService.msgRecordsCreate(aid, msgList, participants).getData();
+        MsgRecords msgRecords = (MsgRecords) msgRecordsService.msgRecordsCreate(aid, msgList, memberIds).getData();
         return msgRecords;
     }
 

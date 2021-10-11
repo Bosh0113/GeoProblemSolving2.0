@@ -550,6 +550,12 @@ export function getTempOperations() {
                 operation["resRef"] = operationNode.getAttribute("resRef");
                 operation["operator"] = operationNode.getAttribute("operator");
                 operation["time"] = operationNode.getAttribute("time");
+            } else if (operationNode.getAttribute("type") === "tool") {
+
+                operation["behavior"] = operationNode.getAttribute("behavior");
+                operation["toolRef"] = operationNode.getAttribute("toolRef");
+                operation["operator"] = operationNode.getAttribute("operator");
+                operation["time"] = operationNode.getAttribute("time");
             } else {
                 continue;
             }
@@ -1033,6 +1039,7 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
     }
 
     updateActivityDoc(aid);
+    return operationId;
 }
 
 export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo) {
@@ -1121,6 +1128,7 @@ export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo
     }
 
     updateActivityDoc(aid);
+    return operationId;
 }
 
 export function communicationRecord(activity, oid, taskId, toolId, resId, time, onlineMembers) {
@@ -1180,6 +1188,7 @@ export function communicationRecord(activity, oid, taskId, toolId, resId, time, 
         }
     }
     updateActivityDoc(aid);
+    return operationId;
 }
 
 export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs, outputs, params, participants) {
@@ -1259,6 +1268,7 @@ export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs
     }
 
     updateActivityDoc(aid);
+    return operationId;
 }
 
 // Child Activity
