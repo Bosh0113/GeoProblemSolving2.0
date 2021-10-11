@@ -52,7 +52,7 @@
     <div v-if="useProjectCSS">
       <div id="title">
             <h1 style="text-align: center;margin-top: 10px;">Project</h1>
-            <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
+            <h3 style="text-align: center;margin-bottom: 10px;">You can manage projects that you created and joined here</h3>
           </div>
           <Row>
             <Col span="22" offset="1">
@@ -297,7 +297,7 @@
     <div v-else>
       <div id="title">
             <h1 style="text-align: center;margin-top: 10px;">Project</h1>
-            <h3 style="text-align: center;margin-bottom: 10px;">you can manage projects you create and join here</h3>
+            <h3 style="text-align: center;margin-bottom: 10px;">You can manage projects that you created or joined here</h3>
           </div>
           <Row>
             <Col span="22" offset="1">

@@ -246,7 +246,7 @@ export default {
       memberRoleModal: false,
       userRoleBtn: false,
       roleSelected: "",
-      socketId: "OperationServer/task/vueTask"
+      taskSocketId: "OperationServer/task-vueTask"
     };
   },
   created() {
@@ -257,7 +257,7 @@ export default {
     activityInfo: {
       immediate: true,
       handler(){
-        this.socketId = `OperationServer/${this.projectInfo.aid}/${this.activityInfo.aid}`;
+          this.taskSocketId = `OperationServer/task${this.projectInfo.aid}/${this.activityInfo.aid}`;
       }
     }
   },
@@ -706,20 +706,20 @@ export default {
         });
     },
     initTaskSocket(){
-      if (!socketApi.getSocketInfo(this.socketId).linked){
-        socketApi.initWebSocket(this.socketId);
+      if (!socketApi.getSocketInfo(this.taskSocketId).linked){
+        socketApi.initWebSocket(this.taskSocketId);
         let sockMsg = {
           type: "test",
           sender: this.userInfo.userId
         };
-        socketApi.sendSock(this.socketId, sockMsg, this.$refs.task.socketOnMessage);
+        socketApi.sendSock(this.taskSocketId, sockMsg, this.$refs.task.socketOnMessage);
       }else {
         console.log(`${this.projectInfo.name}: ${this.activityInfo.name}task has connected.`);
       }
     },
     closeTaskSocket(){
-      if (socketApi.getSocketInfo(this.socketId).linked){
-        socketApi.close(this.socketId);
+      if (socketApi.getSocketInfo(this.taskSocketId).linked){
+        socketApi.close(this.taskSocketId);
       }
     },
   },

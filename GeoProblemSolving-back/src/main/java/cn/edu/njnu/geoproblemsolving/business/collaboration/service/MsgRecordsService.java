@@ -23,7 +23,7 @@ public class MsgRecordsService {
     @Autowired
     ChatMsgRepository chatMsgRepository;
 
-    public JsonResult msgRecordsCreate(String aid, ArrayList<String> records, ArrayList<JSONObject> participants) {
+    public JsonResult msgRecordsCreate(String aid, ArrayList<String> records, ArrayList<String> participants) {
         try {
             MsgRecords msgRecords = new MsgRecords();
 

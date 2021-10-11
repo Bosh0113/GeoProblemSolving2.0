@@ -19,7 +19,7 @@ public class MsgRecords {
 
     private ArrayList<String> records;
 
-    private ArrayList<JSONObject> participants;
+    private ArrayList<String> participants;
 
     private Date createdTime;
 }
