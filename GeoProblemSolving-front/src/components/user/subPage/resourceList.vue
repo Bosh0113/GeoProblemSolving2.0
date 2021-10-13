@@ -449,7 +449,7 @@
                     <Tree :data="folderTree" :render="renderStyle" style="width:400px"></Tree>
                   </vue-scroll>
                 </Card>
-                
+
                 <div slot="footer">
                   <Button type="warning" icon="md-add" style="float:left;" @click="addNewFolderModalShow()">Add new folder</Button>
                   <Button  @click="fileMoveModalClose()">Cancel</Button>
@@ -731,7 +731,7 @@
       },
       updataFolderTree(rootRes,options){
         if(options == "init"){
-          
+
             let allFolder = {
               name: "All Folder",
               folder: true,
@@ -748,8 +748,8 @@
             //递归清理其中不是文件夹的child
             this.recursiveTree(folderTreeTemp);
             this.folderTree[0].children = folderTreeTemp;
-          
-          
+
+
         } else if (options == "add"){
           //待补充
         }
@@ -791,7 +791,7 @@
               display: 'inline-block',
               width: '100%'
             },
-            
+
           }, [
             h('span', [
               h(
@@ -823,7 +823,7 @@
                   )
                 ])
             ]),
-        ]); 
+        ]);
       },
       handleCheckAll() {
         if (this.indeterminate) {
@@ -1185,9 +1185,11 @@
                   this.uploadProgress = 0;
                 } else {
                   this.$Message.warning("Upload fail.");
+                  this.progressModalShow = false;
                 }
               }).catch(err => {
                 this.$Message.warning("Upload fail.");
+                this.progressModalShow = false;
               })
             }
           }
@@ -1339,7 +1341,7 @@
         //fileInfo
         let moveFile = this.slctFile;
         //oldPath
-        let oldPath = ""; 
+        let oldPath = "";
         let foldersPath = this.folderIdStack;
         if (foldersPath.length == 0) {
           foldersPath = ["0"];
@@ -1387,7 +1389,7 @@
         } else {
           path.push(slctFolder.uid);
         }
-        
+
       },
       getFolderByUid(tree,uid){
         for(let i =0 ; i < tree.length ; i++){
@@ -1406,7 +1408,7 @@
         } else {
           this.addNewFolderModal = true;
         }
-        
+
       },
       createNewFolder: function (name) {
         this.$refs[name].validate(valid => {
@@ -1481,12 +1483,12 @@
     margin-left: 10px;
   }
   .res-content-text{
-    width:60px; 
+    width:60px;
     text-overflow: ellipsis;
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
     text-align: center;
-    
+
   }
 
   .fileSpace{

@@ -827,7 +827,7 @@ export default {
       //   valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       // );
       this.$router.push({name: "workspaceContent", params: {projectId: this.projectInfo.aid}, query:{aid: activity.aid, level: activity.level }});
-
+      this.contentId = Math.random();
       if (
         this.roleIdentity(activity) == "visitor" &&
         !this.permissionIdentity(
