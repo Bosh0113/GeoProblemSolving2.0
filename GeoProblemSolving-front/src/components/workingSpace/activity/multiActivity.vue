@@ -88,6 +88,7 @@
     created() {
     },
     mounted() {
+      this.operationApi.getActivityDoc(this.activityInfo.aid);
     },
     beforeDestroy() {
       this.closeTaskSocket();

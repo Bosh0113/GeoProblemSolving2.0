@@ -371,6 +371,9 @@ export default {
     this.initInfo();
   },
   mounted() {
+    // load activity doc
+    this.operationApi.getActivityDoc(this.slctActivity.aid);
+
     // this.initInfo();
     // this.locateActivity();
     window.addEventListener("resize", this.reSize);

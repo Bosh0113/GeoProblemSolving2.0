@@ -488,12 +488,14 @@
         </Button>
       </div>
     </Modal>
-    <Modal v-model="editFileModel" title="Edit file information">
+    <Modal v-model="editFileModel" title="Edit file information" width="600">
       <Form
         ref="editFileValidate"
         :model="editFileValidate"
         :rules="editFileRuleValidate"
-        :label-width="80"
+        label-position="left"
+        :label-width="100"
+        inline
       >
         <FormItem label="Type" prop="type">
           <RadioGroup v-model="editFileValidate.type">
@@ -506,18 +508,53 @@
             <Radio label="others"></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="Name" prop="name">
+        <FormItem label="Name" prop="name" style="width: 100%">
           <Input
             v-model="editFileValidate.name"
-            :rows="4"
             placeholder="Enter the name for file..."
           />
         </FormItem>
-        <FormItem label="Description" prop="description">
+        <FormItem label="Description" prop="description" style="width: 100%"> 
           <Input
             type="textarea"
-            :rows="4"
+            :rows="3"
             v-model="editFileValidate.description"
+          />
+        </FormItem>
+        <Divider orientation="left" v-if="editFileValidate.type == 'data'">Metadata</Divider>
+        <FormItem label="Format" prop="format" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.format"
+          />
+        </FormItem>
+        <FormItem label="Scale" prop="scale" v-if="editFileValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.scale"
+          />
+        </FormItem>
+        <FormItem label="Reference" prop="reference" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.reference"
+          />
+        </FormItem>
+        <FormItem label="Unit" prop="unit" v-if="editFileValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.unit"
+          />
+        </FormItem>
+        <FormItem label="Concept" prop="concept" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.concept"
           />
         </FormItem>
       </Form>
@@ -668,9 +705,10 @@
         :rules="uploadDataRule"
         :label-width="100"
         label-position="left"
+        inline
       >
-        <FormItem label="Privacy" prop="privacy">
-          <RadioGroup v-model="uploadDataInfo.privacy" style="width: 80%">
+        <FormItem label="Privacy" prop="privacy" >
+          <RadioGroup v-model="uploadDataInfo.privacy" style="width: 100%">
             <Radio label="private">Private</Radio>
             <Radio label="public">Public</Radio>
           </RadioGroup>
@@ -686,11 +724,47 @@
             <Radio label="others"></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="Description" prop="description">
+        <FormItem label="Description" prop="description" style="width: 100%">
           <Input
             type="textarea"
-            :rows="4"
+            :rows="3"
             v-model="uploadDataInfo.description"
+          />
+        </FormItem>
+        <Divider orientation="left" v-if="uploadDataInfo.type == 'data'">Metadata</Divider>
+        <FormItem label="Format" prop="format" v-if="uploadDataInfo.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadDataInfo.format"
+          />
+        </FormItem>
+        <FormItem label="Scale" prop="scale" v-if="uploadDataInfo.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadDataInfo.scale"
+          />
+        </FormItem>
+        <FormItem label="Reference" prop="reference" v-if="uploadDataInfo.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadDataInfo.reference"
+          />
+        </FormItem>
+        <FormItem label="Unit" prop="unit" v-if="uploadDataInfo.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadDataInfo.unit"
+          />
+        </FormItem>
+        <FormItem label="Concept" prop="concept" v-if="uploadDataInfo.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadDataInfo.concept"
           />
         </FormItem>
       </Form>
@@ -816,6 +890,11 @@ export default {
         privacy: "private",
         type: "data",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       },
       uploadDataRule: {
         privacy: [
@@ -904,6 +983,11 @@ export default {
         name: "",
         type: "",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       },
       editFileRuleValidate: {
         type: [
@@ -1206,6 +1290,11 @@ export default {
         privacy: "private",
         type: "data",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       };
       this.dataUploadModal = true;
     },
@@ -1223,9 +1312,17 @@ export default {
             if (temp.length == 0) {
               temp = ["0"];
             }
+            console.log(this.uploadDataInfo);
             formData.append("description", this.uploadDataInfo.description);
             formData.append("type", this.uploadDataInfo.type);
             formData.append("privacy", this.uploadDataInfo.privacy);
+            // if(this.uploadDataInfo.type == "data"){
+            //   formData.append("format", this.uploadDataInfo.format);
+            //   formData.append("scale", this.uploadDataInfo.scale);
+            //   formData.append("reference", this.uploadDataInfo.reference);
+            //   formData.append("unit", this.uploadDataInfo.unit);
+            //   formData.append("concept", this.uploadDataInfo.concept);
+            // }
             formData.append("aid", this.activityInfo.aid);
             formData.append("paths", temp.toString());
             this.progressModalShow = true;
@@ -1244,15 +1341,22 @@ export default {
                 data: formData,
               })
                 .then((res) => {
+                  console.log(res);
                   if (res.data != "Fail") {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
+                    let metadata = {};
 
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.activityResList.push(uploadedList[i]);
                       if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
+                        metadata.format = this.uploadDataInfo.format;
+                        metadata.scale = this.uploadDataInfo.scale;
+                        metadata.reference = this.uploadDataInfo.reference;
+                        metadata.unit = this.uploadDataInfo.unit;
+                        metadata.concept = this.uploadDataInfo.concept;
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
@@ -1263,7 +1367,8 @@ export default {
                         "",
                         "upload",
                         this.userInfo.userId,
-                        uploadedList[i]
+                        uploadedList[i],
+                        metadata
                       );
                       // 生成临时操作记录
                       let resOperation = {
@@ -1299,6 +1404,10 @@ export default {
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
+                  this.$Notice.success({
+                    title: "Upload result",
+                    desc: "Upload successfully",
+                  });
                   this.progressModalShow = false;
                   this.uploadProgress = 0;
                 })
@@ -1886,10 +1995,20 @@ export default {
     },
 
     fileEditModelShow(fileInfo) {
+      let metadata = {};
       this.selectFileInfo = fileInfo;
       this.editFileValidate.name = fileInfo.name;
       this.editFileValidate.type = fileInfo.type;
       this.editFileValidate.description = fileInfo.description;
+      if(this.editFileValidate.type =="data"){
+        metadata = this.operationApi.getResInfo(fileInfo.uid);
+        console.log(metadata);
+        this.editFileValidate.format = metadata.format;
+        this.editFileValidate.scale = metadata.scale;
+        this.editFileValidate.reference = metadata.reference;
+        this.editFileValidate.unit = metadata.unit;
+        this.editFileValidate.concept = metadata.concept;
+      }
       this.editFileModel = true;
     },
     editFileInfo(name) {
@@ -1902,6 +2021,7 @@ export default {
             type: this.editFileValidate.type,
             description: this.editFileValidate.description,
           };
+          formData.append("resInfo",JSON.stringify(putResInfo));
           let temp = this.folderIdStack;
           if (temp.length == 0) {
             temp = ["0"];
@@ -1912,9 +2032,10 @@ export default {
                 this.activityInfo.aid +
                 "/" +
                 temp.toString(),
-              putResInfo
+              formData
             )
             .then((res) => {
+              console.log(res);
               this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1923,8 +2044,7 @@ export default {
               } else if (res.data.code == 0) {
                 this.selectFileInfo.name = this.editFileValidate.name;
                 this.selectFileInfo.type = this.editFileValidate.type;
-                this.selectFileInfo.description =
-                  this.editFileValidate.description;
+                this.selectFileInfo.description =this.editFileValidate.description;
 
                 for (var i = 0; i < this.activityResList.length; i++) {
                   if (this.activityResList[i].uid == this.selectFileInfo.uid) {
@@ -1944,14 +2064,22 @@ export default {
                     break;
                   }
                 }
-
+                let metadata = {};
+                if(this.editFileValidate.type == "data"){
+                  metadata.format = this.editFileValidate.format;
+                  metadata.scale = this.editFileValidate.scale;
+                  metadata.reference = this.editFileValidate.reference;
+                  metadata.unit = this.editFileValidate.unit;
+                  metadata.concept = this.editFileValidate.concept;
+                }
                 let operationId = this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
                   "",
                   "",
                   "update",
                   this.userInfo.userId,
-                  this.selectFileInfo
+                  this.selectFileInfo,
+                  metadata,
                 );
                 // 生成临时操作记录
                 let resOperation = {
@@ -1967,6 +2095,10 @@ export default {
               } else {
                 this.$Message.warning("Update fail.");
               }
+              this.$Notice.success({
+                title: "Edit result",
+                desc: "Edit successfully",
+              });
             })
             .catch((err) => {
               this.$Message.warning("Update fail.");
