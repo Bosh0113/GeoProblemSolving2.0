@@ -4,9 +4,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
@@ -34,7 +31,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 )//拦截的请求
                 .excludePathPatterns(
                         "/rip/file/allPublic",
-
+                        "/user/changePwd/**",
                         //测试用
                         "/activityDriven/**",
                         "/activity/**",

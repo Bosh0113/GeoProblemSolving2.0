@@ -1045,13 +1045,13 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
     }
   } else if (behavior === "update") {
     let Resource = xmlDoc.getElementById(resInfo.uid);
-    if (Resource === undefined || Resource.localName !== "Resource") {
+    if (Resource == undefined || Resource.localName != "Resource") {
       Resource = xmlDoc.createElement("Resource");
       Resource.setAttribute("id", resInfo.uid);
     }
     Resource.setAttribute("name", resInfo.name);
     Resource.setAttribute("type", resInfo.type);
-    Resource.setAttribute("format", resInfo.suffix);
+    // Resource.setAttribute("format", resInfo.suffix);
     Resource.setAttribute("description", resInfo.description);
     Resource.setAttribute("provider", resInfo.uploaderId);
     Resource.setAttribute("href", resInfo.address);
@@ -1061,19 +1061,23 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
       for (let i = 0; i < MatedataList.length; i++) {
         if (MatedataList[i].getAttribute("type") === "scale") {
           if (metadata.scale != undefined) {
-            Metadata.setAttribute("description", metadata.scale);
+            MatedataList[i].setAttribute("description", metadata.scale);
           }
         } else if (MatedataList[i].getAttribute("type") === "reference") {
           if (metadata.reference != undefined) {
-            Metadata.setAttribute("description", metadata.reference);
+            MatedataList[i].setAttribute("description", metadata.reference);
           }
         } else if (MatedataList[i].getAttribute("type") === "unit") {
           if (metadata.unit != undefined) {
-            Metadata.setAttribute("description", metadata.unit);
+            MatedataList[i].setAttribute("description", metadata.unit);
           }
         } else if (MatedataList[i].getAttribute("type") === "concept") {
           if (metadata.concept != undefined) {
-            Metadata.setAttribute("description", metadata.concept);
+            MatedataList[i].setAttribute("description", metadata.concept);
+          }
+        } else if (MatedataList[i].getAttribute("type") === "format") {
+          if (metadata.format != undefined) {
+            MatedataList[i].setAttribute("description", metadata.format);
           }
         }
       }

@@ -371,6 +371,9 @@ export default {
     this.initInfo();
   },
   mounted() {
+    // load activity doc
+    this.operationApi.getActivityDoc(this.slctActivity.aid);
+
     // this.initInfo();
     // this.locateActivity();
     window.addEventListener("resize", this.reSize);
@@ -817,6 +820,9 @@ export default {
       this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
+    activityInfo(data){
+      this.activityInfo = data;
+    },
     setContent(activity) {
       //更改当前页面的url，且不刷新页面
       // var originUrl = window.location.href;
@@ -943,57 +949,59 @@ export default {
       });
     },
     updatePathway(type, content) {
-      if (this.parentActivity.pathway != undefined) {
-        if (type === "name") {
-          let pathway = JSON.stringify(this.parentActivity.pathway);
-          // let faceName = new RegExp(this.slctActivity.name, "g");
-          // pathway.replace(faceName, content);
-          let newpathway = pathway.replaceAll(
-            '"' + this.slctActivity.name + '"',
-            '"' + content + '"'
-          );
-          this.parentActivity.pathway = JSON.parse(newpathway);
-        } else if (type === "type") {
-          for (let i = 0; i < this.parentActivity.pathway.length; i++) {
-            if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
-              this.parentActivity.pathway[i].category =
-                this.getStepCategroy(content);
+      if(this.parentActivity){
+        if (this.parentActivity.pathway != undefined) {
+          if (type === "name") {
+            let pathway = JSON.stringify(this.parentActivity.pathway);
+            // let faceName = new RegExp(this.slctActivity.name, "g");
+            // pathway.replace(faceName, content);
+            let newpathway = pathway.replaceAll(
+              '"' + this.slctActivity.name + '"',
+              '"' + content + '"'
+            );
+            this.parentActivity.pathway = JSON.parse(newpathway);
+          } else if (type === "type") {
+            for (let i = 0; i < this.parentActivity.pathway.length; i++) {
+              if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+                this.parentActivity.pathway[i].category =
+                  this.getStepCategroy(content);
+              }
             }
+          } else if (type === "delete") {
+            this.removePathwayNode(content);
           }
-        } else if (type === "delete") {
-          this.removePathwayNode(content);
         }
-      }
 
-      // url
-      let url = "";
-      if (this.parentActivity.level == 1) {
-        url = "/GeoProblemSolving/subproject/" + this.parentActivity.aid;
-      } else if (this.parentActivity.level > 1) {
-        url = "/GeoProblemSolving/activity/" + this.parentActivity.aid;
-      } else {
-        url = "/GeoProblemSolving/project/" + this.parentActivity.aid;
+        // url
+        let url = "";
+        if (this.parentActivity.level == 1) {
+          url = "/GeoProblemSolving/subproject/" + this.parentActivity.aid;
+        } else if (this.parentActivity.level > 1) {
+          url = "/GeoProblemSolving/activity/" + this.parentActivity.aid;
+        } else {
+          url = "/GeoProblemSolving/project/" + this.parentActivity.aid;
+        }
+        let data = {
+          aid: this.parentActivity.aid,
+          pathway: this.parentActivity.pathway,
+        };
+        this.axios
+          .put(url, data)
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code !== 0) {
+              this.$Notice.info({
+                desc: "Fail to update the pathway in the parent activity!",
+              });
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
       }
-      let data = {
-        aid: this.parentActivity.aid,
-        pathway: this.parentActivity.pathway,
-      };
-      this.axios
-        .put(url, data)
-        .then((res) => {
-          if (res.data == "Offline") {
-            this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
-            this.tempLoginModal = true;
-          } else if (res.data.code !== 0) {
-            this.$Notice.info({
-              desc: "Fail to update the pathway in the parent activity!",
-            });
-          }
-        })
-        .catch((err) => {
-          throw err;
-        });
     },
     // remove
     removePathwayNode(aid) {

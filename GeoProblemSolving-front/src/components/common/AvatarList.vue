@@ -1,6 +1,18 @@
 <template>
   <div class="avatarList">
-    <Avatar class="avatar" v-for="(item,index) in avatarList" :src="item.avatar" :key="index" :title="item.name"/>
+    <span class="avatar" v-for="(item,index) in avatarList" :key="index" :title="item.name">
+      <img
+        v-if="item.avatar != '' && item.avatar != undefined"
+        :src="avatarUrl(item.avatar)"
+        style="width: 35px; height: 35px; border-radius: 50%;"
+      />
+      <avatar
+        v-else
+        :username="item.name"
+        :size="30"
+        :rounded="true"
+      />
+    </span>
   </div>
 </template>
 
@@ -12,19 +24,15 @@
     props: {
       list: Array
     },
+    components: {
+      Avatar,
+    },
     watch: {
       list: {
         deep: true,
         handler(val, oldVal){
           let newVal = JSON.parse(JSON.stringify(val));
           this.avatarList = newVal;
-          for (let i = 0; i < newVal.length; i++) {
-            if (val[i].avatar == undefined || val[i].avatar == ''){
-              continue;
-            }
-            let newAvatar = this.$store.getters.userServer + val[i].avatar;
-            this.$set(this.avatarList[i], "avatar", newAvatar);
-        }
         }
       }
     },
@@ -35,7 +43,14 @@
     },
     mounted() {
       this.avatarList = this.list;
-    }
+      console.log(this.avatarList);
+    },
+    methods: {
+      avatarUrl(url) {
+        let avatarUrl = this.$store.state.UserServer + url;
+        return avatarUrl;
+      },
+    },
   }
 </script>
 
@@ -44,8 +59,7 @@
     display: inline-block;
   }
   .avatar {
-    margin-right: -8px;
-    border: 1px solid white;
+    margin-right: -12px;
   }
 
 </style>

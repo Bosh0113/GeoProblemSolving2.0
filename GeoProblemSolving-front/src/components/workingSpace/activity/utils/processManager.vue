@@ -196,9 +196,12 @@
           </div>
           <div id="steps"></div>
 
-          <div v-if="collaborating">
+          <div v-if="collaborating && permissionIdentity(
+                  activityInfo.permission,
+                  'manage_child_activity'
+                )" style="margin-top: 20px;"><strong>collaborating:</strong> 
             <div
-              v-for="(item, index) in collaboratingInfoList"
+              v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
             >
               <avatar-list
@@ -249,7 +252,8 @@
       @on-visible-change='linkModalStatus'
     >
       <div slot="footer">
-        <div style="display: inline-block; position: absolute; left: 10px">
+        <div style="display: inline-block; position: absolute; left: 30px">
+          <span style="margin-right:10px; font-size:14px; vertical-align:top;"  v-if="collLinkUser.length > 1">online collaborating members: </span>
           <avatar-list
             :list="collLinkUser"
             v-if="collLinkUser.length > 1"
@@ -908,6 +912,9 @@
           });
           if (this.collaboratingInfoList.length > 0) {
             this.collaborating = true;
+          }
+          if (this.collaboratingInfoList.length == 0) {
+            this.collaborating = false;
           }
         },
       },
