@@ -970,7 +970,7 @@ export default {
         });
     },
     initSize() {
-      this.contentHeight = window.innerHeight - 230;
+      this.contentHeight = window.innerHeight - 400;
     },
     roleIdentity() {
       this.userRole = this.userRoleApi.roleIdentify(
