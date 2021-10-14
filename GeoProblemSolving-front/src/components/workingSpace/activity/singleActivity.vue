@@ -253,6 +253,9 @@ export default {
     this.userRole = this.roleIdentity(this.activityInfo);
     this.getParticipants();
   },
+  mounted() {
+    this.operationApi.getActivityDoc(this.activityInfo.aid);
+  },
   watch: {
     activityInfo: {
       immediate: true,

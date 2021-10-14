@@ -6,6 +6,8 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
+
 @CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/activityDoc")
@@ -48,5 +50,10 @@ public class ActivityDocController {
     public JsonResult updateAcitivityDoc(@RequestBody  ActivityDoc activityDoc)
     {
         return activityDocService.updateDocument(activityDoc.getAid(), activityDoc.getDocument());
+    }
+
+    @RequestMapping(value = "/{aids}",method = RequestMethod.GET)
+    public JsonResult inquiryActivityDocs(@PathVariable HashSet<String> aids){
+        return activityDocService.findDocuments(aids);
     }
 }

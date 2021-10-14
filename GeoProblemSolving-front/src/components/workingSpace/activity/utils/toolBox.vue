@@ -327,6 +327,7 @@ export default {
     //     })
     // },
     getAllTools() {
+      console.log(this.activityInfo);
       this.toolIdList = this.activityInfo.toolList;
       if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
         this.getToolInfos();

@@ -489,9 +489,10 @@
         :rules="uploadRuleValidate"
         :label-width="100"
         label-position="left"
+        inline
       >
         <FormItem label="Privacy" prop="privacy">
-          <RadioGroup v-model="uploadValidate.privacy" style="width: 80%">
+          <RadioGroup v-model="uploadValidate.privacy" style="width: 100%">
             <Radio label="private">Private</Radio>
             <Radio label="public">Public</Radio>
           </RadioGroup>
@@ -507,11 +508,47 @@
             <Radio label="others"></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="Description" prop="description">
+        <FormItem label="Description" prop="description" style="width: 100%">
           <Input
             type="textarea"
-            :rows="4"
+            :rows="3"
             v-model="uploadValidate.description"
+          />
+        </FormItem>
+        <Divider orientation="left" v-if="uploadValidate.type == 'data'">Metadata</Divider>
+        <FormItem label="Format" prop="format" v-if="uploadValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadValidate.format"
+          />
+        </FormItem>
+        <FormItem label="Scale" prop="scale" v-if="uploadValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadValidate.scale"
+          />
+        </FormItem>
+        <FormItem label="Reference" prop="reference" v-if="uploadValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadValidate.reference"
+          />
+        </FormItem>
+        <FormItem label="Unit" prop="unit" v-if="uploadValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadValidate.unit"
+          />
+        </FormItem>
+        <FormItem label="Concept" prop="concept" v-if="uploadValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="uploadValidate.concept"
           />
         </FormItem>
       </Form>
@@ -734,12 +771,14 @@
         </i-button>
       </div>
     </Modal>
-    <Modal v-model="editFileModel" title="Edit file information">
+    <Modal v-model="editFileModel" title="Edit file information" width="600">
       <Form
         ref="editFileValidate"
         :model="editFileValidate"
         :rules="editFileRuleValidate"
-        :label-width="80"
+        label-position="left"
+        :label-width="100"
+        inline
       >
         <FormItem label="Type" prop="type">
           <RadioGroup v-model="editFileValidate.type">
@@ -752,18 +791,54 @@
             <Radio label="others"></Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="Name" prop="name">
+        <FormItem label="Name" prop="name" style="width: 100%">
           <Input
             v-model="editFileValidate.name"
             :rows="4"
             placeholder="Enter the name for file..."
           />
         </FormItem>
-        <FormItem label="Description" prop="description">
+        <FormItem label="Description" prop="description" style="width: 100%">
           <Input
             type="textarea"
-            :rows="4"
+            :rows="3"
             v-model="editFileValidate.description"
+          />
+        </FormItem>
+        <Divider orientation="left" v-if="editFileValidate.type == 'data'">Metadata</Divider>
+        <FormItem label="Format" prop="format" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.format"
+          />
+        </FormItem>
+        <FormItem label="Scale" prop="scale" v-if="editFileValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.scale"
+          />
+        </FormItem>
+        <FormItem label="Reference" prop="reference" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.reference"
+          />
+        </FormItem>
+        <FormItem label="Unit" prop="unit" v-if="editFileValidate.type == 'data'" :label-width="50">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.unit"
+          />
+        </FormItem>
+        <FormItem label="Concept" prop="concept" v-if="editFileValidate.type == 'data'" :label-width="70">
+          <Input
+            type="text"
+            style="width:200px;"
+            v-model="editFileValidate.concept"
           />
         </FormItem>
       </Form>
@@ -843,6 +918,11 @@ export default {
         name: "",
         type: "",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       },
       editFileRuleValidate: {
         type: [
@@ -872,6 +952,11 @@ export default {
         privacy: "private",
         type: "data",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       },
       uploadRuleValidate: {
         privacy: [
@@ -1216,6 +1301,11 @@ export default {
         privacy: "private",
         type: "data",
         description: "",
+        format: "",
+        scale: "",
+        reference: "",
+        unit: "",
+        concept: "",
       };
       this.toUploadFiles = [];
       this.uploadModal = true;
@@ -1280,8 +1370,38 @@ export default {
                   var uploadedList = res.data.uploaded;
                   var failedList = res.data.failed;
                   var sizeOverList = res.data.sizeOver;
+                  let metadata = {};
                   for (var i = 0; i < uploadedList.length; i++) {
                     this.currentFolder.files.push(uploadedList[i]);
+                    if(this.uploadValidate.type == "data"){
+                      metadata.format = this.uploadValidate.format;
+                      metadata.scale = this.uploadValidate.scale;
+                      metadata.reference = this.uploadValidate.reference;
+                      metadata.unit = this.uploadValidate.unit;
+                      metadata.concept = this.uploadValidate.concept;
+                    }
+
+                    let operationId = this.operationApi.resOperationRecord(
+                      this.activityInfo.aid,
+                      "",
+                      "",
+                      "upload",
+                      this.userInfo.userId,
+                      uploadedList[i],
+                      metadata
+                    );
+                      
+                    // 生成临时操作记录
+                    let resOperation = {
+                      id: operationId,
+                      type: "resource",
+                      resRef: uploadedList[i].uid,
+                      operator: this.userInfo.userId,
+                    };
+                    this.$store.commit("updateTempOperations", {
+                      behavior: "add",
+                      operation: resOperation,
+                    });
                   }
                   if (sizeOverList.length > 0) {
                     this.$Notice.warning({
@@ -1302,6 +1422,11 @@ export default {
                 } else {
                   this.$Message.warning("Upload fail.");
                 }
+                //上传成功
+                this.$Notice.success({
+                  title: "Upload result",
+                  desc: "Upload successfully",
+                });
                 this.progressModalShow = false;
                 this.uploadProgress = 0;
               })
@@ -1562,10 +1687,20 @@ export default {
       window.open(fileInfo.address);
     },
     fileEditModelShow(fileInfo) {
+      let metadata = {};
       this.putFileInfo = fileInfo;
       this.editFileValidate.name = fileInfo.name;
       this.editFileValidate.type = fileInfo.type;
       this.editFileValidate.description = fileInfo.description;
+      if(this.editFileValidate.type =="data"){
+        metadata = this.operationApi.getResInfo(fileInfo.uid);
+        console.log(metadata);
+        this.editFileValidate.format = metadata.format;
+        this.editFileValidate.scale = metadata.scale;
+        this.editFileValidate.reference = metadata.reference;
+        this.editFileValidate.unit = metadata.unit;
+        this.editFileValidate.concept = metadata.concept;
+      }
       this.editFileModel = true;
     },
     editFileInfo(name) {
@@ -1592,6 +1727,7 @@ export default {
               formData
             )
             .then((res) => {
+              console.log(res);
               this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -1610,6 +1746,34 @@ export default {
                     break;
                   }
                 }
+                let metadata = {};
+                if(this.editFileValidate.type == "data"){
+                  metadata.format = this.editFileValidate.format;
+                  metadata.scale = this.editFileValidate.scale;
+                  metadata.reference = this.editFileValidate.reference;
+                  metadata.unit = this.editFileValidate.unit;
+                  metadata.concept = this.editFileValidate.concept;
+                }
+                let operationId = this.operationApi.resOperationRecord(
+                  this.activityInfo.aid,
+                  "",
+                  "",
+                  "update",
+                  this.userInfo.userId,
+                  this.putFileInfo,
+                  metadata,
+                );
+                // 生成临时操作记录
+                let resOperation = {
+                  id: operationId,
+                  type: "resource",
+                  resRef: this.putFileInfo.uid,
+                  operator: this.userInfo.userId,
+                };
+                this.$store.commit("updateTempOperations", {
+                  behavior: "add",
+                  operation: resOperation,
+                });
               } else {
                 this.$Message.warning("Update fail.");
               }
@@ -1654,19 +1818,19 @@ export default {
           this.$Message.error("Copy file fail.");
         });
     },
-    filters: {
-      filterSizeType(value){
-        if(value === 0) return "0 B";
-        let k = 1024;
-        let sizes = ["B","KB","MB","GB"];
-        let i = Math.floor(Math.log(value) / Math.log(k));
-        return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
-      },
-      filterTimeStyle(str){
-        let result = str.split('.')[0];
-        return result.replace('T'," ");
-      }
+  },
+  filters: {
+    filterSizeType(value){
+      if(value === 0) return "0 B";
+      let k = 1024;
+      let sizes = ["B","KB","MB","GB"];
+      let i = Math.floor(Math.log(value) / Math.log(k));
+      return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
     },
-    },
-  };
+    filterTimeStyle(str){
+      let result = str.split('.')[0];
+      return result.replace('T'," ");
+    }
+  },
+};
 </script>

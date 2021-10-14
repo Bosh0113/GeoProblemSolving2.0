@@ -7,6 +7,8 @@ import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 
 @Service
@@ -68,6 +70,21 @@ public class ActivityDocServiceImpl implements ActivityDocService {
 
             return ResultUtils.success(activityDoc);
         } catch (Exception ex) {
+            return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult findDocuments(HashSet<String> aids) {
+        try {
+            Iterable<ActivityDoc> allById = activityDocRepository.findAllById(aids);
+            HashSet<ActivityDoc> activityDocs = new HashSet<>();
+            Iterator<ActivityDoc> iterator = allById.iterator();
+            while (iterator.hasNext()){
+                activityDocs.add(iterator.next());
+            }
+            return ResultUtils.success(activityDocs);
+        }catch (Exception ex){
             return ResultUtils.error(-2, ex.toString());
         }
     }

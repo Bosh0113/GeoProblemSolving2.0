@@ -4,6 +4,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.HashSet;
+
 public interface ActivityDocService {
 
     JsonResult saveDocument(ActivityDoc activityDoc);
@@ -13,4 +15,6 @@ public interface ActivityDocService {
     JsonResult deleteDocument(String aid);
 
     JsonResult updateDocument(String aid, String document);
+
+    JsonResult findDocuments(HashSet<String> aids);
 }
