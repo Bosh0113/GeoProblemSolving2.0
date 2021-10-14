@@ -692,10 +692,12 @@ function updateActivityDoc(aid) {
 
 // acitivity——type: type/other
 export function activityUpdate(updateType, activityInfo) {
-  this.getActivityDoc(activityInfo.aid);
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
-    return;
+    getActivityDoc(activityInfo.aid);
+    if (xmlDoc === null){
+      alert("Failed to record operation. Please load activity document first!");
+      return;
+    }
   }
 
   let Activity = xmlDoc.getElementsByTagName('Activity')[0];
