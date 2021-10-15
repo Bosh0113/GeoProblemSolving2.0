@@ -240,26 +240,26 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      */
     private void resFlowInProtocol(HashMap<String, HashMap<String, LinkRestriction>> upperNodeLinkList, String type, ArrayList<String> nodeIds, LinkRestriction linkRestriction) {
         //关系上层到关系连接点的流动，内部包含活动层的更新
-        for (Map.Entry<String, HashMap<String, LinkRestriction>> linkedEdge : upperNodeLinkList.entrySet()) {
-            //起终点是倒置的，所以起点是存储在 value 中的，有多个起点
-            String endNodeId = linkedEdge.getKey();
-            ActivityNode endNode = nodeRepository.findById(endNodeId).get();
-            HashMap<String, LinkRestriction> startNodeAndLinkRestriction = linkedEdge.getValue();
-            for (Map.Entry<String, LinkRestriction> endNodeItem : startNodeAndLinkRestriction.entrySet()) {
-                //获取流动的资源，并且判断那些资源可以通过限制
-                String startNodeId = endNodeItem.getKey();
-                LinkRestriction edgeRestriction = endNodeItem.getValue();
-                ActivityNode flowNode = nodeRepository.findById(startNodeId).get();
-                HashMap<String, String> flowNodeResources = flowNode.getResources();
-                HashSet<String> approvedRes = resFlowApprove(flowNodeResources, edgeRestriction);
-                //无可流动资源直接就不做处理了
-                if (approvedRes.size() == 0) continue;
-                //将资源流动到节点中
-                HashMap<String, String> nodeResourceTagMap = addResourceToNode(startNodeId, endNodeId, approvedRes);
-                endNode.setResources(nodeResourceTagMap);
-                nodeRepository.save(endNode);
-            }
-        }
+        // for (Map.Entry<String, HashMap<String, LinkRestriction>> linkedEdge : upperNodeLinkList.entrySet()) {
+        //     //起终点是倒置的，所以起点是存储在 value 中的，有多个起点
+        //     String endNodeId = linkedEdge.getKey();
+        //     ActivityNode endNode = nodeRepository.findById(endNodeId).get();
+        //     HashMap<String, LinkRestriction> startNodeAndLinkRestriction = linkedEdge.getValue();
+        //     for (Map.Entry<String, LinkRestriction> endNodeItem : startNodeAndLinkRestriction.entrySet()) {
+        //         //获取流动的资源，并且判断那些资源可以通过限制
+        //         String startNodeId = endNodeItem.getKey();
+        //         LinkRestriction edgeRestriction = endNodeItem.getValue();
+        //         ActivityNode flowNode = nodeRepository.findById(startNodeId).get();
+        //         HashMap<String, String> flowNodeResources = flowNode.getResources();
+        //         HashSet<String> approvedRes = resFlowApprove(flowNodeResources, edgeRestriction);
+        //         //无可流动资源直接就不做处理了
+        //         if (approvedRes.size() == 0) continue;
+        //         //将资源流动到节点中
+        //         HashMap<String, String> nodeResourceTagMap = addResourceToNode(startNodeId, endNodeId, approvedRes);
+        //         endNode.setResources(nodeResourceTagMap);
+        //         nodeRepository.save(endNode);
+        //     }
+        // }
 
         //内部的流动 协议内部的限制性条件是相同的
         String keyNodeId = nodeIds.get(0);
