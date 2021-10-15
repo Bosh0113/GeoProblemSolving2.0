@@ -368,13 +368,13 @@ export default {
     });
   },
   created() {
-    this.initInfo();
+    // this.initInfo();
   },
   mounted() {
     // load activity doc
     this.operationApi.getActivityDoc(this.slctActivity.aid);
 
-    // this.initInfo();
+    this.initInfo();
     // this.locateActivity();
     window.addEventListener("resize", this.reSize);
 
@@ -524,6 +524,7 @@ export default {
         on = {
           click: () => {
             this.slctActivity = data;
+            console.log(this.slctActivity);
             this.locateActivity();
           },
         };
@@ -817,6 +818,9 @@ export default {
     },
     typeChanged(data) {
       this.slctActivity.type = data.type;
+      if(this.slctActivity.level == 0){
+        this.projectInfo.type = data.type;
+      }
       this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
