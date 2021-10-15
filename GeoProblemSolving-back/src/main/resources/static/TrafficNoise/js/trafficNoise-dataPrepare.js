@@ -51,7 +51,7 @@ function onRegisterClick() {
 function isLogin() {
     // $("#userInfo").show();
     // $("#userName").text(userName);
-    $("#content-iframe").attr("src", "./RLS90.html");
+    $("#content-iframe").attr("src", "./RLS90-dataPrepare.html");
     // $("#content-iframe").get(0).contentWindow.userId = userId;
     $("#operate").show();
     // $.ajax({
@@ -66,7 +66,7 @@ function isLogin() {
     //
     //             $("#login").hide();
     //             $("#userInfo").show();
-    //             $("#content-iframe").attr("src", "./RLS90.html");
+    //             $("#content-iframe").attr("src", "./RLS90-dataPrepare.html");
     //             $("#content-iframe").get(0).contentWindow.userId = result.userId;
     //             $("#operate").show();
     //         }
@@ -90,12 +90,12 @@ window.addEventListener('message', function (e) {
 
                 $("#login").hide();
                 $("#userInfo").show();
-                $("#content-iframe").attr("src", "./RLS90.html");
+                $("#content-iframe").attr("src", "./RLS90-dataPrepare.html");
             }
             break;
         case "register.html":
             break;
-        case "RLS90.html":
+        case "RLS90-dataPrepare.html":
             break;
     }
 })
@@ -104,6 +104,9 @@ function selectData(dataType) {
     $("#content-iframe").get(0).contentWindow.selectData(dataType);
 }
 
+function exportData(dataType) {
+    $("#content-iframe").get(0).contentWindow.exportData(dataType);
+}
 
 $(function () {
     $(window).resize(function () {
