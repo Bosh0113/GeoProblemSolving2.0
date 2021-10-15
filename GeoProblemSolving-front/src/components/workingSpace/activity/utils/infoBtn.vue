@@ -496,6 +496,7 @@ export default {
         return;
       }
       let data = await get(url);
+      console.log(data);
 
       this.potentialMembers = [];
       this.invitingMembers = [];
@@ -504,6 +505,7 @@ export default {
         this.potentialMembers.push({
           key: this.potentialMembers.length,
           userId: candidates[i].userId,
+          avatar: candidates[i].avatar,
           name: candidates[i].name,
           role: candidates[i].role,
           domain: candidates[i].domain,
@@ -522,6 +524,7 @@ export default {
     },
     memberRender(item) {
       return `<span title="${item.name} - ${item.role}">${item.name} - ${item.role}</span>`;
+      // return `<span title="${item.name} - ${item.role}">${item.name}</span>`;
     },
     filterMethod(data, query) {
       return data.name.indexOf(query) > -1;
@@ -559,6 +562,7 @@ export default {
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
+              user.role = "ordinary-member";
               this.participants.push(user);
               this.$Notice.info({ desc: "Invite member successfully" });
 
@@ -645,6 +649,7 @@ export default {
         .put(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.slctRoleMember = role;
             this.$Notice.info({ desc: "Change the member role successfully" });
             // update activity doc
             this.operationApi.participantUpdate(
@@ -653,7 +658,7 @@ export default {
               member.userId,
               member.name,
               member.role,
-              user.domain
+              member.domain
             );
             this.getParticipants();
 
@@ -723,6 +728,7 @@ export default {
       this.axios
         .delete(url)
         .then((res) => {
+          console.log(res);
           if (res.data.code == 0) {
             // update activity doc
             this.operationApi.participantUpdate(

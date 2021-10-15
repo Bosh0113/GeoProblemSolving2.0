@@ -524,6 +524,7 @@ export default {
         on = {
           click: () => {
             this.slctActivity = data;
+            console.log(this.slctActivity);
             this.locateActivity();
           },
         };
@@ -817,6 +818,9 @@ export default {
     },
     typeChanged(data) {
       this.slctActivity.type = data.type;
+      if(this.slctActivity.level == 0){
+        this.projectInfo.type = data.type;
+      }
       this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
