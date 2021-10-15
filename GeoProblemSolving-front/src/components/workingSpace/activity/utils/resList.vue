@@ -577,12 +577,12 @@
             >
           </Card>
           <CheckboxGroup v-model="selctResToShare">
-            <Card dis-hover v-for="file in fileList" :key="file.index">
+            <Card dis-hover v-for="file in fileListChoosed" :key="file.index">
               <Checkbox
                 :label="file.uid"
                 class="personalFileLabel"
                 :title="file.name"
-                v-if="!file.folder"
+                v-if="!file.folder && !file.fromParents"
               >
                 <Icon
                   v-if="file.type === 'data'"
@@ -638,7 +638,7 @@
                 :label="file.uid"
                 class="personalFileLabel"
                 :title="file.name"
-                v-else
+                v-else-if="!file.fromParents"
               >
                 <Icon
                   type="ios-folder-open-outline"
@@ -669,6 +669,7 @@
                   text-overflow: ellipsis;
                   margin-left: 50px;
                 "
+                v-if=" !file.fromParents"
               >
                 {{ file.description }}
               </p>
@@ -679,7 +680,7 @@
                 >{{ file.description }}</span
               > -->
               <span
-                style="display: inline-block; vertical-align: top; float: right" v-if="!file.folder"
+                style="display: inline-block; vertical-align: top; float: right" v-if="!file.folder && !file.fromParents"
                 >{{ file.fileSize | filterSizeType }}</span
               >
             </Card>
@@ -1217,6 +1218,7 @@ export default {
       // 共享
       shareModal: false,
       shareToParentModal: false,
+      fileListChoosed: [],
       selctResToShare: [],
       userResourceList: [],
       selectedFilesToShare: [],
@@ -2354,14 +2356,17 @@ export default {
     },
     shareToParentModalShow(){
       this.shareToParentModal = true;
-      console.log(this.fileList);
-      console.log(this.activityInfo);
+      this.fileListChoosed = [];
+      console.log(this.activityInfo.parent);
+      for(let i = 0 ; i < this.fileList.length ; i++){
+        if(!this.fileList[i].fromParents){
+          this.fileListChoosed.push(this.fileList[i]);
+        }
+      }
       this.selctResToShare = [];
     },
     shareToParent(){
-      console.log(this.selctResToShare);
       let addFileList = [];
-      let tempPath = ["0"];
       for(let i = 0 ; i < this.selctResToShare.length ; i++){
         for( let j = 0 ; j < this.fileList.length ; j++){
           if(this.selctResToShare[i] == this.fileList[j].uid){
@@ -2369,7 +2374,32 @@ export default {
           }
         }
       }
-      console.log(addFileList);
+      let suc = true;
+      for( let i =0 ; i < addFileList.length ; i++){
+        this.axios
+          .post("/GeoProblemSolving/rip/file/bind/" + this.activityInfo.parent,addFileList[i])
+          .then((res) => {
+            if (res.data == "Offline") {
+              suc = false;
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              this.shareToParentModal = false;
+            } else {
+              suc = false;
+            }
+          })
+          .catch((err) => {
+            console.log(err.data);
+          });
+      }
+      if(suc){
+        this.$Notice.success({
+          title: "Share result",
+          desc: "Share to parent activity successfully",
+        });
+      }
     },
     shareModalShow() {
       this.shareModal = true;

@@ -726,6 +726,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Override
     public String bindResToProject(ResourceEntity res, String aid) {
+        res.setActivityId(aid);
         if (res.getUid() == null || res.getUid().equals("")){
             res.setUid(UUID.randomUUID().toString());
             res.setUploadTime(new Date());
@@ -733,7 +734,6 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String name = fullName.split("\\.")[0];
             String suffix = fullName.split("\\.")[1];
             res.setSuffix(suffix);
-            res.setActivityId(aid);
             res.setUserUpload(false);
             res.setName(name);
         }
