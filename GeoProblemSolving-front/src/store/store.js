@@ -27,9 +27,9 @@ export default new Vuex.Store({
     // IP_Port:"94.191.49.160:8080",
     DataServer: "221.226.60.2:8082", // 数据容器
     //外网版本用户服务器
-    UserServer: "http://94.191.49.160:8080/userServer",
+    // UserServer: "http://94.191.49.160:8080/userServer",
     //测试用用户服务器
-    // UserServer: "http://172.21.212.103:8088/userServer",
+    UserServer: "http://172.21.212.103:8088/userServer",
   },
   getters: {
     userState: state => {
@@ -64,7 +64,7 @@ export default new Vuex.Store({
     },
     activityTaskChange: state => {
       return state.activityTaskChange;
-    }, 
+    },
     notifications: state => {
       return state.notifications;
     }

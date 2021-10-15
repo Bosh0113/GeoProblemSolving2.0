@@ -11,7 +11,7 @@ public interface UserDispatch {
 
     Object updateActivityMember(String aid, JSONArray members);
 
-    Object getNodeUserTag(HashSet<String> nodeIds);
+    Object getNodeUserTag(Integer level, HashSet<String> nodeIds);
 
     Object getUserTag(String userId);
 

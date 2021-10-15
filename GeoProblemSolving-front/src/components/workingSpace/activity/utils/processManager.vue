@@ -199,7 +199,7 @@
           <div v-if="collaborating && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;"><strong>collaborating:</strong> 
+                )" style="margin-top: 20px;"><strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -727,6 +727,7 @@
       :tempLoginModal="tempLoginModal"
       @changeLoginModal="changeLoginModal"
     ></login-modal>
+
   </Row>
 </template>
 
@@ -1542,6 +1543,18 @@
         }
         this.processStructure = this.activityInfo.pathway;
       },
+      getProtocolInfo(last, next){
+        this.axios.get(`/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${last}/${next}`)
+          .then(res=>{
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              this.viewLinkModal = true;
+            }
+          })
+          .catch(e=>{})
+      },
       showSteps() {
         let option = {
           animationDurationUpdate: 500,
@@ -1664,7 +1677,9 @@
             for (var j = 0; j < this.processStructure[i].next.length; j++) {
               option.series[0].links.push({
                 source: this.processStructure[i].name,
+                sourceId: this.processStructure[i].aid,
                 target: this.processStructure[i].next[j].name,
+                targetId: this.processStructure[i].next[j].aid,
               });
             }
           }
@@ -1682,33 +1697,40 @@
         // 单击选择步骤
         this.stepChart.on("click", function (params) {
           if (_this.procedureDrag) {
-            if (option.series[0].data[params.data.index].symbolSize == 45) {
-              option.series[0].data[params.data.index].symbolSize = 60;
+            if(params.dataType == "edge"){
+              let lastNode = params.data.sourceId;
+              let nextNode = params.data.targetId;
+              _this.getProtocolInfo(lastNode, nextNode);
+            } else if(params.dataType == "node"){
+              if (option.series[0].data[params.data.index].symbolSize == 45) {
+                option.series[0].data[params.data.index].symbolSize = 60;
 
-              // record the selected step nodes
-              _this.selectedActivities.push({
-                aid: params.data.aid,
-                id: params.data.index,
-                name: params.data.name,
-                category: params.data.category,
-                next: params.data.next,
-                last: params.data.last,
-              });
-            } else if (
-              option.series[0].data[params.data.index].symbolSize == 60
-            ) {
-              option.series[0].data[params.data.index].symbolSize = 45;
+                // record the selected step nodes
+                _this.selectedActivities.push({
+                  aid: params.data.aid,
+                  id: params.data.index,
+                  name: params.data.name,
+                  category: params.data.category,
+                  next: params.data.next,
+                  last: params.data.last,
+                });
+              } else if (
+                option.series[0].data[params.data.index].symbolSize == 60
+              ) {
+                option.series[0].data[params.data.index].symbolSize = 45;
 
-              // remove these not selected step nodes
-              for (var i = 0; i < _this.selectedActivities.length; i++) {
-                if (_this.selectedActivities[i].aid == params.data.aid) {
-                  _this.selectedActivities.splice(i, 1);
-                  break;
+                // remove these not selected step nodes
+                for (var i = 0; i < _this.selectedActivities.length; i++) {
+                  if (_this.selectedActivities[i].aid == params.data.aid) {
+                    _this.selectedActivities.splice(i, 1);
+                    break;
+                  }
                 }
               }
+              _this.stepChart.setOption(option);
+              _this.btnEnable();
             }
-            _this.stepChart.setOption(option);
-            _this.btnEnable();
+
           }
         });
         // 双击切换当前步骤
@@ -2183,11 +2205,14 @@
           domains: this.userProtocolForm.selectUserDomain,
           organizations: this.userProtocolForm.selectUserOrg,
         };
+
+
+        let level = window.location.href.split("level=")[1];
         let protocolForm = {
           relation: relation,
           restriction: restriction,
+          level: level
         };
-
         // save protocol
         this.axios
           .post("/GeoProblemSolving/activityDriven", protocolForm)
@@ -2298,7 +2323,7 @@
         // 重新渲染
         this.updateStepChart();
         // 更新图的 pathway
-        // this.breakLink(beginNode.aid, endNode.aid);
+        this.breakLink(beginNode.aid, endNode.aid);
         this.updatePathway();
         //
         let content = {
@@ -2351,9 +2376,10 @@
           aidList.push(activity.aid);
         });
         if (val == "Constraints") {
+          let level = window.location.href.split("level=")[1];
           this.axios
             .get(
-              "/GeoProblemSolving/activityDriven/user/tag/" + aidList.toString()
+              `/GeoProblemSolving/activityDriven/user/tag/${level}/${aidList.toString()}`
             )
             .then((res) => {
               let code = res.data.code;

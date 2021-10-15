@@ -1,14 +1,17 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.UserDispatch;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.Impl.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -32,6 +35,9 @@ public class UserDispatchImpl implements UserDispatch {
     private final RestTemplate restTemplate;
 
     private final ActivityRepository activityDao;
+
+    @Autowired
+    SubprojectRepository subprojectDao;
 
     @Value("${userServerLocation}")
     String userServerLocation;
@@ -59,7 +65,7 @@ public class UserDispatchImpl implements UserDispatch {
      * @return
      */
     @Override
-    public JsonResult getNodeUserTag(HashSet<String> activityIds) {
+    public JsonResult getNodeUserTag(Integer level, HashSet<String> activityIds) {
         if (activityIds.isEmpty()){
             return null;
         }
@@ -69,7 +75,12 @@ public class UserDispatchImpl implements UserDispatch {
             //需要去读取 member 所以不应该叫 nodeId，应该叫 activityId
             String activityId = iterator.next();
             //肯定会有重复的成员，最好是先将成员 id 取出来，然后再去贴换
-            Activity activity = activityDao.findById(activityId).get();
+            Activity activity;
+            if (level == 0){
+                activity = subprojectDao.findById(activityId).get();
+            }else{
+                activity = activityDao.findById(activityId).get();
+            }
             JSONArray members = activity.getMembers();
             members.forEach(member->{
                 JSONObject memberJson = JSONObject.parseObject(JSONObject.toJSONString(member));
