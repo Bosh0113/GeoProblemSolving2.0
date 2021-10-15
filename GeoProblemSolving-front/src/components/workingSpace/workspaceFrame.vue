@@ -368,7 +368,6 @@ export default {
     });
   },
   created() {
-    // this.initInfo();
   },
   mounted() {
     // load activity doc
