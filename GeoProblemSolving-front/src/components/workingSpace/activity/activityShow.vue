@@ -1110,6 +1110,7 @@ export default {
         .put(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.slctRoleMember.role = role;
             this.$Notice.info({ desc: "Change the member role successfully" });
             this.operationApi.participantUpdate(
               this.activityInfo.aid,
@@ -1117,7 +1118,7 @@ export default {
               member.userId,
               member.name,
               member.role,
-              user.domain
+              member.domain
             );
             this.getParticipants();
 

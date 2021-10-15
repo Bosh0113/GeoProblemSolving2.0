@@ -1045,6 +1045,7 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             let rootRes = res.data.data;
+            console.log(res.data.data);
             this.resToCurrentFolder(rootRes);
             this.indeterminate = false;
             this.checkAll = false;
@@ -1055,7 +1056,7 @@ export default {
         });
     },
     initSize() {
-      this.contentHeight = window.innerHeight - 230;
+      this.contentHeight = window.innerHeight - 400;
     },
     roleIdentity() {
       this.userRole = this.userRoleApi.roleIdentify(
@@ -1828,8 +1829,10 @@ export default {
       return (value / Math.pow(k,i)).toPrecision(3) + " " + sizes[i];
     },
     filterTimeStyle(str){
-      let result = str.split('.')[0];
-      return result.replace('T'," ");
+      if(str != null){
+        let result = str.split('.')[0];
+        return result.replace('T'," ");
+      }
     }
   },
 };

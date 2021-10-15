@@ -342,7 +342,7 @@ function getSocketOperation(data) {
                 break;
             }
             case "value-change": {
-                if(content.type === "text") {
+                if (content.type === "text") {
                     $("#" + content.id).val(content.value);
                     $("#" + content.id).css("border-color", "lightgreen");
                 } else if (content.type === "checkbox") {
@@ -475,6 +475,71 @@ function selectData(dataType) {
     }
     $("#loadFile").on("change", function () {
         selectedData = resources.files[$("#loadFile").val()];
+    });
+}
+
+function exportData(dataType) {
+    let data = {};
+    if (dataType === "Road") {
+        if (roadData == undefined) {
+            alert("There is no road data can be exported.");
+            return;
+        } else {
+            data = {
+                uid: roadData.uid
+            }
+        }
+    } else if (dataType === "Building") {
+        if (buildingData == undefined) {
+            alert("There is no building data can be exported.");
+            return;
+        } else {
+            data = {
+                uid: buildingData.uid
+            }
+        }
+    } else if (dataType === "Barrier") {
+        if (barrierData == undefined) {
+            alert("There is no barrier data can be exported.");
+            return;
+        } else {
+            data = {
+                uid: barrierData.uid
+            }
+        }
+    } else if (dataType === "Region") {
+        if (selectROI.ROI == undefined) {
+            alert("There is no simulation area selected.");
+            return;
+        } else {
+            var northWestPoint = selectROI.ROI.getBounds().getNorthWest();
+            var southEastPoint = selectROI.ROI.getBounds().getSouthEast();
+            var upperLeftPoint = proj4("EPSG:4326", "EPSG:2437", [northWestPoint.lng, northWestPoint.lat]);
+            var lowerRightPoint = proj4("EPSG:4326", "EPSG:2437", [southEastPoint.lng, southEastPoint.lat]);
+
+            data = {
+                top: upperLeftPoint[1],
+                right: lowerRightPoint[0],
+                bottom: lowerRightPoint[1],
+                left: upperLeftPoint[0],
+            }
+        }
+    }
+
+    $.ajax({
+        type: "post",
+        url: "/GeoProblemSolving/export" + selectedDataType + "Servlet",
+        data: JSON.stringify(data),
+        processData: false,
+        contentType: 'application/json',
+        success: function (resp) {
+            var result = JSON.parse(resp);
+            if (result.respCode === 1) {
+                alert("Export data successfully!");
+            } else {
+                alert("Fail to export data!");
+            }
+        }
     });
 }
 
@@ -1217,7 +1282,7 @@ function onHasReflectChanged(id) {
     }
 
     // send message
-    window.parent.sendElementChangeOperation(id, "value-change", "checkbox", "", "",  isChecked);
+    window.parent.sendElementChangeOperation(id, "value-change", "checkbox", "", "", isChecked);
 }
 
 

@@ -8,18 +8,14 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectReposit
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
-import cn.hutool.bloomfilter.filter.SDBMFilter;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * @ClassName HttpUtil
@@ -104,7 +100,7 @@ public class ProjectUtil {
             level++;
         }
 
-        if (childIds == null && childIds.size() <= 0) {
+        if (childIds == null || childIds.size() <= 0) {
             return;
         }
         ArrayList<Subproject> subprojects = new ArrayList<>();

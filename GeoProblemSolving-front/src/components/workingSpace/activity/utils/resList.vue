@@ -31,7 +31,56 @@
           <Option value="others">Other resources</Option>
           <!-- <Option value="toolData">Results</Option> -->
         </Select>
+        <Poptip placement="bottom">
+          <Button 
+            shape="circle"
+            size="small"
+            icon="md-shuffle"
+            style="margin-right: 10px"
+            title="Get resources"
+          ></Button>
+          <div slot="content" >
+            <Button
+              v-if="
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'upload_resource'
+                )
+              "
+              @click="shareModalShow()"
+              title="Get resources from your personal space"
+            > Get resources from your personal space</Button><br>
+            <Button
+              v-if="
+                permissionIdentity(
+                  activityInfo.permission,
+                  userRole,
+                  'upload_resource'
+                )
+              "
+              @click="getPreviousRes()"
+              style="margin-top: 10px;"
+              title="Get resources from the previous activities"
+            > Get resources from the previous activities</Button>
+          </div>
+        </Poptip>
         <Button
+          v-if="
+            permissionIdentity(
+              activityInfo.permission,
+              userRole,
+              'upload_resource'
+            )
+          "
+          shape="circle"
+          size="small"
+          icon="md-cloud-outline"
+          @click="shareToParentModalShow()"
+          style="margin-right: 10px"
+          title="Share resources"
+        ></Button>
+        <!-- <Button
           v-if="
             permissionIdentity(
               activityInfo.permission,
@@ -45,8 +94,8 @@
           @click="shareModalShow()"
           style="margin-right: 10px"
           title="Get resources from your personal space"
-        ></Button>
-        <Button
+        ></Button> -->
+        <!-- <Button
           v-if="
             permissionIdentity(
               activityInfo.permission,
@@ -60,7 +109,7 @@
           @click="getPreviousRes()"
           style="margin-right: 10px"
           title="Get resources from the previous activities"
-        ></Button>
+        ></Button> -->
         <Button
           v-if="
             permissionIdentity(
@@ -234,7 +283,7 @@
                   </div>
                 </div>
               </Card>
-              <Card class="res-content-edit" v-else>
+              <Card class="res-content-edit" v-else-if="resEdit && item.fromParents == undefined">
                 <div
                   class="res-content-image"
                   v-if="item.folder"
@@ -265,6 +314,59 @@
                         :title="item.type"
                       />
                     </Badge>
+                  </template>
+                  <template v-else>
+                    <img :src="item.thumbnail" height="42px" width="42px" />
+                  </template>
+                </div>
+                <div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name"
+                    v-if="item.folder"
+                  >
+                    {{ item.name }}
+                  </div>
+                  <div
+                    class="toolDataText"
+                    :title="item.name + item.suffix"
+                    v-else
+                  >
+                    {{ item.name + item.suffix }}
+                  </div>
+                </div>
+              </Card>
+              <Card
+                class="res-content-parents"
+                v-else
+              >
+                <div
+                  class="res-content-image"
+                  v-if="item.folder"
+                  @click="enterFolder(item)"
+                >
+                  <img
+                    :src="folderUrl"
+                    height="42px"
+                    width="42px"
+                    title="Folder"
+                  />
+                </div>
+                <div
+                  class="res-content-image"
+                  @click="checkData(item)"
+                  :title="item.fromParents"
+                  v-else
+                >
+                  <template
+                    v-if="item.thumbnail == '' || item.thumbnail == undefined"
+                  >
+                    <img
+                      :src="getImageUrl(item.type)"
+                      height="42px"
+                      width="42px"
+                      :title="item.type + ' | ' + item.fromParents"
+                    />
                   </template>
                   <template v-else>
                     <img :src="item.thumbnail" height="42px" width="42px" />
@@ -461,6 +563,142 @@
       </div>
     </Modal>
     <Modal
+      v-model="shareToParentModal"
+      title="Share files to parent activity"
+      width="600"
+      :mask-closable="false"
+    >
+      <div>
+        <vue-scroll :ops="ops" style="height: 300px">
+          <Card dis-hover v-if="fileList.length == 0" style="text-align: center; border: transparent; margin-top: 70px">
+            <h2 style="color: #808695">No Resource</h2>
+            <small style="color: #dcdee2"
+              >*You do not have any resource.</small
+            >
+          </Card>
+          <CheckboxGroup v-model="selctResToShare">
+            <Card dis-hover v-for="file in fileList" :key="file.index">
+              <Checkbox
+                :label="file.uid"
+                class="personalFileLabel"
+                :title="file.name"
+                v-if="!file.folder"
+              >
+                <Icon
+                  v-if="file.type === 'data'"
+                  type="ios-podium-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <Icon
+                  v-else-if="file.type === 'image'"
+                  type="ios-image-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <Icon
+                  v-else-if="file.type === 'paper'"
+                  type="ios-paper-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <Icon
+                  v-else-if="file.type === 'document'"
+                  type="ios-document-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <Icon
+                  v-else-if="file.type === 'model'"
+                  type="ios-construct-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <Icon
+                  v-else-if="file.type === 'video'"
+                  type="ios-videocam-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <p
+                  style="
+                    display: inline-block;
+                    vertical-align: top;
+                    width: 100px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  <strong>{{ file.name }}</strong>
+                </p>
+                <!-- <span ><strong>{{ file.name }}</strong></span> -->
+              </Checkbox>
+              <Checkbox
+                :label="file.uid"
+                class="personalFileLabel"
+                :title="file.name"
+                v-else
+              >
+                <Icon
+                  type="ios-folder-open-outline"
+                  class="itemIcon"
+                  size="25"
+                />
+                <p
+                  style="
+                    display: inline-block;
+                    vertical-align: top;
+                    width: 100px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                  "
+                >
+                  <strong>{{ file.name }}</strong>
+                </p>
+              </Checkbox>
+              <p
+                :title="file.description"
+                style="
+                  display: inline-block;
+                  vertical-align: top;
+                  width: 200px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  margin-left: 50px;
+                "
+              >
+                {{ file.description }}
+              </p>
+              <!-- <span
+                class="personalFileDes"
+                style="width: 150px;margin-left:50px"
+                :title="file.description"
+                >{{ file.description }}</span
+              > -->
+              <span
+                style="display: inline-block; vertical-align: top; float: right" v-if="!file.folder"
+                >{{ file.fileSize | filterSizeType }}</span
+              >
+            </Card>
+          </CheckboxGroup>
+        </vue-scroll>
+      </div>
+     
+      <div slot="footer" style="display: inline-block">
+        <Button type="primary" @click="shareToParent()" style="float: right"
+          >Submit
+        </Button>
+        <Button
+          @click="shareToParentModal = false"
+          style="float: right; margin-right: 15px"
+          >Cancel
+        </Button>
+      </div>
+    </Modal>
+    <Modal
       v-model="editFolderModal"
       title="Edit folder"
       ok-text="Assure"
@@ -621,6 +859,10 @@
           <Label class="dataLabel">Description:</Label>
           <span class="dataText">{{ selectData.description }}</span>
         </div>
+        <div class="dataInfo" v-if="selectData.fromParents != undefined">
+          <Label class="dataLabel">Source:</Label>
+          <span class="dataText">{{ selectData.fromParents }}</span>
+        </div>
       </div>
       <!-- </TabPane>
         <TabPane label="UDX Schema" name="udx" icon="md-browsers">
@@ -651,7 +893,8 @@
         </a>
         <Button
           v-if="
-            permissionIdentity(
+            selectData.fromParents == undefined &&
+            (permissionIdentity(
               activityInfo.permission,
               userRole,
               'manage_resource'
@@ -661,7 +904,7 @@
               userRole,
               'upload_resource'
             ) &&
-              selectData.uploaderId == userInfo.userId)
+              selectData.uploaderId == userInfo.userId))
           "
           size="small"
           type="warning"
@@ -973,6 +1216,8 @@ export default {
       deleteResource: {},
       // 共享
       shareModal: false,
+      shareToParentModal: false,
+      selctResToShare: [],
       userResourceList: [],
       selectedFilesToShare: [],
       //编辑
@@ -2107,6 +2352,25 @@ export default {
         }
       });
     },
+    shareToParentModalShow(){
+      this.shareToParentModal = true;
+      console.log(this.fileList);
+      console.log(this.activityInfo);
+      this.selctResToShare = [];
+    },
+    shareToParent(){
+      console.log(this.selctResToShare);
+      let addFileList = [];
+      let tempPath = ["0"];
+      for(let i = 0 ; i < this.selctResToShare.length ; i++){
+        for( let j = 0 ; j < this.fileList.length ; j++){
+          if(this.selctResToShare[i] == this.fileList[j].uid){
+            addFileList.push(this.fileList[j]);
+          }
+        }
+      }
+      console.log(addFileList);
+    },
     shareModalShow() {
       this.shareModal = true;
       this.axios
@@ -2160,18 +2424,27 @@ export default {
           } else if (res.data.code == 0) {
             this.shareModal = false;
             let sharedFile = res.data.data;
+            console.log(res.data);
 
             for (let i = 0; i < sharedFile.length; i++) {
               this.activityResList.push(sharedFile[i]);
               this.activityDataList.push(sharedFile[i]);
 
+              let metadata = {
+                format:"",
+                scale:"",
+                reference:"",
+                unit:"",
+                concept:""
+              };
               this.operationApi.resOperationRecord(
                 this.activityInfo.aid,
                 "",
                 "",
                 "upload",
                 this.userInfo.userId,
-                sharedFile[i]
+                sharedFile[i],
+                metadata,
               );
             }
 

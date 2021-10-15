@@ -8,3 +8,4 @@ GeoProblemSolving-back/geoproblemsolving.iml
 GeoProblemSolving-back/src/main/resources/templates/integratedModeling_new---1.html
 GeoProblemSolving-back/src/main/resources/templates/integratedModelEditor---1.html
 GeoProblemSolving-back/src/main/resources/static/js/page/integratedModeling_new--1.js
+GeoProblemSolving-back/src/main/resources/application.properties

@@ -32,6 +32,20 @@
   height: 30px;
   cursor: pointer;
 }
+#remove-all {
+  background-color: white;
+  width: 30px;
+  height: 30px;
+  border-bottom: 1px solid lightgray;
+  cursor: pointer;
+}
+#remove-all:hover {
+  background-color: #f3f3f3;
+  width: 30px;
+  height: 30px;
+  border-bottom: 1px solid lightgray;
+  cursor: pointer;
+}
 </style>
 <template>
   <div>
@@ -120,6 +134,7 @@ import minimap from "@static/js/Control.MiniMap.min.js";
 import pm from "@static/js/leaflet.pm.min.js";
 import imIcon from "@static/Images/import.png";
 import exIcon from "@static/Images/export.png";
+import removeIcon from "@static/Images/trash.png";
 //leaflet
 import L from "leaflet";
 import shp from "shpjs";
@@ -217,8 +232,8 @@ export default {
       this.tdtVectorAno =
         // "http://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         // "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
-         "http://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
-        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=eva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
+        "http://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=eva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtImgMap =
         "http://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
@@ -309,6 +324,7 @@ export default {
       this.map.pm.addControls(options);
 
       this.diyDataControl();
+      this.diyRemoveAllControl();
     },
     diyDataControl() {
       var that = this;
@@ -366,6 +382,50 @@ export default {
         },
         _importData() {
           that.modalImport = true;
+        },
+      });
+      L.control.data = function () {
+        return new L.Control.Data();
+      };
+      L.control.data().addTo(this.map);
+    },
+    diyRemoveAllControl() {
+      var that = this;
+      L.Control.Data = L.Control.extend({
+        //在此定义参数
+        options: {
+          position: "topleft",
+        },
+        //在此初始化
+        initialize: function (map) {},
+        onAdd: function (map) {
+          this._container = L.DomUtil.create("div", "leaflet-RemoveAll");
+          this._container.style =
+            "border:2px solid rgba(128,128,128,0.5);border-radius:6px";
+
+          let removeAll = document.createElement("div");
+          removeAll.id = "remove-all";
+          removeAll.title = "Remove all";
+          removeAll.onclick = this._removeAll;
+          let iconImport = document.createElement("img");
+          iconImport.src = removeIcon;
+          iconImport.style = "margin-left: 3.5px;margin-top: 3px";
+          removeAll.appendChild(iconImport);
+
+          this._container.appendChild(removeAll);
+          return this._container;
+        },
+        _removeAll() {
+          that.drawingLayerGroup.clearLayers();
+
+          that.send_content = {
+            type: "operation",
+            sender: that.userInfo.userId,
+            behavior: "removeAll",
+            content: JSON.stringify({}),
+          };
+          
+          sendCustomOperation(that.send_content);
         },
       });
       L.control.data = function () {
@@ -796,6 +856,9 @@ export default {
             // });
             // this.drawingLayerGroup.addLayer(geoJsonLayer);
             // break;
+          }
+          case "removeAll": {
+            this.drawingLayerGroup.clearLayers();
           }
         }
       }
