@@ -15,7 +15,7 @@ public interface GeoAnalysisProcess {
      * @param graphId 根活动的 aid
      * @return
      */
-    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol);
+    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol, Integer level);
 
     HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
 
@@ -32,6 +32,8 @@ public interface GeoAnalysisProcess {
     void updateGraphByProtocol(String rootId, ActivityLinkProtocol protocol);
 
     void delGraphByProtocol(String rootId, String protocolId);
+
+    LinkRestriction getLinkRestriction(String graphId, String startId, String endId);
 
 
     //协议已经变成了一系列的字符串

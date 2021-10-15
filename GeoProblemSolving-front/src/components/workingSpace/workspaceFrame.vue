@@ -371,7 +371,8 @@ export default {
   },
   mounted() {
     // load activity doc
-    this.operationApi.getActivityDoc(this.slctActivity.aid);
+    let urlInfo = this.getUrlInfo();
+    this.operationApi.getActivityDoc(urlInfo.aid);
 
     this.initInfo();
     // this.locateActivity();

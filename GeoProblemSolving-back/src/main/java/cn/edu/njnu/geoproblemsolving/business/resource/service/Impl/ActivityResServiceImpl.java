@@ -726,15 +726,17 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Override
     public String bindResToProject(ResourceEntity res, String aid) {
-        res.setUid(UUID.randomUUID().toString());
-        res.setUploadTime(new Date());
-        String fullName = res.getName();
-        String name = fullName.split("\\.")[0];
-        String suffix = fullName.split("\\.")[1];
-        res.setSuffix(suffix);
-        res.setActivityId(aid);
-        res.setUserUpload(false);
-        res.setName(name);
+        if (res.getUid() == null || res.getUid().equals("")){
+            res.setUid(UUID.randomUUID().toString());
+            res.setUploadTime(new Date());
+            String fullName = res.getName();
+            String name = fullName.split("\\.")[0];
+            String suffix = fullName.split("\\.")[1];
+            res.setSuffix(suffix);
+            res.setActivityId(aid);
+            res.setUserUpload(false);
+            res.setName(name);
+        }
         ResourceEntity addResource = activityResDao.addResource(res);
         if (addResource == null) {
             return "fail";
