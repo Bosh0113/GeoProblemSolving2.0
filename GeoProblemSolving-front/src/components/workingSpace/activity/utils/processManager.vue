@@ -199,7 +199,7 @@
           <div v-if="collaborating && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;"><strong>collaborating:</strong> 
+                )" style="margin-top: 20px;"><strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -601,7 +601,8 @@
                 v-for="(item, index) in userDomain"
                 :value="item.name"
                 :key="index"
-              >{{item.name}}</Option>
+              >{{item.name}}
+              </Option>
             </Select>
           </div>
           <div style="display: flex; margin-bottom: 10px">
@@ -617,7 +618,8 @@
                 v-for="(item, index) in userOrganizations"
                 :value="item.name"
                 :key="index"
-              >{{item.name}}</Option>
+              >{{item.name}}
+              </Option>
             </Select>
           </div>
         </template>
@@ -674,6 +676,7 @@
               class="res-protocol"
               v-model="formats_tag"
               :tags="resProtocolForm.formats"
+              :autocomplete-items="formatFilteredItems"
               @tags-changed="formatChange"
             />
           </div>
@@ -683,6 +686,7 @@
               class="res-protocol"
               v-model="scales_tag"
               :tags="resProtocolForm.scales"
+              :autocomplete-items="scaleFilteredItems"
               @tags-changed="scaleChange"
             />
             <div style="margin-top: 5px; margin-left: 50px; width: 72px">
@@ -692,6 +696,7 @@
               class="res-protocol"
               v-model="references_tag"
               :tags="resProtocolForm.references"
+              :autocomplete-items="referenceFilteredItems"
               @tags-changed="referenceChange"
             />
           </div>
@@ -701,6 +706,7 @@
               class="res-protocol"
               v-model="units_tag"
               :tags="resProtocolForm.units"
+              :autocomplete-items="unitFilteredItems"
               @tags-changed="unitChange"
             />
             <div style="margin-top: 5px; margin-left: 50px; width: 72px">
@@ -710,6 +716,7 @@
               class="res-protocol"
               v-model="concepts_tag"
               :tags="resProtocolForm.concepts"
+              :autocomplete-items="conceptFilteredItems"
               @tags-changed="conceptChange"
             />
           </div>
@@ -720,6 +727,7 @@
       :tempLoginModal="tempLoginModal"
       @changeLoginModal="changeLoginModal"
     ></login-modal>
+
   </Row>
 </template>
 
@@ -783,6 +791,12 @@
           units: [],
           concepts: [],
         },
+        //autoComplete 内容
+        autoFormats: [{text: ""}],
+        autoScales: [{text: ""}],
+        autoReferences: [{text: ""}],
+        autoUnits: [{text: ""}],
+        autoConcepts: [{text: ""}],
 
         // 添加/编辑step
         stepInfo: {
@@ -943,6 +957,33 @@
         socketApi.close(this.socketId);
       }
     },
+    computed: {
+      formatFilteredItems(){
+        return this.autoFormats.filter(i => {
+          return i.text.toLowerCase().indexOf(this.formats_tag.toLowerCase()) !== -1;
+        })
+      },
+      scaleFilteredItems(){
+        return this.autoScales.filter(i => {
+          return i.text.toLowerCase().indexOf(this.scales_tag.toLowerCase()) !== -1;
+        })
+      },
+      referenceFilteredItems(){
+        return this.autoReferences.filter(i => {
+          return i.text.toLowerCase().indexOf(this.references_tag.toLowerCase()) !== -1;
+        })
+      },
+      unitFilteredItems(){
+        return this.autoUnits.filter(i => {
+          return i.text.toLowerCase().indexOf(this.units_tag.toLowerCase()) !== -1;
+        })
+      },
+      conceptFilteredItems(){
+        return this.autoConcepts.filter(i => {
+          return i.text.toLowerCase().indexOf(this.concepts_tag.toLowerCase()) !== -1;
+        })
+      }
+    },
     methods: {
       computeCollIndex(collLinkId) {
         let collLinkIdArr = collLinkId.split(",");
@@ -1081,22 +1122,21 @@
                   this.activityLinks = this.selectedActivities.map((item) => {
                     return 0;
                   });
-                } else {
-                  //协同等待
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[this.collaIndex].protocolType =
-                    tempType;
-                  this.collaboratingInfoList[this.collaIndex].selectedActivities =
-                    tempSel;
-                  this.collaboratingInfoList[this.collaIndex].otherNodes =
-                    JSON.parse(JSON.stringify(tempSel));
-                  this.activityLinks = tempSel.map((item) => {
-                    return 0;
-                  });
                 }
+                //协同等待
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[this.collaIndex].protocolType =
+                  tempType;
+                this.collaboratingInfoList[this.collaIndex].selectedActivities =
+                  tempSel;
+                this.collaboratingInfoList[this.collaIndex].otherNodes =
+                  JSON.parse(JSON.stringify(tempSel));
+                this.activityLinks = tempSel.map((item) => {
+                  return 0;
+                });
                 break;
               case "activityLinks":
                 let tempLinks = content.activityLinks;
@@ -1104,16 +1144,15 @@
                 if (this.linkingId == content.linkingId) {
                   this.activityLinks = tempLinks;
                   this.otherNodes = tempOtherNodes;
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[this.collaIndex].activityLinks =
-                    tempLinks;
-                  this.collaboratingInfoList[this.collaIndex].otherNodes =
-                    tempOtherNodes;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[this.collaIndex].activityLinks =
+                  tempLinks;
+                this.collaboratingInfoList[this.collaIndex].otherNodes =
+                  tempOtherNodes;
                 break;
               case "roleProtocol":
                 let tempRole = content.roleProtocol;
@@ -1123,21 +1162,20 @@
                     this.userOrganizations = content.userOrganization;
                   }
                   this.$set(this.userProtocolForm, "roleProtocol", tempRole);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
+                }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].userProtocolForm.roleProtocol = tempRole;
+                if (tempRole == "Constraints") {
+                  this.collaboratingInfoList[this.collaIndex].userDomains =
+                    content.userDomain;
                   this.collaboratingInfoList[
                     this.collaIndex
-                    ].userProtocolForm.roleProtocol = tempRole;
-                  if (tempRole == "Constraints") {
-                    this.collaboratingInfoList[this.collaIndex].userDomains =
-                      content.userDomain;
-                    this.collaboratingInfoList[
-                      this.collaIndex
-                      ].userOrganizations = content.userOrganizations;
-                  }
+                    ].userOrganizations = content.userOrganizations;
                 }
                 break;
               case "userRole":
@@ -1162,15 +1200,14 @@
                     "selectUserDomain",
                     tempSelectDomain
                   );
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].userProtocolForm.selectUserDomain = tempSelectDomain;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].userProtocolForm.selectUserDomain = tempSelectDomain;
                 break;
               case "userOrganization":
                 let tempSelectOrg = content.userSelectOrganization;
@@ -1180,127 +1217,136 @@
                     "selectUserOrg",
                     tempSelectOrg
                   );
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].userProtocolForm.selectUserOrg = tempOrg;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].userProtocolForm.selectUserOrg = tempOrg;
                 break;
               case "autoUpdate":
                 let tempAuto = content.autoUpdate;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "autoUpdate", tempAuto);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.autoUpdate = tempAuto;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.autoUpdate = tempAuto;
                 break;
               case "resProtocol":
                 let tempProtocol = content.resProtocol;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "resProtocol", tempProtocol);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
+                  let resMetaInfo = content.resMetaInfo;
+                  if(resMetaInfo !== undefined){
+                    if (resMetaInfo.format !== undefined){
+                      this.autoFormats = resMetaInfo.format;
+                    }
+                    if (resMetaInfo.scale !== undefined){
+                      this.autoScales = resMetaInfo.scale;
+                    }
+                    if (resMetaInfo.reference !== undefined){
+                      this.autoReferences = resMetaInfo.reference;
+                    }
+                    if (resMetaInfo.unit !== undefined){
+                      this.autoUnits = resMetaInfo.unit;
+                    }
+                    if (resMetaInfo.concept !== undefined){
+                      this.autoConcepts = resMetaInfo.concept;
+                    }
                   }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.resProtocol = tempProtocol;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.resProtocol = tempProtocol;
                 break;
               case "resType":
                 let tempTypes = content.resType;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "types", tempTypes);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.types = tempTypes;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.types = tempTypes;
                 break;
               case "resFormat":
                 let tempFormat = content.resFormat;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "formats", tempFormat);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.formats = tempFormat;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.formats = tempFormat;
                 break;
               case "resScale":
                 let tempScale = content.resScale;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "scales", tempScale);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.scales = tempScale;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.scales = tempScale;
                 break;
               case "resReference":
                 let tempReference = content.resReference;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "references", tempReference);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.references = tempReference;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.references = tempReference;
                 break;
               case "resUnit":
                 let tempUnit = content.resUnit;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "units", tempUnit);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.units = tempUnit;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.units = tempUnit;
                 break;
               case "resConcept":
                 let tempConcept = content.resConcept;
                 if (this.linkingId == content.linkingId) {
                   this.$set(this.resProtocolForm, "concepts", tempConcept);
-                } else {
-                  this.computeCollIndex(content.linkingId);
-                  if (this.collaIndex == -1) {
-                    return;
-                  }
-                  this.collaboratingInfoList[
-                    this.collaIndex
-                    ].resProtocolForm.concepts = tempConcept;
                 }
+                this.computeCollIndex(content.linkingId);
+                if (this.collaIndex == -1) {
+                  return;
+                }
+                this.collaboratingInfoList[
+                  this.collaIndex
+                  ].resProtocolForm.concepts = tempConcept;
                 break;
             }
           }
@@ -1497,6 +1543,18 @@
         }
         this.processStructure = this.activityInfo.pathway;
       },
+      getProtocolInfo(last, next){
+        this.axios.get(`/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${last}/${next}`)
+          .then(res=>{
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              this.viewLinkModal = true;
+            }
+          })
+          .catch(e=>{})
+      },
       showSteps() {
         let option = {
           animationDurationUpdate: 500,
@@ -1619,7 +1677,9 @@
             for (var j = 0; j < this.processStructure[i].next.length; j++) {
               option.series[0].links.push({
                 source: this.processStructure[i].name,
+                sourceId: this.processStructure[i].aid,
                 target: this.processStructure[i].next[j].name,
+                targetId: this.processStructure[i].next[j].aid,
               });
             }
           }
@@ -1637,33 +1697,40 @@
         // 单击选择步骤
         this.stepChart.on("click", function (params) {
           if (_this.procedureDrag) {
-            if (option.series[0].data[params.data.index].symbolSize == 45) {
-              option.series[0].data[params.data.index].symbolSize = 60;
+            if(params.dataType == "edge"){
+              let lastNode = params.data.sourceId;
+              let nextNode = params.data.targetId;
+              _this.getProtocolInfo(lastNode, nextNode);
+            } else if(params.dataType == "node"){
+              if (option.series[0].data[params.data.index].symbolSize == 45) {
+                option.series[0].data[params.data.index].symbolSize = 60;
 
-              // record the selected step nodes
-              _this.selectedActivities.push({
-                aid: params.data.aid,
-                id: params.data.index,
-                name: params.data.name,
-                category: params.data.category,
-                next: params.data.next,
-                last: params.data.last,
-              });
-            } else if (
-              option.series[0].data[params.data.index].symbolSize == 60
-            ) {
-              option.series[0].data[params.data.index].symbolSize = 45;
+                // record the selected step nodes
+                _this.selectedActivities.push({
+                  aid: params.data.aid,
+                  id: params.data.index,
+                  name: params.data.name,
+                  category: params.data.category,
+                  next: params.data.next,
+                  last: params.data.last,
+                });
+              } else if (
+                option.series[0].data[params.data.index].symbolSize == 60
+              ) {
+                option.series[0].data[params.data.index].symbolSize = 45;
 
-              // remove these not selected step nodes
-              for (var i = 0; i < _this.selectedActivities.length; i++) {
-                if (_this.selectedActivities[i].aid == params.data.aid) {
-                  _this.selectedActivities.splice(i, 1);
-                  break;
+                // remove these not selected step nodes
+                for (var i = 0; i < _this.selectedActivities.length; i++) {
+                  if (_this.selectedActivities[i].aid == params.data.aid) {
+                    _this.selectedActivities.splice(i, 1);
+                    break;
+                  }
                 }
               }
+              _this.stepChart.setOption(option);
+              _this.btnEnable();
             }
-            _this.stepChart.setOption(option);
-            _this.btnEnable();
+
           }
         });
         // 双击切换当前步骤
@@ -2138,11 +2205,14 @@
           domains: this.userProtocolForm.selectUserDomain,
           organizations: this.userProtocolForm.selectUserOrg,
         };
+
+
+        let level = window.location.href.split("level=")[1];
         let protocolForm = {
           relation: relation,
           restriction: restriction,
+          level: level
         };
-
         // save protocol
         this.axios
           .post("/GeoProblemSolving/activityDriven", protocolForm)
@@ -2253,7 +2323,7 @@
         // 重新渲染
         this.updateStepChart();
         // 更新图的 pathway
-        // this.breakLink(beginNode.aid, endNode.aid);
+        this.breakLink(beginNode.aid, endNode.aid);
         this.updatePathway();
         //
         let content = {
@@ -2267,7 +2337,7 @@
       },
       breakLink(beginNode, endNode) {
         this.axios
-          .post(
+          .delete(
             `/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${beginNode}/${endNode}`
           )
           .then((res) => {
@@ -2306,9 +2376,10 @@
           aidList.push(activity.aid);
         });
         if (val == "Constraints") {
+          let level = window.location.href.split("level=")[1];
           this.axios
             .get(
-              "/GeoProblemSolving/activityDriven/user/tag/" + aidList.toString()
+              `/GeoProblemSolving/activityDriven/user/tag/${level}/${aidList.toString()}`
             )
             .then((res) => {
               let code = res.data.code;
@@ -2389,21 +2460,40 @@
         this.sendLinkSock(content);
       },
       resProtocolChange(val) {
+        let aidList = [];
+        this.selectedActivities.forEach((activity) => {
+          aidList.push(activity.aid);
+        });
         let content = {
           behavior: "setLink",
           param: "resProtocol",
           linkingId: this.linkingId,
           resProtocol: this.resProtocolForm.resProtocol,
         };
-        this.sendLinkSock(content);
-
-        let aidList = [];
-        this.selectedActivities.forEach((activity) => {
-          aidList.push(activity.aid);
-        });
-        if(val == "Constraints"){
-          this.operationApi.getResMetaInfo(aidList);
+        if (val == "Constraints") {
+          //
+          let resMetaInfo = this.operationApi.getResMetaInfo(aidList);
+          if (resMetaInfo !== undefined){
+            content["resMetaInfo"]  = resMetaInfo;
+            if (resMetaInfo.format !== undefined){
+              this.autoFormats = resMetaInfo.format;
+            }
+            if (resMetaInfo.scale !== undefined){
+              this.autoScales = resMetaInfo.scale;
+            }
+            if (resMetaInfo.reference !== undefined){
+              this.autoReferences = resMetaInfo.reference;
+            }
+            if (resMetaInfo.unit !== undefined){
+              this.autoUnits = resMetaInfo.unit;
+            }
+            if (resMetaInfo.concept !== undefined){
+              this.autoConcepts = resMetaInfo.concept;
+            }
+          }
         }
+
+        this.sendLinkSock(content);
         // if (val == "Constraints") {
         //   this.axios
         //     .get(

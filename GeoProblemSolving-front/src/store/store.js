@@ -64,7 +64,7 @@ export default new Vuex.Store({
     },
     activityTaskChange: state => {
       return state.activityTaskChange;
-    }, 
+    },
     notifications: state => {
       return state.notifications;
     }

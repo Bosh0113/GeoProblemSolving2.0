@@ -28,15 +28,22 @@ public class TagUtil {
         String[] tagArray = tagStr.split("O517");
         //三类判断条件
         String roles =  tagArray[0];
-        String domains = tagArray[1];
-        String organizations = tagArray[2];
         HashSet<String> roleSet = new HashSet<>(Arrays.asList(roles.split("#")));
-        HashSet<String> domainsSet = new HashSet<>(Arrays.asList(domains.split("#")));
-        HashSet<String> organizationsSet = new HashSet<>(Arrays.asList(organizations.split("#")));
-
+        try {
+            String domains = tagArray[1];
+            HashSet<String> domainsSet = new HashSet<>(Arrays.asList(domains.split("#")));
+            userTagMap.put("domain", domainsSet);
+        }catch (ArrayIndexOutOfBoundsException e){
+            userTagMap.put("domain", new HashSet<>());
+        }
+        try {
+            String organizations = tagArray[2];
+            HashSet<String> organizationsSet = new HashSet<>(Arrays.asList(organizations.split("#")));
+            userTagMap.put("organization", organizationsSet);
+        }catch (ArrayIndexOutOfBoundsException e){
+            userTagMap.put("organization", new HashSet<>());
+        }
         userTagMap.put("role", roleSet);
-        userTagMap.put("domain", domainsSet);
-        userTagMap.put("organization", organizationsSet);
         return userTagMap;
     }
 

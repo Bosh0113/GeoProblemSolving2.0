@@ -17,7 +17,7 @@ public interface NodeService {
     //
     // void putUserTagInNode(String aid, HashMap<String, String> putInfo);
 
-    ActivityNode createActivityNode(String aid);
+    ActivityNode createActivityNode(String aid, Integer level);
 
     HashMap<String, String> getActivityResourceTag(String aid);
 

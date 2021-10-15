@@ -6,6 +6,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.Nod
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDao;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
@@ -43,14 +44,18 @@ public class NodeServiceImpl implements NodeService{
     @Autowired
     ActivityResDao activityResDao;
 
+    @Autowired
+    SubprojectRepository subprojectRepository;
+
     @Value("${userServerLocation}")
     String userServer;
 
+
     @Override
-    public ActivityNode createActivityNode(String aid) {
+    public ActivityNode createActivityNode(String aid, Integer level) {
         ActivityNode node = new ActivityNode();
         node.setId(aid);
-        HashMap<String, String> activityUserTag = getActivityUserTag(aid);
+        HashMap<String, String> activityUserTag = getActivityUserTag(aid, level);
         HashMap<String, String> activityResourceTag = getActivityResourceTag(aid);
         node.setMembers(activityUserTag);
         node.setResources(activityResourceTag);
@@ -109,10 +114,13 @@ public class NodeServiceImpl implements NodeService{
     }
 
 
-    public HashMap<String, String> getActivityUserTag(String aid){
-        Optional<Activity> byId = activityRepository.findById(aid);
-        if (!byId.isPresent()) return null;
-        Activity activity = byId.get();
+    public HashMap<String, String> getActivityUserTag(String aid, Integer level){
+        Activity activity;
+        if (level == 0){
+            activity = subprojectRepository.findById(aid).get();
+        }else {
+            activity = activityRepository.findById(aid).get();
+        }
         JSONArray members = activity.getMembers();
         HashMap<String, String> idRoleMap = new HashMap<>();
         for (int i = 0; i < members.size(); i++) {

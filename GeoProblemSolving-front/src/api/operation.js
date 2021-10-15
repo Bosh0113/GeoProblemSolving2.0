@@ -277,36 +277,38 @@ export function getResMetaInfo(aids) {
     let resMetaInfo = {};
     let parser = new DOMParser();
     for (let i = 0; i < docs.length; i++) {
-      let xmlDoc = parser.parseFromString(docs[i].document, "text/xml");
-      let resNode = xmlDoc.getElementsByTagName("Resource");
-      if (resNode == null || resNode.localName != "Resource") {
+      let xmlDocument = parser.parseFromString(docs[i].document, "text/xml");
+      let resNode = xmlDocument.getElementsByTagName("Resource");
+      if (resNode == null || resNode.length == 0) {
         continue;
       }
-      let metaDtaList = resNode.childNodes;
-      for (let j = 0; j < metaDtaList.length; i++) {
-        let type = metaDtaList[i].getAttribute("type");
-        let description = metaDtaList[i].getAttribute("description");
-        if (type === "scale") {
-          scaleTemp.push({text: description});
-        } else if (type === "format") {
-          formatTemp.push({text: description});
-        } else if (type === "reference") {
-          referenceTemp.push({text: description});
-        } else if (type === "unit") {
-          unitTemp.push({text: description});
-        } else if (type === "concept") {
-          conceptTemp.push({text: description});
+      for (let j = 0; j < resNode.length; j++){
+        let metaDtaList = resNode[j].childNodes;
+        for (let k = 0; k < metaDtaList.length; k++) {
+          let type = metaDtaList[k].getAttribute("type");
+          let description = metaDtaList[k].getAttribute("description");
+          if (type === "scale") {
+            scaleTemp.push({text: description});
+          } else if (type === "format") {
+            formatTemp.push({text: description});
+          } else if (type === "reference") {
+            referenceTemp.push({text: description});
+          } else if (type === "unit") {
+            unitTemp.push({text: description});
+          } else if (type === "concept") {
+            conceptTemp.push({text: description});
+          }
         }
       }
-      resMetaInfo = {
-        format: Array.from(new Set(formatTemp)),
-        scale: Array.from(new Set(scaleTemp)),
-        reference: Array.from(new Set(referenceTemp)),
-        unit: Array.from(new Set(unitTemp)),
-        concept: Array.from(new Set(conceptTemp))
-      };
-      return resMetaInfo;
     }
+    resMetaInfo = {
+      format: Array.from(new Set(formatTemp)),
+      scale: Array.from(new Set(scaleTemp)),
+      reference: Array.from(new Set(referenceTemp)),
+      unit: Array.from(new Set(unitTemp)),
+      concept: Array.from(new Set(conceptTemp))
+    };
+    return resMetaInfo;
   } else {
     throw new Error(result.msg)
   }
@@ -692,10 +694,11 @@ function updateActivityDoc(aid) {
 
 // acitivity——type: type/other
 export function activityUpdate(updateType, activityInfo) {
-  this.getActivityDoc(activityInfo.aid);
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
-    return;
+    if (xmlDoc === null){
+      alert("Failed to record operation. Please load activity document first!");
+      return;
+    }
   }
 
   let Activity = xmlDoc.getElementsByTagName('Activity')[0];
@@ -1006,35 +1009,35 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
     }
     // matedata
     if (metadata != undefined && metadata != {}) {
-      if (metadata.format != undefined) {
+      if (metadata.format != undefined && metadata.format != "") {
         let Metadata = xmlDoc.createElement('Metadata');
         Metadata.setAttribute("type", "format");
         Metadata.setAttribute("description", metadata.format);
         Resource.appendChild(Metadata);
 
       }
-      if (metadata.scale != undefined) {
+      if (metadata.scale != undefined && metadata.scale != "") {
         let Metadata = xmlDoc.createElement('Metadata');
         Metadata.setAttribute("type", "scale");
         Metadata.setAttribute("description", metadata.scale);
         Resource.appendChild(Metadata);
 
       }
-      if (metadata.reference != undefined) {
+      if (metadata.reference != undefined && metadata.reference != "") {
         let Metadata = xmlDoc.createElement('Metadata');
         Metadata.setAttribute("type", "reference");
         Metadata.setAttribute("description", metadata.reference);
         Resource.appendChild(Metadata);
 
       }
-      if (metadata.unit != undefined) {
+      if (metadata.unit != undefined && metadata.unit != "") {
         let Metadata = xmlDoc.createElement('Metadata');
         Metadata.setAttribute("type", "unit");
         Metadata.setAttribute("description", metadata.unit);
         Resource.appendChild(Metadata);
 
       }
-      if (metadata.concept != undefined) {
+      if (metadata.concept != undefined && metadata.concept != "") {
         let Metadata = xmlDoc.createElement('Metadata');
         Metadata.setAttribute("type", "concept");
         Metadata.setAttribute("description", metadata.concept);
@@ -1090,9 +1093,12 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
 
   //OperationRecords
   let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+  console.log("OperationRecords")
+  console.log(OperationRecords)
   if (OperationRecords == undefined) return;
 
   let operationId = (oid === "") ? guid() : oid;
+  console.log("operationId: " + operationId);
   let Operation = xmlDoc.getElementById(operationId);
   if (Operation !== null && Operation.localName == "Operation") return;
 

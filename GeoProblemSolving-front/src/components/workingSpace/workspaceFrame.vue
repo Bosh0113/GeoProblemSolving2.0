@@ -372,7 +372,8 @@ export default {
   },
   mounted() {
     // load activity doc
-    this.operationApi.getActivityDoc(this.slctActivity.aid);
+    let urlInfo = this.getUrlInfo();
+    this.operationApi.getActivityDoc(urlInfo.aid);
 
     this.initInfo();
     // this.locateActivity();
@@ -837,7 +838,7 @@ export default {
       //   valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       // );
       this.$router.push({name: "workspaceContent", params: {projectId: this.projectInfo.aid}, query:{aid: activity.aid, level: activity.level }});
-
+      this.contentId = Math.random();
       if (
         this.roleIdentity(activity) == "visitor" &&
         !this.permissionIdentity(
