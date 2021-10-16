@@ -696,7 +696,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     /**
      * 文件上传的自动更新
-     * 这个应该是这一块内容最麻烦的地方了
      * 实现逻辑
      * 1. 查询与此节点来连通的节点（深度/广度搜索？？？或者我直接递归进去就完事了可能还简单一些）
      * 2. 依次判断每条边是否拦得住这个资源，限制不住就放行
@@ -708,12 +707,17 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      */
     @Override
     public void resFlowAutoUpdate(String graphId, String nodeId, String uid) {
+        //获取该节点往下的路径
         Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
-        //需要判断它是否接受 AutoUpdate
+        /*
+        获取当前节点中的该资源
+        需要判断它是否接受 AutoUpdate
+         */
         ResourceEntity file = activityResService.getFileById(nodeId, uid);
         String resTags = TagUtil.setResourceTag(file);
         HashMap<String, String> resTagMap = new HashMap<>();
         resTagMap.put(uid, resTags);
+        //获取该资源可以流动的的到的节点
         HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTagMap);
         resFlow(nodeId, flowNode);
     }
