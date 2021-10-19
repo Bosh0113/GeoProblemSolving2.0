@@ -4,7 +4,7 @@ var websockLinked = {};
 //当前连接
 let connectorNum = {};
 
-var socketSites = []
+var socketSites = [];
 
 var timer = null;
 
@@ -25,12 +25,14 @@ function initWebSocket(para) { //初始化websocket
     websocketclose(e, para);
     removeTimer();
     websockLinked[para] = false;
+    connectorNum[para] = -1;
   }
   //连接成功的回调函数
   websock.onopen = function () {
     websocketOpen();
     setTimer();
     websockLinked[para] = true;
+    connectorNum[para] = 1;
   }
 
   //连接发生错误的回调方法
@@ -38,15 +40,16 @@ function initWebSocket(para) { //初始化websocket
     console.log("WebSocket error");
     removeTimer();
     websockLinked[para] = false;
+    connectorNum[para] = -1;
   }
 
   socketSites.push[para];
   websockets[para] = websock;
-  connectorNum[para] = 1;
 }
 
 function close(param) {
   websockets[param].close();
+  websockets[param] = null;
 }
 
 function getSocketInfo(param) {
@@ -81,20 +84,19 @@ function sendSock(param, agentData, callback) {
 
 //数据接收
 function websocketonmessage(e, param) {
-  let socketCallback = callbacks[param];
   try {
     var data = JSON.parse(e.data);
-    if (data.type == "members") {
+    if (data.type == "ping") return;
+    else if (data.type == "members") {
       connectorNum[param] = data.participants.length;
-    }
-    if (data.type != "ping") {
+    } else {
+      let socketCallback = callbacks[param];
       if (socketCallback != null && socketCallback != "" && socketCallback != undefined) {
         socketCallback(data);
       }
     }
   } catch (err) {
-  }
-  ;
+  };
 }
 
 //数据发送
@@ -104,7 +106,6 @@ function websocketsend(param, agentData) {
 
 //关闭
 function websocketclose(e, para) {
-  connectorNum[para] -= 1;
   console.log("Connection closed (" + e.code + ")");
 }
 
@@ -114,7 +115,7 @@ function websocketOpen(e) {
 
 function setTimer() {
   timer = setInterval(() => {
-    var messageJson = {type: "ping"};
+    var messageJson = { type: "ping" };
     for (let i = 0; i < socketSites.length; i++) {
       websocketsend(socketSites[i], messageJson);
     }
@@ -128,4 +129,4 @@ function removeTimer() {
 
 // initWebSocket();
 
-export {initWebSocket, sendSock, close, getSocketInfo}
+export { initWebSocket, sendSock, close, getSocketInfo }

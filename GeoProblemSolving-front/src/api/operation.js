@@ -1093,12 +1093,9 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
 
   //OperationRecords
   let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
-  console.log("OperationRecords")
-  console.log(OperationRecords)
   if (OperationRecords == undefined) return;
 
   let operationId = (oid === "") ? guid() : oid;
-  console.log("operationId: " + operationId);
   let Operation = xmlDoc.getElementById(operationId);
   if (Operation !== null && Operation.localName == "Operation") return;
 

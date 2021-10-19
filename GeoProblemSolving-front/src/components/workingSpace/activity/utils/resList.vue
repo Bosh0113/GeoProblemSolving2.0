@@ -173,7 +173,7 @@
               >*You do not have permission to manage resource.</small
             >
           </div>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px)" v-else>
+          <vue-scroll :ops="ops" style="max-height: calc(50vh - 220px)" v-else>
             <Card class="res-content"
               ><Icon
                 type="ios-add"

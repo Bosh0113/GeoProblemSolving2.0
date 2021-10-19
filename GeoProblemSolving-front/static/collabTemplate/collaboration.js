@@ -34,7 +34,7 @@ var taskList = [];
     var panelType = "people";
 
     function initComponent() {
-        $("#collab-tool-head").append(`<li class="head-logo"></li>`);
+        $("#collab-tool-head").append(`<li><span class="head-logo" id="tool-logo" style="cursor: pointer; width: 120px; display: inline-block;"></span></li>`);
         $("#collab-tool-sidebar").append(
             `<ul class="nav flex-column" style="width: 46px">
             <li class="nav-item">
@@ -198,6 +198,10 @@ var taskList = [];
         // message
         // The event occurs when a message is received through the event source
         window.addEventListener("message", getActivityInfo, false);
+
+        $("#tool-logo").on("click", function () {
+            location.reload();
+        });
 
         $("#people-btn").on("click", function () {
 
@@ -1280,7 +1284,8 @@ var taskList = [];
                 type: "computation",
                 inputs: inputs,
                 outputs: outputs,
-                sender: userInfo.userId
+                sender: userInfo.userId,
+                graphId: activityInfo.parent
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeForm);
@@ -1305,7 +1310,8 @@ var taskList = [];
                 urls: inputs,
                 params: params,
                 computeAbleModel: false,
-                sender: userInfo.userId
+                sender: userInfo.userId,
+                graphId: activityInfo.parent
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeMsg);

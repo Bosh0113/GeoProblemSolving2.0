@@ -246,12 +246,35 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/mxgraph-all.jar</systemPath>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.jetbrains</groupId>-->
-<!--            <artifactId>annotations</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>commons-lang-2.5</groupId>
+            <artifactId>commons-lang-2.5</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/commons-lang-2.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>dom4j-2.1.1</groupId>
+            <artifactId>dom4j-2.1.1</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>dom4j-2.1.1-javadoc</groupId>
+            <artifactId>dom4j-2.1.1-javadoc</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1-javadoc.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>dom4j-2.1.1-sources</groupId>
+            <artifactId>dom4j-2.1.1-sources</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1-sources.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

@@ -524,7 +524,6 @@ export default {
         on = {
           click: () => {
             this.slctActivity = data;
-            console.log(this.slctActivity);
             this.locateActivity();
           },
         };
