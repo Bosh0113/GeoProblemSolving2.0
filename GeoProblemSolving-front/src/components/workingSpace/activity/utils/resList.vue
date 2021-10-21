@@ -2385,7 +2385,11 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              this.shareToParentModal = false;
+              for( let j = 0 ; j < this.fileList.length ; j++){
+                if(addFileList[i].uid == this.fileList[j].uid){
+                  this.fileList.splice(j,1);
+                }
+              }
             } else {
               suc = false;
             }
@@ -2395,6 +2399,7 @@ export default {
           });
       }
       if(suc){
+        this.shareToParentModal = false;
         this.$Notice.success({
           title: "Share result",
           desc: "Share to parent activity successfully",
