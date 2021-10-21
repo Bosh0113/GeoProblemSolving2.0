@@ -48,6 +48,7 @@ public class TagUtil {
     }
 
     public static String setResourceTag(ResourceEntity res){
+        //需要从活动文档中进行读取
         String type = res.getType();
         String suffix = res.getSuffix();
         return addFlagInTags(type, suffix);

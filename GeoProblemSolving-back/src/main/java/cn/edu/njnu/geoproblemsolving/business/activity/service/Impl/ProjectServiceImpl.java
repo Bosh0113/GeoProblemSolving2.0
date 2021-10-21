@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -45,8 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final FolderDaoImpl folderDao;
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -54,6 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.folderDao = folderDao;
         this.projectUtil = projectUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -442,6 +445,9 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
+
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             staticPagesBuilder.projectDetailPageBuilder(project);
 
@@ -487,6 +493,9 @@ public class ProjectServiceImpl implements ProjectService {
 
             projectRepository.save(project);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId, role);
+
             return ResultUtils.success(project);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -524,6 +533,7 @@ public class ProjectServiceImpl implements ProjectService {
             //save
             projectRepository.save(project);
             userRepository.save(user);
+            nodeService.userExitActivity(aid, userId);
 
             //退出子活动
             projectUtil.quitSubProject(aid, userId, 0);

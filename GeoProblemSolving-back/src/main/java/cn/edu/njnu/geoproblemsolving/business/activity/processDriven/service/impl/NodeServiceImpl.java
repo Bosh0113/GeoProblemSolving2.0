@@ -13,8 +13,16 @@ import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResS
 import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -162,8 +170,93 @@ public class NodeServiceImpl implements NodeService{
         }
     }
 
+
+    //只关注当前节点上的操作
+    private HashMap<String, String> putNodeResource(String aid, Object res, String operationType){
+        Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        if (!byId.isPresent()) return null;
+        ActivityNode node = byId.get();
+        HashMap<String, String> resources = node.getResources();
+        switch (operationType){
+            case "add":
+                ResourceEntity addRes = (ResourceEntity) res;
+                String resTag = TagUtil.setResourceTag(addRes);
+                resources.put(addRes.getUid(), resTag);
+                break;
+            case "del":
+                resources.remove((String) res);
+                break;
+            case "delBatch":
+                HashSet<String> uids = (HashSet<String>)res;
+                Iterator<String> iterator = uids.iterator();
+                while (iterator.hasNext()){
+                    resources.remove(iterator.next());
+                }
+            case "put":
+                ResourceEntity putRes = (ResourceEntity)res;
+                String uid = putRes.getUid();
+                String resTagStr = resources.get(uid);
+                HashMap<String, String> tagMap = TagUtil.recoveryResTag(resTagStr);
+                String type = putRes.getType();
+                if (type != null && !type.equals("")){
+                    tagMap.put("type", type);
+                }
+                String suffix = putRes.getSuffix();
+                if (suffix != null && !suffix.equals("")){
+                    tagMap.put("suffix", suffix);
+                }
+                String resourceTag = TagUtil.setResourceTag(tagMap);
+                resources.put(uid, resourceTag);
+                break;
+        }
+        return resources;
+    }
+
+    @Override
+    public void addResToNode(String aid, ResourceEntity res) {
+        putNodeResource(aid, res, "add");
+    }
+
+    @Override
+    public void delResInNode(String aid, String uid) {
+        putNodeResource(aid, uid, "del");
+    }
+
+    @Override
+    public void delResInNodeBatch(String aid, HashSet<String> uid) {
+        putNodeResource(aid, uid, "delBatch");
+    }
+
+    @Override
+    public void putResInNode(String aid, ResourceEntity res) {
+        // todo 等待接入metadata，现在的无法修改
+    }
+
+    @Override
+    public void addOrPutUserToNode(String aid, String userId, String userRole) {
+        putNodeUser(aid, userId, userRole, "add");
+    }
+
+    @Override
+    public void userFlowToNode(String aid, String userId) {
+        Activity activity = activityRepository.findById(aid).get();
+        JSONArray members = activity.getMembers();
+        JSONObject member = new JSONObject();
+        member.put("role", "ordinary-member");
+        member.put("userId", userId);
+        members.add(member);
+        activityRepository.save(activity);
+        addOrPutUserToNode(aid, userId, "ordinary-member");
+    }
+
+    @Override
+    public void userExitActivity(String aid, String userId) {
+        putNodeUser(aid, userId, null, "del");
+    }
+
+
     //节点、活动层面同步的内容
-    private HashMap<String, String> putNodeUser(String aid, String userId,String role, String operationType){
+    private ActivityNode putNodeUser(String aid, String userId,String role, String operationType){
         Optional<ActivityNode> byId = nodeRepository.findById(aid);
         //无此节点，返回 null
         if (!byId.isPresent()) return null;
@@ -182,67 +275,68 @@ public class NodeServiceImpl implements NodeService{
             default:
                 return null;
         }
-        return members;
+        return nodeRepository.save(node);
     }
 
-    //只关注当前节点上的操作
-    private HashMap<String, String> putNodeResource(String aid, String operationType, ResourceEntity res){
-        Optional<ActivityNode> byId = nodeRepository.findById(aid);
-        if (!byId.isPresent()) return null;
-        ActivityNode node = byId.get();
-        HashMap<String, String> resources = node.getResources();
-        String uid = res.getUid();
-        switch (operationType){
-            case "add":
-                String resTag = TagUtil.setResourceTag(res);
-                resources.put(uid, resTag);
-                break;
-            case "del":
-                resources.remove(uid);
-                break;
-            case "put":
-                String resTagStr = resources.get(uid);
-                HashMap<String, String> tagMap = TagUtil.recoveryResTag(resTagStr);
-                String type = res.getType();
-                if (type != null && !type.equals("")){
-                    tagMap.put("type", type);
+    @Override
+    public void addUserToNode(String aid, String userId, String role) {
+        putNodeUser(aid, userId, role, "add");
+    }
+
+    @Autowired
+    MongoTemplate mongoTemplate;
+    @Override
+    public void putUserInfoToNode(String userId, ArrayList<String> organizations, ArrayList<String> domains) {
+        String key = "members." + userId;
+        Criteria criteria = Criteria.where(key).exists(true);
+        Query query = new Query(criteria);
+        try {
+            List<ActivityNode> activityNodes = mongoTemplate.find(query, ActivityNode.class);
+            for (ActivityNode item : activityNodes){
+                HashMap<String, String> members = item.getMembers();
+                String userTag = members.get(userId);
+                int fIndex = userTag.indexOf("O517");
+                int lIndex = userTag.lastIndexOf("O517");
+                String oOrgs = userTag.substring(lIndex + 4);
+                String oDomain = userTag.substring(fIndex + 4, lIndex);
+                String oRole = userTag.substring(0, fIndex);
+                if (organizations != null){
+                    JSONArray orgs = JSONArray.parseArray(JSONObject.toJSONString(organizations));
+                    oOrgs = TagUtil.array2String(orgs);
                 }
-                String suffix = res.getSuffix();
-                if (suffix != null && !suffix.equals("")){
-                    tagMap.put("suffix", suffix);
+                if (domains != null){
+                    JSONArray domain = JSONArray.parseArray(JSONObject.toJSONString(domains));
+                    oDomain = TagUtil.array2String(domain);
                 }
-                String resourceTag = TagUtil.setResourceTag(tagMap);
-                resources.put(uid, resourceTag);
-                break;
+                String newUserTag = TagUtil.addFlagInTags(oRole, oDomain, oOrgs);
+                members.put(userId, newUserTag);
+                mongoTemplate.save(item);
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
         }
-        return resources;
+
     }
 
     @Override
-    public void addOrPutUserToNode(String aid, String userId, String userRole) {
-        HashMap<String, String> users = putNodeUser(aid, userId, userRole, "add");
-        ActivityNode node = nodeRepository.findById(aid).get();
-        node.setMembers(users);
-        nodeRepository.save(node);
-    }
+    public void putUserInfoToNode(String userId,
+                                  ArrayList<String> localOrg,
+                                  ArrayList<String> serverOrg,
+                                  ArrayList<String> localDomain,
+                                  ArrayList<String> serverDomain){
 
-    @Override
-    public void userFlowToNode(String aid, String userId) {
-        Activity activity = activityRepository.findById(aid).get();
-        JSONArray members = activity.getMembers();
-        JSONObject member = new JSONObject();
-        member.put("role", "ordinary-member");
-        member.put("userId", userId);
-        members.add(member);
-        activityRepository.save(activity);
-        addOrPutUserToNode(aid, userId, "ordinary-member");
-    }
-
-    @Override
-    public void userExitActivity(String aid, String userId) {
-        HashMap<String, String> members = putNodeUser(aid, userId, null, "del");
-        ActivityNode node = nodeRepository.findById(aid).get();
-        node.setMembers(members);
-        nodeRepository.save(node);
+        if (localOrg == null) localOrg = new ArrayList<>();
+        if (serverOrg == null) serverOrg = new ArrayList<>();
+        if (localDomain == null) localDomain = new ArrayList<>();
+        if (serverDomain == null) serverDomain = new ArrayList<>();
+        boolean orgEq = localOrg.containsAll(serverOrg) && serverOrg.containsAll(localOrg);
+        boolean domainEq = localDomain.containsAll(serverDomain) && serverDomain.containsAll(localDomain);
+        if (!orgEq && !domainEq){
+            putUserInfoToNode(userId, serverOrg, serverDomain);
+        }else if (!orgEq && domainEq){
+            putUserInfoToNode(userId, serverOrg, null);
+        }else if (orgEq && !domainEq){
+            putUserInfoToNode(userId, null, serverDomain);
+        }
     }
 }

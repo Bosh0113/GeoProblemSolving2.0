@@ -379,7 +379,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 String nextNodeId = iterator.next();
                 //将资源添加到对应的活动中，并返回节点的资源标签
                 HashMap<String, String> resTagMap = addResource(resNodeId, nextNodeId, resId);
-                //将标签更新到节点中
+                //将标签更新到节点中 todo 完成迁移到NodeServer 暂时还是使用老的
                 ActivityNode node = nodeRepository.findById(nextNodeId).get();
                 node.setResources(resTagMap);
                 nodeRepository.save(node);
@@ -731,6 +731,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      */
     @Override
     public void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
+        if (graphId == null || graphId.equals("") || graphId.equals("null")) return;
         Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
         HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTag);
         resFlow(nodeId, flowNode);
@@ -1159,6 +1160,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     private Stack<Stack<HashMap<String, LinkRestriction>>> getRelevantNodeRoute(String graphId, String nodeId) {
         Optional<ActivityGraph> byId = graphRepository.findById(graphId);
         ActivityGraph activityGraph = byId.isPresent() ? byId.get() : null;
+        if (activityGraph == null) return null;
         HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap = activityGraph.getAdjacencyMap();
         /*
         将第一层拼接好后，然后再进去递归完后拼接，每一层都往endNode的hashMap中去存
@@ -1170,7 +1172,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         //用于存储遍历层次
         Stack<HashMap<String, LinkRestriction>> nodeStack = new Stack<>();
         //用于标记访问过的节点
-        ArrayList<String> visitedNode = new ArrayList<>();
+        Stack<String> visitedNode = new Stack<>();
         return depthFirstSearch(adjacencyMap, nodeId, nodeStack, pathStack, visitedNode);
     }
 
@@ -1183,13 +1185,13 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param pathStackTemp 存储节点层次
      * @param path          存储路径
      * @return 有多条路径 key路径
-     * bug: 环的处理
+     * 环的处理， visited是对于当前正在进行查找的路径而言的
      */
     private Stack<Stack<HashMap<String, LinkRestriction>>> depthFirstSearch(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap,
                                                                             String startId,
                                                                             Stack<HashMap<String, LinkRestriction>> pathStackTemp,
                                                                             Stack<Stack<HashMap<String, LinkRestriction>>> path,
-                                                                            ArrayList<String> visitedNode
+                                                                            Stack<String> visitedNode
     ) {
         //起点不用管,有肯定就不为空
         HashMap<String, LinkRestriction> endNode = adjacencyMap.get(startId);
@@ -1225,6 +1227,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
          */
         if (pathStackTemp.size() == 0) return path;
         pathStackTemp.pop();
+        visitedNode.pop();
         return path;
     }
 
@@ -1297,6 +1300,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return
      */
     private HashMap<String, HashSet<String>> getFlowNode(Stack<Stack<HashMap<String, LinkRestriction>>> paths, HashMap<String, String> resApproveMap) {
+        if (paths == null) return null;
         HashMap<String, HashSet<String>> flowNodeList = new HashMap<>();
         /*
         初始化资源可到达的数据结构，用于存储 key 为resId, value为可以到达的节点
@@ -1313,6 +1317,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             pathNumTemp--;
             flags += "T";
         }
+        //将标记字符串存入资源id前
         for (String resId : resIds) {
             //初始化的时候当然是所有的资源都是yes状态, flowNodeList存储能达到的节点
             resId = flags + resId;
@@ -1338,11 +1343,13 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 //遍历所有资源，判断是能够通过
                 for (Map.Entry<String, String> restriction : resApproveMap.entrySet()) {
                     String resId = restriction.getKey();
+                    //获取带标签的资源 Id
                     Set<String> resIdAndFlags = flowNodeList.keySet();
                     String resIdAndFlag = "";
                     String flag = "";
                     String tempFlags = "";
                     for (String item : resIdAndFlags) {
+                        //获取该资源的 id 中的标记
                         String tempResId = item.substring(pathNum);
                         if (tempResId.equals(resId)) {
                             //获取此资源 此条路径的通路情况
@@ -1359,7 +1366,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     }
                     HashSet<String> canFlowNodeSet = flowNodeList.get(resIdAndFlag);
                     //已经到达过该节点，不再判断
-                    if (canFlowNodeSet.contains(resId)) {
+                    if (canFlowNodeSet.contains(flowNodeId)) {
                         continue;
                     }
                     String resTagStr = restriction.getValue();
