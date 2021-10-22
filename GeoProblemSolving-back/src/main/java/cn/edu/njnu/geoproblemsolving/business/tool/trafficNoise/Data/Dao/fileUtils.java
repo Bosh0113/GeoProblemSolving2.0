@@ -64,7 +64,7 @@ public class fileUtils {
                 }
 
                 //保存文件路径信息
-                System.err.println("unzip：" + outPath);
+                System.out.println("unzip：" + outPath);
                 OutputStream out = new FileOutputStream(outPath);
                 byte[] buf1 = new byte[2048];
                 int len;
@@ -78,7 +78,8 @@ public class fileUtils {
             zip.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
 
         return flag;

@@ -123,7 +123,7 @@ public class exportBuildingServlet extends HttpServlet {
                 return respJson.toJSONString();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return respJson.toString();
     }

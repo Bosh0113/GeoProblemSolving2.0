@@ -217,7 +217,7 @@ export function getActivityDoc(aid) {
 
 export function getResInfo(resId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -316,7 +316,7 @@ export function getResMetaInfo(aids) {
 
 export function getMemberInfo(pid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -334,7 +334,7 @@ export function getMemberInfo(pid) {
 
 export function getToolInfo(tid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -354,7 +354,7 @@ export function getToolInfo(tid) {
 
 export function getOperationInfo(oid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -428,7 +428,7 @@ export function getOperationInfo(oid) {
 
 export function getTaskInfo(taskId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -453,7 +453,7 @@ export function getTaskInfo(taskId) {
 
 export function getTaskList() {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -486,7 +486,7 @@ export function getTaskList() {
 
 export function getTaskDependencies() {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -516,7 +516,7 @@ export function getTaskDependencies() {
 
 export function getToollist() {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -534,7 +534,7 @@ export function getToollist() {
 
 export function getReslist() {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -551,7 +551,7 @@ export function getReslist() {
 // independent operations(Temporary operations)
 export function getTempOperations() {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -696,7 +696,7 @@ function updateActivityDoc(aid) {
 export function activityUpdate(updateType, activityInfo) {
   if (xmlDoc === null) {
     if (xmlDoc === null){
-      alert("Failed to record operation. Please load activity document first!");
+      alert("Failed to record operation.Please try it again!");
       return;
     }
   }
@@ -771,7 +771,7 @@ export function activityUpdate(updateType, activityInfo) {
 
 export function taskUpdate(aid, behavior, taskInfo) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
   let time1 = new Date(taskInfo.startTime);
@@ -830,7 +830,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
 
 export function taskDependencyRecord(aid, behavior, last, next) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -868,7 +868,7 @@ export function taskDependencyRecord(aid, behavior, last, next) {
 
 export function participantUpdate(aid, behavior, userId, name, role, domains) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -940,7 +940,7 @@ export function participantUpdate(aid, behavior, userId, name, role, domains) {
 
 export function bindTempOperation2Task(aid, operationId, taskId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -970,7 +970,7 @@ export function bindTempOperation2Task(aid, operationId, taskId) {
 
 export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, metadata) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1124,7 +1124,7 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
 
 export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1214,7 +1214,7 @@ export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo
 
 export function communicationRecord(activity, oid, taskId, toolId, resId, time, onlineMembers) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1274,7 +1274,7 @@ export function communicationRecord(activity, oid, taskId, toolId, resId, time, 
 
 export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs, outputs, params, participants) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1355,7 +1355,7 @@ export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs
 // Child Activity
 export function activityRecord(oid, behavior, userId, childInfo) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1414,7 +1414,7 @@ export function activityRecord(oid, behavior, userId, childInfo) {
 
 export function processRecord(aid, oid, behavior, userId, last, next, protocalId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1489,7 +1489,7 @@ export function deleteActivityDoc(aid) {
 
 export function deleteOperation(aid, operationId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 
@@ -1504,7 +1504,7 @@ export function deleteOperation(aid, operationId) {
 // remove independent operations(Temporary operations) > 48h
 function clearTempOperations(aid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation. Please load activity document first!");
+    alert("Failed to record operation.Please try it again!");
     return;
   }
 

@@ -618,7 +618,7 @@ export default {
       // load activity doc
       let result = this.operationApi.getActivityDoc(aid);
       if (result === "empty") {
-        this.operationApi.activityDocInit(activity, this.userInfo);
+        this.operationApi.activityDocInit(this.slctActivity, this.userInfo);
       }
 
       if (level > 1) {
