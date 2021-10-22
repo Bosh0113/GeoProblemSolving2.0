@@ -608,6 +608,7 @@
       <template-general-toolset
         @generalInfo="getGeneralInfo"
         :step="currentStep"
+        :info="toolInfo"
       ></template-general-toolset>
       <div slot="footer">
         <Button
@@ -1110,7 +1111,7 @@ export default {
     },
     createTool: async function () {
       let createToolForm = this.toolInfo;
-      console.log(createToolForm);
+      // console.log(createToolForm);
       if (createToolForm.backendType == "" || createToolForm.toolName == "") {
         this.$Notice.error({
           title: "Crate failed",

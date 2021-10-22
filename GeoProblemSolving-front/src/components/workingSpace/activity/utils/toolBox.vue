@@ -66,7 +66,7 @@
               >*You do not have permission to manage tools.</small
             >
           </div>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 700px); padding-top: 5px" v-else>
+          <vue-scroll :ops="ops" style="max-height: calc(50vh - 220px); padding-top: 5px" v-else>
             <Card
               class= "tool-content"
               v-show="toolsetLevel > 0"

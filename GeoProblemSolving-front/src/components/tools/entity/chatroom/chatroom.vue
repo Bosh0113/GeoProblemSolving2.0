@@ -154,7 +154,7 @@
             <template v-if="list.type == 'members'">
               <div class="chat-notice">{{ list.content }}</div>
             </template>
-            <template v-else-if="list.sender.userId === $store.getters.userId">
+            <template v-else-if="list.sender.userId === userInfo.userId">
               <bubble-right :message="list"></bubble-right>
             </template>
             <template v-else>
@@ -420,16 +420,12 @@ export default {
     window.addEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus, true); //监听浏览器失焦事件
     window.addEventListener("resize", this.initSize, true);
-    window.addEventListener("message", this.getActivityInfo, false);
+    window.addEventListener("message", this.getActivityInfo, true);
 
-    this.init();
+    this.initSize();
     this.supportNotify();
   },
-  methods: {
-    async init() {
-      this.initSize();
-      this.startWebSocket();
-    },    
+  methods: { 
     avatarUrl(url) {
       let avatarUrl = this.$store.state.UserServer + url;
       return avatarUrl;
@@ -438,8 +434,9 @@ export default {
       if (event.data.type === "activity") {
         this.activityInfo = event.data.activity;
         this.userInfo = event.data.user;
-        console.log(this.userInfo)
+        // console.log(this.userInfo)
         this.participants.push(this.userInfo);
+        this.startWebSocket();
       }
     },
     initSize() {
@@ -569,12 +566,10 @@ export default {
             let time = new Date(this.msglist[i].time);
             let current = new Date();
             let threshold = 1000 * 60 * 3;
-            if (this.msglist[i].time == chatMsg.time) {
+            if (this.msglist[i].status == "sending" && this.msglist[i].time == chatMsg.time) {
               this.msglist[i].status = "done";
               msgCheck = true;
-            } else if (
-              (this.msglist[i].status = "sending" && current - time > threshold)
-            ) {
+            } else if (this.msglist[i].status == "sending" && (current - time > threshold)) {
               this.msglist[i].status = "failed";
             }
           }
@@ -618,6 +613,9 @@ export default {
       } else if (chatMsg.type == "message-cache") {
         for (let i = 0; i < chatMsg.content.length; i++) {
           if (chatMsg.content[i] != "") {
+            if(chatMsg.content[i].sender.userId == this.userInfo.userId){
+              chatMsg.content[i].status = "done";
+            }
             this.msglist.push(chatMsg.content[i]);
           }
         }
@@ -649,6 +647,7 @@ export default {
           this.selectReceiver.push(user);
         }
       }
+      this.participants = [];
       if (participants != undefined && participants.length > 1) {
         this.participants = participants;
       }

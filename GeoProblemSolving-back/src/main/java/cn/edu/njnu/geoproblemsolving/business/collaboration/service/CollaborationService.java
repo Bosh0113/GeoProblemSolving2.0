@@ -1,5 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -61,6 +63,9 @@ public class CollaborationService {
 
     @Autowired
     ActivityResDaoImpl ripDao;
+
+    @Autowired
+    GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -343,8 +348,9 @@ public class CollaborationService {
 
 
                     RestTemplate restTemplate = new RestTemplate();
+                    String graphId = messageObject.getString("graphId");
 
-
+                    HashMap<String, String> resTagMap = new HashMap<>();
                     if (isComputeModel) {
                     /*
                      1. 根据模型 md5 获取合适的 taskService
@@ -478,19 +484,28 @@ public class CollaborationService {
                             ResourceEntity resourceEntity = new ResourceEntity();
                             resourceEntity.setUserUpload(false);
                             resourceEntity.setSuffix("." + suffix);
-                            resourceEntity.setUid(UUID.randomUUID().toString());
+                            String uid = UUID.randomUUID().toString();
+                            resourceEntity.setUid(uid);
                             resourceEntity.setUploadTime(new Date());
                             resourceEntity.setName(fileName);
                             resourceEntity.setAddress(address);
                             resourceEntity.setDescription(fileName);
                             //这个需要确定
                             resourceEntity.setType("data");
-                            resourceEntity.setPrivacy("public");
+                            resourceEntity.setPrivacy("private");
                             resourceEntity.setActivityId(aid);
                             resourceEntity.setFolder(false);
                             //已经将数据存入资源中心
                             ripDao.addResource(resourceEntity);
+
+                            String resTag = TagUtil.setResourceTag(resourceEntity);
+                            resTagMap.put(uid ,resTag);
                         }
+                        //资源自动更新
+                        if(graphId != null && graphId != ""){
+                            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                        }
+
                         HashMap<String, CollaborationUser> receivers1 = sucMessage.getReceivers();
                         HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                         collaborationBehavior.sendComputeResult(participants, receivers1, computeMsg);
@@ -544,13 +559,24 @@ public class CollaborationService {
                                     String suffix = strings[1];
                                     ResourceEntity outputEntity = new ResourceEntity();
                                     outputEntity.setUserUpload(false);
-                                    outputEntity.setUid(UUID.randomUUID().toString());
+                                    String uid = UUID.randomUUID().toString();
+                                    outputEntity.setUid(uid);
                                     outputEntity.setName(prefix);
-                                    outputEntity.setSuffix(suffix);
+                                    outputEntity.setSuffix("." + suffix);
+                                    outputEntity.setType("data");
+                                    outputEntity.setPrivacy("private");
                                     outputEntity.setAddress(outputUrl);
+                                    outputEntity.setUploadTime(new Date());
                                     outputEntity.setActivityId(aid);
                                     outputEntity.setFolder(false);
                                     ripDao.addResource(outputEntity);
+
+                                    String resTag = TagUtil.setResourceTag(outputEntity);
+                                    resTagMap.put(uid ,resTag);
+                                }
+                                //资源自动更新
+                                if(graphId != null && graphId != ""){
+                                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
                                 }
                             }
                             computeMsg.setOutputs(outputs);

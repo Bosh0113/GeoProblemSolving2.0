@@ -1510,7 +1510,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 ActivityNode node = nodeRepository.findById(startId).get();
                 HashMap<String, String> members = node.getMembers();
                 //该节点都没此用户可以切了
-                if (!members.containsKey(userId)) continue;
+                if (members == null || !members.containsKey(userId)) continue;
                 //该节点有此用户，则切一下路径 tips: depthIndex = 0 的情况
                 //能通过此路径则说明能行，不单单返回内容，将节点一并返回好了
                 if (cUserIsApprovedInPath(path.subList(0, depthIndex + 1), members.get(userId))) {
