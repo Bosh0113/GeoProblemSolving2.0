@@ -157,9 +157,11 @@ public class SubprojectServiceImpl implements SubprojectService {
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: subproject does not exist.");
 
             Subproject subproject = (Subproject) result.get();
+            String oldPurpose = subproject.getPurpose();
+            if(oldPurpose == null) oldPurpose = ActivityType.Activity_Default.toString();
 
             String purpose = update.getPurpose();
-            if (subproject.getType().equals(ActivityType.Activity_Unit) && purpose != null && !subproject.getPurpose().equals(purpose)){
+            if (subproject.getType().equals(ActivityType.Activity_Unit) && purpose != null && !oldPurpose.equals(purpose)){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : relevantPurposeTool){

@@ -232,7 +232,9 @@ public class ProjectServiceImpl implements ProjectService {
             //补充绑定对于 purpose 的工具
             ActivityType activityType = update.getType();
             String oldPurpose = project.getPurpose();
+            if(oldPurpose == null) oldPurpose = ActivityType.Activity_Default.toString();
             String purpose = update.getPurpose();
+
             if (purpose != null && activityType.equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();

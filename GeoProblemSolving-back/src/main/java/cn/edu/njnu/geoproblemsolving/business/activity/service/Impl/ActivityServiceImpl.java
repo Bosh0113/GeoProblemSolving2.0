@@ -238,8 +238,11 @@ public class ActivityServiceImpl implements ActivityService {
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) result.get();
 
+            String oldPurpose = activity.getPurpose();
+            if(oldPurpose == null) oldPurpose = ActivityType.Activity_Default.toString();
             String purpose = update.getPurpose();
-            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !activity.getPurpose().equals(purpose)) {
+
+            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : tools) {
