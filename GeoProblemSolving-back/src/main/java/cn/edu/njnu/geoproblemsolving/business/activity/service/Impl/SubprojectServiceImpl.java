@@ -4,18 +4,18 @@ import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
-import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
-import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class SubprojectServiceImpl implements SubprojectService {
@@ -159,7 +158,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = (Subproject) result.get();
 
             String purpose = update.getPurpose();
-            if (subproject.getType().equals(ActivityType.Activity_Unit) && purpose != null && !subproject.getPurpose().equals(purpose)){
+            if ( !subproject.getType().equals(ActivityType.Activity_Unit) && update.getType().equals(ActivityType.Activity_Unit) || (subproject.getPurpose() != null && !subproject.getPurpose().equals(purpose))){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : relevantPurposeTool){

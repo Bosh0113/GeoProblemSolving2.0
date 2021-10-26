@@ -2,29 +2,27 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
-import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -231,9 +228,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             //补充绑定对于 purpose 的工具
             ActivityType activityType = update.getType();
+            ActivityType oldType = project.getType();
             String oldPurpose = project.getPurpose();
             String purpose = update.getPurpose();
-            if (purpose != null && activityType.equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)){
+            if (activityType.equals(ActivityType.Activity_Unit) && !oldType.equals(ActivityType.Activity_Unit) || (oldPurpose != null &&!oldPurpose.equals(purpose))
+            ){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for(Tool tool : relevantPurposeTool){

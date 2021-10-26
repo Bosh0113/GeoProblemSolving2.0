@@ -1,20 +1,20 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
+import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -239,7 +238,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             String purpose = update.getPurpose();
-            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !activity.getPurpose().equals(purpose)) {
+            if (!activity.getType().equals(ActivityType.Activity_Unit) && update.getType().equals(ActivityType.Activity_Unit) || (activity.getPurpose()!= null && !activity.getPurpose().equals(purpose))) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : tools) {

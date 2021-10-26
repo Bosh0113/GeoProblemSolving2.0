@@ -199,13 +199,14 @@
           <div v-if="collaborating && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;"><strong>collaborating:</strong>
+                )" style="margin-top: 20px;">
+            <strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
             >
               <avatar-list
-                v-if="item.collLinkUser.length > 0"
+                v-show="item.collLinkUser.length > 0"
                 :list="item.collLinkUser"
                 :key="index"
                 @click.native="joinLinkCollaboration(index)"

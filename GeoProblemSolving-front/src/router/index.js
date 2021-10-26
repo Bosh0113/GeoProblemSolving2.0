@@ -79,6 +79,12 @@ const routes = [
           require(["@/components/projects/newProject"], resolve)
       },
       {
+        path: "workflow/:projectId",
+        name: "Workflow",
+        component: resolve =>
+          require(["@/components/projects/workflow"], resolve)
+      },
+      {
         path: "community",
         name: "Community",
         component: resolve =>
