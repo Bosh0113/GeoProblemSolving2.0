@@ -444,6 +444,7 @@ public class CollaborationService {
                                         resJson.put("outputs", outputs);
                                         resJson.put("tid", dataJson.getString("tid"));
                                     } else {
+                                        if (index > 60 && refreshStatus == 0) return null;
                                         System.out.println("Waiting for computation: "+ (++index) + "+++status: " + refreshStatus);
                                     }
 
@@ -471,6 +472,7 @@ public class CollaborationService {
                          */
                         System.out.println("end: " + groupKey);
                         System.out.println(collaborationConfig);
+                        if (resJson == null) return;
                         String sucTaskTid = resJson.getString("tid");
                         HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
                         ComputeMsg sucMessage = computeList.get(sucTaskTid);
