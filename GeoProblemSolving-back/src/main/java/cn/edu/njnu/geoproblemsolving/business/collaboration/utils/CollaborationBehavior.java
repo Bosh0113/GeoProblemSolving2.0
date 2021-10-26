@@ -334,11 +334,15 @@ public class CollaborationBehavior {
         }
     }
 
-    public void sendTasKAssignment(HashMap<String, CollaborationUser> participants, CollaborationUser sender, JSONObject msgJson) throws IOException {
+    public void sendTasKAssignment(HashMap<String, CollaborationUser> participants, CollaborationUser sender, JSONObject msgJson, String receiverId) throws IOException {
         try {
-
+            if (receiverId != null){
+                CollaborationUser collaborationUser = participants.get(receiverId);
+                collaborationUser.getSession().getBasicRemote().sendText(msgJson.toString());
+                return;
+            }
             for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
-                //发送者的就不需要 webSocket 进行广播通知，在页面上有相应的处理逻辑
+                // the message didn't need to receive the message.
                 if (participant.getValue().getUserId().equals(sender.getUserId())) continue;
                 participant.getValue().getSession().getBasicRemote().sendText(msgJson.toString());
             }

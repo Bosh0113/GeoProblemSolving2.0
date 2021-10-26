@@ -343,7 +343,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     }
                 }
             }
-            if (relevantNodeRoute.size() == 0) return;
+            if (relevantNodeRoute.size() == 0) continue;
             ActivityNode node = nodeRepository.findById(nodeId).get();
             HashMap<String, String> resourceTagMap = node.getResources();
             //获取当前节点中资源所能到达的节点
@@ -594,11 +594,15 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         HashMap<String, String> tagMap = TagUtil.recoveryResTag(tagStr);
         String type = tagMap.get("type");
         String suffix = tagMap.get("suffix");
-        HashSet<String> types = linkRestriction.getTypes();
-        if (types.contains(type)) {
+        //
+        if (linkRestriction.getResProtocol().toString().equals("All")){
             return true;
+        }else if (linkRestriction.getResProtocol().toString().equals("None")){
+            return false;
+        }else {
+            HashSet<String> types = linkRestriction.getTypes();
+            return types.contains(type);
         }
-        return false;
     }
 
     /**
@@ -734,7 +738,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         if (graphId == null || graphId.equals("") || graphId.equals("null")) return;
         Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
         HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTag);
-        resFlow(nodeId, flowNode);
+        if (flowNode != null){
+            resFlow(nodeId, flowNode);
+        }
     }
 
     /*
@@ -1008,6 +1014,17 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         //将资源放入 Flowing Resources 中
         res.setParent(flowFolderId);
         if (flowFolderChildren == null) flowFolderChildren = new ArrayList<>();
+        //重复资源处理
+        if (flowFolderChildren.size() > 0){
+            ArrayList<String> flowFolderFileIds = new ArrayList<>();
+            for (ResourceEntity item : flowFolderChildren){
+                flowFolderFileIds.add(item.getUid());
+            }
+            int index = flowFolderFileIds.indexOf(uid);
+            if (index != -1){
+                flowFolderChildren.remove(index);
+            }
+        }
         flowFolderChildren.add(res);
         flowFolder.setChildren(flowFolderChildren);
         activityResDao.addResource(flowFolder);
@@ -1300,7 +1317,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return
      */
     private HashMap<String, HashSet<String>> getFlowNode(Stack<Stack<HashMap<String, LinkRestriction>>> paths, HashMap<String, String> resApproveMap) {
-        if (paths == null) return null;
+        if (paths == null || paths.size() == 0) return null;
         HashMap<String, HashSet<String>> flowNodeList = new HashMap<>();
         /*
         初始化资源可到达的数据结构，用于存储 key 为resId, value为可以到达的节点
@@ -1327,7 +1344,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         开始遍历每一条路径，判断能到达的节点，需要去重
         优化点：不用走相同的路
          */
-        for (int i = 0; i < paths.size(); i++) {
+        for (int i = 0; i < pathNum; i++) {
             //获得第 i 条路径
             Stack<HashMap<String, LinkRestriction>> path = paths.pop();
             for (int j = 0; j < path.size(); j++) {
@@ -1381,18 +1398,23 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                         builder.replace(i, i + 1, "F");
                         flowNodeList.put(builder.toString(), canFlowNodeSet);
                     }
-                }
+               }
             }
         }
+        HashMap<String, HashSet<String>> newFlowNodeList = new HashMap<>();
         for (Map.Entry<String, HashSet<String>> item : flowNodeList.entrySet()) {
             String key = item.getKey();
             HashSet<String> value = item.getValue();
-            // 去除资源的路径标记
+            // Remove path tag.
             String resId = key.substring(pathNum);
-            flowNodeList.remove(key);
-            flowNodeList.put(resId, value);
+            if (value != null && value.size() != 0){
+                newFlowNodeList.put(resId, value);
+            }
+            // newFlowNodeList.put(resId, value);
+            // flowNodeList.remove(key);
+            // flowNodeList.put(resId, value);
         }
-        return flowNodeList;
+        return newFlowNodeList;
     }
 
 

@@ -74,12 +74,13 @@ public class CollaborationService {
     String dataProxyServer;
 
     private CollaborationConfig collaborationConfig;
+    //global static
     private static final Map<String, CollaborationConfig> groups = new ConcurrentHashMap<>(); // collaboration groups
 
     public void msgStart(String groupKey, Session session, EndpointConfig config) {
         CollaborationConfig collaborationConfig;
         try {
-            //判断会话是否存在
+            //Check if the session existence
             if (groups.containsKey(groupKey)) {
                 collaborationConfig = groups.get(groupKey);
             } else {
@@ -118,7 +119,7 @@ public class CollaborationService {
     public void operationStart(String groupKey, Session session, EndpointConfig config) {
         CollaborationConfig collaborationConfig;
         try {
-            //判断会话是否存在
+            //Check if the session existence.
             if (groups.containsKey(groupKey)) {
                 collaborationConfig = groups.get(groupKey);
             } else {
@@ -591,12 +592,14 @@ public class CollaborationService {
                 case "task":{
                     //做消息转发
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject);
+                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject, null);
                 }
                 case "general": {
-                    //做消息转发
+                    //message transmission
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject);
+                    String receiver = messageObject.getString("receiver");
+                    collaborationBehavior.sendTasKAssignment(participants, sender, messageObject, receiver != null && !receiver.equals("") ? receiver : null);
+
                 }
             }
         } catch (Exception ex) {

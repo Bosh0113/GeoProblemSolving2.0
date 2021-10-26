@@ -233,18 +233,18 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             //补充绑定对于 purpose 的工具
-            ActivityType activityType = update.getType();
-            String oldPurpose = project.getPurpose();
-            String purpose = update.getPurpose();
-            if (purpose != null && activityType.equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)){
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit)
+                    && !project.getType().equals(ActivityType.Activity_Unit)
+                    || !project.getPurpose().equals(update.getPurpose()))) {
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
                 HashSet<String> toolSet = new HashSet<>();
-                for(Tool tool : relevantPurposeTool){
+                for (Tool tool : relevantPurposeTool) {
                     toolSet.add(tool.getTid());
                 }
                 project.setToolList(toolSet);
             }
-
             update.updateTo(project);
             projectRepository.save(project);
 

@@ -216,9 +216,11 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
                             uploadInfos.uploaded.add(res);
                             //======活动链接相关操作======================================
-                            //资源自动更新内容
-                            String resTag = TagUtil.setResourceTag(res);
-                            resTagMap.put(uid, resTag);
+                            //资源自动更新内容, public can auto update
+                            if (res.getPrivacy().equals("public")){
+                                String resTag = TagUtil.setResourceTag(res);
+                                resTagMap.put(uid, resTag);
+                            }
                             //===================================================
                             //如果不是最后一个，则进入下一次循环
                             if (fileNum != 0) {
@@ -255,17 +257,17 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                         }
                     }
                 } catch (Exception e) {
-                    uploadInfos.sizeOver.add(e.toString());
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
             //更新节点
-
+            nodeService.addResToNodeBatch(aid, resTagMap);
             /*
             资源自动更新
             todo 操作活动文档（需要的信息：aid、resourceEntity）
              */
             String graphId = req.getParameter("graphId");
+            //update
             geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
 
             return uploadInfos;
@@ -308,6 +310,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             for (String uid : uids) {
                 activityResDao.delResource(uid);
             }
+            //update node
+            nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
             return "suc";
         }
         //不是根目录情况则需要遍历删除

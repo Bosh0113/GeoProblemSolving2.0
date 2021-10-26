@@ -56,6 +56,8 @@ public interface NodeService {
     //资源相关内容，将可能异常的地方在此层完成屏蔽
     void addResToNode(String aid, ResourceEntity res);
 
+    void addResToNodeBatch(String aid, HashMap<String, String> resInfo);
+
     void delResInNode(String aid, String uid);
 
     void delResInNodeBatch(String aid, HashSet<String> uid);

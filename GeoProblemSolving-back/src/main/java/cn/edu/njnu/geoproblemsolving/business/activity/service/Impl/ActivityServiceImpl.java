@@ -242,7 +242,11 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             String purpose = update.getPurpose();
-            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !activity.getPurpose().equals(purpose)) {
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit) &&
+                    !activity.getType().equals(ActivityType.Activity_Unit) ||
+                    !activity.getPurpose().equals(purpose))) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : tools) {
@@ -605,7 +609,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity);
 
             //update node
-            nodeService.addOrPutUserToNode(aid ,userId, "ordinary-member");
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {

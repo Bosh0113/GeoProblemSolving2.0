@@ -1589,7 +1589,6 @@ export default {
                 data: formData,
               })
                 .then((res) => {
-                  console.log(res);
                   if (res.data != "Fail") {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
@@ -1647,11 +1646,14 @@ export default {
                       });
                     }
                     if (uploadedList.length > 0){
+                      let sucFileName = uploadedList.map((item)=>{
+                        return item.name + item.suffix;
+                      });
                       this.$Notice.success({
                         title: "Upload result",
                         desc: "Upload successfully",
                         render: (h) =>{
-                          return h("span", uploadedList.join(";"));
+                          return h("span", sucFileName.join(";"));
                         }
                       });
                     }

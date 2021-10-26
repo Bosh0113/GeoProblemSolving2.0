@@ -196,10 +196,15 @@
           </div>
           <div id="steps"></div>
 
-          <div v-if="collaborating && permissionIdentity(
+          <div v-if="
+          Array.isArray(participants) && participants.length !=0
+          && collaborating
+          && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;"><strong>collaborating:</strong>
+                )"
+               style="margin-top: 20px;">
+            <strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -1009,7 +1014,6 @@
         socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
       },
       socketOnMessage: function (messageJson) {
-        let that = this;
         let content = messageJson.content;
         let type = messageJson.type;
         let senderName = messageJson.senderName;
@@ -1019,7 +1023,7 @@
             this.$Notice.info({
               title: `${senderName}  join the page of pathway.`,
             });
-            //如果有人正在进行活动连接，则将内容发送过去
+            //Send content if an active connection is in progress.
             if (this.linkBuildModal) {
               let senderId = messageJson.sender;
               let initLinkInfo = {
@@ -1035,7 +1039,7 @@
                 sender: this.userInfo.userId,
                 senderName: this.userInfo.name,
                 type: "general",
-                receivers: [senderId],
+                receiver: senderId,
                 content: initLinkInfo,
               };
               socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
@@ -1351,6 +1355,8 @@
             }
           }
         } else if (type == "members") {
+          //people currently on the page
+          // the parameter is not available, when there is only one.
           this.participants = messageJson.participants;
         }
       },
@@ -1965,7 +1971,13 @@
               this.linkBuildModal = true;
               // record and end
               this.linkStep = 0;
-
+              let linkUserInfo = {
+                avatar: this.userInfo.avatar,
+                email: this.userInfo.email,
+                name: this.userInfo.name,
+                userId: this.userInfo.userId
+              };
+              this.collLinkUser = [linkUserInfo];
               let content = {
                 behavior: "inLink",
                 linkInfo: {
@@ -1976,15 +1988,14 @@
                   linkRestriction: this.restriction,
                   userDomains: this.userDomain,
                   userOrganizations: this.userOrganizations,
-                  collLinkUser: this.participants.filter(
-                    (item) => item.userId == this.userInfo.userId
-                  ),
+                  collLinkUser: linkUserInfo,
                 },
               };
               this.sendLinkSock(content);
               this.collaboratingInfoList.push(content.linkInfo);
             } else {
               //此几个选中的活动正在进行连接
+              this.linkBuildModal = true;
               let linkingInfo = this.collaboratingInfoList[this.collaIndex];
               this.selectedActivities = linkingInfo.selectActivities;
               this.activityLinks = linkingInfo.activityLinks;
