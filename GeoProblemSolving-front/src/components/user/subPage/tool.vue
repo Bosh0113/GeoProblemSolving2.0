@@ -992,7 +992,6 @@ export default {
       }
     },
 
-    //？？？？？why getUserProjects
     getUserProjects: function () {
       let projectIds = "";
       let userInfo = this.$store.getters.userInfo;
