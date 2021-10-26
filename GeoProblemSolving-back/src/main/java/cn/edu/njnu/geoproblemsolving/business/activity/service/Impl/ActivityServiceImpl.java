@@ -608,6 +608,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             activityRepository.save(activity);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
+
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -635,6 +638,9 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            //update node
+            nodeService.userExitActivity(aid, userId);
+
             //完成当前项目的退出，需要将子项目推出
             projectUtil.quitSubProject(aid, userId, 2);
 
@@ -677,6 +683,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {

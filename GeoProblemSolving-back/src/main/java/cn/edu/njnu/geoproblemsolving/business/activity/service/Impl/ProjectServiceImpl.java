@@ -493,6 +493,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.setActiveTime(dateFormat.format(new Date()));
 
             projectRepository.save(project);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
