@@ -1,7 +1,7 @@
 <template>
-	<div style="display: flex; background-color: #eee; height: calc(100vh - 130px)">
-		<Menu active-name="projectInfo" style="width: 180px;" @on-select="changeIntro">
-			<MenuGroup title="Introdection">
+	<div style="display: flex; background-color: #eee; height: calc(100vh - 130px)" id="workflow">
+		<Menu active-name="projectInfo" style="width: 9%; position:ablusote; z-index: 0;" @on-select="changeIntro">
+			<MenuGroup title="Project">
 				<MenuItem name="projectInfo" >
 					<Icon type="md-document" />
 					Project Info
@@ -13,13 +13,23 @@
 			</MenuGroup>
 			<MenuGroup title="Resource and Tool">
 				<MenuItem name="resource">
-					<Icon type="md-heart" />
+					<Icon type="md-cloud" />
 					Resource
 				</MenuItem>
 				<MenuItem name="tool" >
-					<Icon type="md-leaf" />
+					<Icon type="ios-cog" />
 					Tool
 				</MenuItem>
+			</MenuGroup>
+			<MenuGroup title="Template">
+				<MenuItem name="templateInfo">
+					<Icon type="md-information-circle" />
+					Template Info
+				</MenuItem>
+				<!-- <MenuItem name="2" >
+					<Icon type="md-leaf" />
+					Tool
+				</MenuItem> -->
 			</MenuGroup>
 		</Menu>
 		<Card
@@ -30,12 +40,12 @@
 		>
 			<div v-if="introType == 'projectInfo'">
 				<h2 style="margin-top:5px; text-align:center;">{{projectInfo.name}}</h2>
-				<div style="margin-top:15px;">
+				<div style="margin-top:15px;" v-if="getProjectFinish">
 					<img
 						v-if="projectInfo.picture != null && projectInfo.picture != '' && projectInfo.picture != undefined"
-						:src="avatarUrl"
+						:src="projectInfo.picture"
 						:title="projectInfo.name"
-						style="vertical-align:middle;width: 80px;height: 80px;"
+						style="margin-left: 35%;margin-top:10px; width: 100px; height: 100px; border-radius:50%; "
 					/>
 					<avatar
 						:size="100"
@@ -194,8 +204,58 @@
 			id="moadalCard"
 			style="height: calc(100vh - 130px)"
 		>
-			<Card dis-hover style="height:600px; width: 450px;margin: auto;">
-
+			<h2 v-show="tempToolInfo.value != undefined" style="margin-top:5px; text-align:center; margin-bottom: 25px;">{{tempToolInfo.value}}</h2>
+			<Card dis-hover style="height:600px; width: 500px;margin: auto;"  v-show="tempToolInfo.vertex != undefined && tempToolInfo.vertex">
+				<div style="heigth: 70%; width: 90%; float: left; margin-top:10px; margin-left:15px;">
+					<Divider orientation="left">Operation Information</Divider>
+					<div style="margin: 10px 0">
+						<Label>Operation Name:</Label>
+						<span style="margin-left: 10px">{{ tempToolInfo.value }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Id:</Label>
+						<span style="margin-left: 10px">{{ tempToolInfo.id }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Style:</Label>
+						<span style="margin-left: 10px">{{ tempToolInfo.style }}</span>
+					</div>
+					<Divider orientation="left" style="margin: 30px 0;">Tool Information</Divider>
+					<div style="margin-top:15px;" v-if="getToolInfoFinish">
+						<img
+							v-if="selectToolInfo.toolImg != null && selectToolInfo.toolImg != '' && selectToolInfo.toolImg != undefined"
+							:src="selectToolInfo.toolImg"
+							:title="selectToolInfo.toolName"
+							style="margin-left: 35%;margin-top:10px; width: 70px; height: 70px; border-radius:50%; "
+						/>
+						<avatar
+							:size="70"
+							:username="selectToolInfo.toolName"
+							style="margin-top:10px;margin-left: 35%;"
+							v-else
+						/>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Tool Name:</Label>
+						<span style="margin-left: 10px">{{ selectToolInfo.toolName }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Privacy:</Label>
+						<span style="margin-left: 10px">{{ selectToolInfo.privacy }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Tags:</Label>
+						<span style="margin-left: 10px">{{ selectToolInfo.tags }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Created Time:</Label>
+						<span style="margin-left: 10px">{{ selectToolInfo.createdTime }}</span>
+					</div>
+					<div style="margin: 10px 0">
+						<Label>Description:</Label>
+						<span style="margin-left: 10px">{{ selectToolInfo.description }}</span>
+					</div>
+				</div>
 			</Card>
 		</Card>
 		<Modal v-model="vertexInfoShow" title="Vertex Infomation">
@@ -289,6 +349,8 @@
       				userRoleBtn: false,
 					userInfo: {},
 					projectInfo: {},
+					getProjectFinish: false,
+					getToolInfoFinish: false,
 					creatorInfo: {},
 					participants: [],
 					introType: "projectInfo",
@@ -454,6 +516,7 @@
 					memberRoleModal: false,
 					roleSelected: "",
 					tempToolInfo: {},
+					selectToolInfo: {},
 				}
 			},
 		components:{
@@ -465,10 +528,14 @@
 			this.getProjectInfo();
 		},
 		mounted () {
+			
 			this.initMxGraph();
 		    this.listenGraphEvent();
             
-       },
+        },
+	    beforeDestroy() {
+			window.removeEventListener("message", this.toolMsgHandle, false);
+		},
 	    methods:{
 			getProjectInfo(){
 				this.userInfo = this.$store.getters.userInfo;
@@ -479,7 +546,9 @@
 						if (res.data.code == 0) {
 							// this.$set(this, "projectInfo", res.data.data[0])
 							this.projectInfo = res.data.data;
+							this.getProjectFinish = true;
 							this.userRole = this.roleIdentity(this.projectInfo);
+							this.operationApi.getActivityDoc(this.projectInfo.aid);
 							this.getParticipants();
 						} else {
 							console.log(res.data.msg);
@@ -571,6 +640,11 @@
 							this.operationListToGraph();
 							layout.execute(parent);
 							graph.center(true,true,0.1,0.5);
+							
+							// graph.setEnabled(false);//graph只能预览
+							graph.setCellsResizable(false);//节点不可改变大小 
+							mxGraphHandler.prototype.setMoveEnabled(false);//是否可以移动
+
 						} finally {
 							// Updates the display
 							graph.getModel().endUpdate();
@@ -674,7 +748,14 @@
 							let cell = evt.properties.cell;
 							console.log(cell);
 							this.selectVertex = cell;
-							this.vertexInfoShow = true;
+
+							//临时实验
+							this.selectVertex.backendType = "modelItem";
+							this.selectVertex.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
+							this.selectVertex.toolUrl = null;
+
+							// this.vertexInfoShow = true;
+							this.openTool();
 						}
 					});
 					// 监听单击事件
@@ -684,18 +765,165 @@
 							let cell = evt.properties.cell;
 							console.log(cell);
 							this.tempToolInfo = cell;
+
+							//临时实验
+							this.tempToolInfo.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
+							this.getToolInfo();
 						}
+					});
+				},
+				openTool(){
+					let toolInfo = this.selectVertex;
+					let routerUrl = toolInfo.toolUrl;
+					if ( toolInfo.backendType == "webTool") {
+						routerUrl = toolInfo.toolUrl;
+					} else if ( toolInfo.backendType == "modelItem") {
+						routerUrl = "/GeoProblemSolving/computeModel";
+					} else if ( toolInfo.backendType == "dataMethod") {
+						routerUrl = "/GeoProblemSolving/dataMethod";
+					}
+					var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+
+					jsPanel.create({
+						id: 'panel',
+						theme: 'primary',
+						headerTitle: '测试',
+						contentSize: {
+							width: 1000,
+							height: 600
+						},
+						contentOverflow: 'hidden',
+						content: toolContent,
+						container: "div#workflow",
+						boxShadow: 5,
+						dragit: {
+							containment: [70, 30, -50, 20],
+						},
+        				closeOnEscape: true,
+        				disableOnMaximized: true,
+						callback: function () {
+							this.content.style.padding = '0px';
+						}
+					});
+
+					 // 设置iframe 父子页面消息传输处理
+					window.addEventListener("message", this.toolMsgHandle, false);
+					let activity = this.projectInfo;
+					let userInfo = this.userInfo;
+					let taskList = this.operationApi.getTaskList();
+					let iFrame = document.getElementById(toolInfo.tid);
+					//iframe加载完毕后再发送消息，否则子页面接收不到message
+					iFrame.onload = function () {
+						//iframe加载完立即发送一条消息
+						iFrame.contentWindow.postMessage(
+						{
+							user: userInfo,
+							activity: activity,
+							tasks: taskList,
+							tid: toolInfo.tid,
+							type: "activity",
+						},
+						"*"
+						);
+					};
+				},
+				toolMsgHandle(event) {
+					if (event.data.type === "task") {
+						let operations = event.data.operations;
+						let behavior = event.data.behavior;
+						for (let i = 0; i < operations.length; i++) {
+							let operationType = operations[i].type;
+							switch (operationType) {
+								case "resource": {
+								if (behavior === "record") {
+									this.operationApi.resOperationRecord(
+									this.activityInfo.aid,
+									operations[i].id,
+									event.data.task,
+									behavior,
+									this.userInfo.userId,
+									operations[i].content
+									);
+									this.$store.commit("updateTempOperations", {
+									behavior: "add",
+									operation: operations[i],
+									});
+								} else if (behavior === "bind") {
+									this.operationApi.bindTempOperation2Task(
+									this.activityInfo.aid,
+									operations[i].id,
+									event.data.task
+									);
+									this.$store.commit("updateTempOperations", {
+									behavior: "remove",
+									operation: operations[i],
+									});
+								}
+								break;
+								}
+								case "communication": {
+								break;
+								}
+								case "geo-analysis": {
+								if (behavior === "record") {
+									this.operationApi.analysisRecord(
+									this.activityInfo.aid,
+									operations[i].id,
+									event.data.task,
+									this.userInfo.userId,
+									operations[i].toolId,
+									operations[i].purpose,
+									operations[i].inputs,
+									operations[i].outputs,
+									operations[i].params,
+									operations[i].participants
+									);
+								} else if (behavior === "bind") {
+									this.operationApi.bindTempOperation2Task(
+									this.activityInfo.aid,
+									operations[i].id,
+									event.data.task
+									);
+								}
+								break;
+								}
+							}
+
+							if (behavior === "record") {
+								this.$store.commit("updateTempOperations", {
+								behavior: "add",
+								operation: operations[i],
+								});
+							} else if (behavior === "bind") {
+								this.$store.commit("updateTempOperations", {
+								behavior: "remove",
+								operation: operations[i],
+								});
+							}
+						}
+					}
+				},
+				getToolInfo(){
+					let tid = this.tempToolInfo.tid;
+					this.getToolInfoFinish = false;
+					this.axios
+					.get("/GeoProblemSolving/tool/" + tid)
+					.then((res) => {
+						if (res.data.code == 0) {
+							console.log(res.data.data);
+							this.selectToolInfo = res.data.data;
+							this.getToolInfoFinish = true;
+						} else {
+							console.log(res.data.msg);
+						}
+						})
+					.catch((err) => {
+						throw err;
 					});
 				},
 				heightChange(){
 					let count = this.vertexList.length;
 					return (count * 100 + 100) + 'px'
-				},
-				zoomIn(){
-					this.graph.zoomIn();
-				},
-				zoomOut(){
-					this.graph.zoomOut();
 				},
 				zoomActual(){
 					this.graph.zoomActual();
@@ -825,43 +1053,26 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.infoCard {
 		margin-right: 5px;
-		width: 370px;
+		width: 23%;
 		overflow-y: auto;
 		border: 0;
 	}
 
 	.mxGraphCard {
 		margin-right: 5px;
-		width: 750px;
+		width: 38%;
 		overflow-y: auto;
 		border: 0;
 	}
 
 	.modalCard {
 		margin-right: 5px;
-		width: 600px;
+		width: 30%;
 		overflow-y: auto;
 		border: 0;
-	}
-
-	.introduceBox{
-		margin-left:60px;
-		position: absolute;
-		width: 27%;
-		height: 300px;
-		border: rgb(194, 185, 185) solid 3px;
-	}
-
-	.resAndToolBox{
-		margin-left:60px;
-		position: absolute;
-		width: 27%;
-		height: 500px;
-		top: 400px;
-		border: rgb(194, 185, 185) solid 3px;
 	}
 	.memberImg {
 		width: 40px;

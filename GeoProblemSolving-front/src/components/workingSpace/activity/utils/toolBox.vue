@@ -31,6 +31,9 @@
 .toolCard >>> .ivu-card-head {
   padding: 11px 16px;
 }
+.toolCard >>> .ivu-card-body {
+  padding: 0 8px;
+}
 </style>
 <template>
   <div>
@@ -70,7 +73,7 @@
             <Card
               class= "tool-content"
               v-show="toolsetLevel > 0"
-              ><Icon
+            ><Icon
                 type="md-arrow-back"
                 size="70"
                 style="margin-top:5px"
@@ -327,7 +330,6 @@ export default {
     //     })
     // },
     getAllTools() {
-      console.log(this.activityInfo);
       this.toolIdList = this.activityInfo.toolList;
       if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
         this.getToolInfos();
@@ -348,6 +350,7 @@ export default {
     // },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
+      console.log(this.selectedTool);
       this.openTool();
       // this.openToolModal = true;
     },
@@ -411,8 +414,8 @@ export default {
         },
       });
       $(".jsPanel-content").css("font-size", "0");
-      this.panelList.push(panel);
-      this.$emit("toolPanel", panel);
+      this.panelList.push(panel);//
+      this.$emit("toolPanel", panel);//
 
       // 设置iframe 父子页面消息传输处理
       window.addEventListener("message", this.toolMsgHandle, false);
