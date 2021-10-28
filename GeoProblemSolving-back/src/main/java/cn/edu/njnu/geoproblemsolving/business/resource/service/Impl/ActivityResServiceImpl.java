@@ -210,12 +210,18 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                                 String editToolInfo = req.getParameter("editToolInfo");
                                 res.setThumbnail(thumbnail);
                                 res.setEditToolInfo(editToolInfo);
-                            }
-                            catch (Exception ex){
+                            } catch (Exception ex) {
 
                             }
 
                             uploadInfos.uploaded.add(res);
+                            //======活动链接相关操作======================================
+                            //资源自动更新内容, public can auto update
+                            if (res.getPrivacy().equals("public")){
+                                String resTag = TagUtil.setResourceTag(res);
+                                resTagMap.put(uid, resTag);
+                            }
+                            //===================================================
                             //如果不是最后一个，则进入下一次循环
                             if (fileNum != 0) {
                                 continue;
@@ -229,6 +235,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                                 }
                                 break;
                             }
+                            //将上传的资源存入文件夹中
                             List<ResourceEntity> putResList = aRes(resourceList, paths, uploadInfos.uploaded, "0");
                             int index = 0;
                             for (int i = 0; i < putResList.size(); i++) {
@@ -245,9 +252,6 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             //不会出问题
                             activityResDao.updateRes(query, update);
 
-                            //资源自动更新内容
-                            String resTag = TagUtil.setResourceTag(res);
-                            resTagMap.put(uid ,resTag);
                         } else {
                             uploadInfos.sizeOver.add(part.getSubmittedFileName());
                         }
@@ -256,16 +260,22 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
-            //资源自动更新
-            // String graphId = req.getParameter("graphId");
-            // geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+            //更新节点
+            nodeService.addResToNodeBatch(aid, resTagMap);
+            /*
+            资源自动更新
+            todo 操作活动文档（需要的信息：aid、resourceEntity）
+             */
+            String graphId = req.getParameter("graphId");
+            //update
+            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+
             return uploadInfos;
 
         } catch (Exception e) {
             return "Fail";
         }
     }
-
 
 
     private List<ResourceEntity> aRes(List<ResourceEntity> resList, ArrayList<String> paths, List<ResourceEntity> resources, String parent) {
@@ -300,6 +310,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             for (String uid : uids) {
                 activityResDao.delResource(uid);
             }
+            //update node
+            nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
             return "suc";
         }
         //不是根目录情况则需要遍历删除
@@ -316,6 +328,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                 break;
             }
         }
+
+        //update node
+        nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
 
         //增加同步节点
         return activityResDao.updateRes(query, update);
@@ -397,27 +412,27 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         Part file = req.getPart("file");
         JSONObject uploadRemoteResult = uploadFileToDataContainer(file);
         Integer uploadResultCode = uploadRemoteResult.getInteger("code");
-        if (uploadResultCode != 1){
+        if (uploadResultCode != 1) {
             return ResultUtils.error(-2, "Failed uploading file");
         }
         String dataIdInContainer = uploadRemoteResult.getJSONObject("data").getString("id");
         String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
         //2. put
-        ArrayList<ResourceEntity> resourceList = (ArrayList<ResourceEntity>)activityResDao.queryByAid(aid);
+        ArrayList<ResourceEntity> resourceList = (ArrayList<ResourceEntity>) activityResDao.queryByAid(aid);
         ResourceEntity putRes = new ResourceEntity();
         putRes.setUid(uid);
         putRes.setAddress(address);
         String rootResUid = paths.get(paths.size() - 1);
         ArrayList<ResourceEntity> putResList = pResourceByPath(resourceList, putRes, paths);
         String updateRes = updateResourceInDB(rootResUid, putResList);
-        if (updateRes.equals("suc")){
+        if (updateRes.equals("suc")) {
             return ResultUtils.success(address);
         }
         return ResultUtils.error(-2, "fail");
     }
 
     //将更新后资源更新到数据库中
-    private String updateResourceInDB(String rootResUid, ArrayList<ResourceEntity> putResList){
+    private String updateResourceInDB(String rootResUid, ArrayList<ResourceEntity> putResList) {
         //putResList 含该activity 下所有资源
         Query query = new Query(Criteria.where("uid").is(rootResUid));
         Update update = new Update();
@@ -482,6 +497,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
     /**
      * 新版资源更新
      * 支持修改资源描述对应的资源实体(address)
+     *
      * @param aid
      * @param paths
      * @param putResInfo
@@ -491,11 +507,11 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
     public JsonResult putResourceByPath(String aid, ArrayList<String> paths, String putResInfo, HttpServletRequest request) throws IOException, ServletException {
         Part file = request.getPart("file");
         ResourceEntity putRes = JSONObject.parseObject(putResInfo, ResourceEntity.class);
-        if (file != null){
+        if (file != null) {
             //上传文件
             JSONObject uploadResult = uploadFileToDataContainer(file);
             Integer code = uploadResult.getInteger("code");
-            if (code != 1){
+            if (code != 1) {
                 return ResultUtils.error(-2, "Failed uploading file.");
             }
             uploadResult.getString("id");
@@ -512,7 +528,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             putRes.setAddress(address);
             putRes.setFileSize(file.getSize());
         }
-        ArrayList<ResourceEntity> rootResList = (ArrayList<ResourceEntity>)activityResDao.queryByAid(aid);
+        ArrayList<ResourceEntity> rootResList = (ArrayList<ResourceEntity>) activityResDao.queryByAid(aid);
         if (paths.size() == 1 && paths.get(0).equals("0")) {
             String delResUid = putRes.getUid();
             ResourceEntity res = activityResDao.queryByUid(delResUid);
@@ -526,7 +542,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         ArrayList<ResourceEntity> putResList = pResourceByPath(rootResList, putRes, paths);
         //更新数据库
         String updateResult = updateResourceInDB(rootResUid, putResList);
-        if (updateResult.equals("suc")){
+        if (updateResult.equals("suc")) {
             return ResultUtils.success(putRes);
         }
         return ResultUtils.error(-2, "Failed to update MongoDB.");
@@ -727,7 +743,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
     @Override
     public String bindResToProject(ResourceEntity res, String aid) {
         res.setActivityId(aid);
-        if (res.getUid() == null || res.getUid().equals("")){
+        if (res.getUid() == null || res.getUid().equals("")) {
             res.setUid(UUID.randomUUID().toString());
             res.setUploadTime(new Date());
             String fullName = res.getName();
@@ -756,9 +772,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
     private ArrayList<ResourceEntity> gallFileInProject(List<ResourceEntity> resInProject, ArrayList<ResourceEntity> fileList) {
         for (int i = 0; i < resInProject.size(); i++) {
             ResourceEntity res = resInProject.get(i);
-            if (res.getFolder()){
+            if (res.getFolder()) {
                 gallFileInProject(res.getChildren(), fileList);
-            }else {
+            } else {
                 fileList.add(res);
             }
         }
@@ -766,8 +782,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
     }
 
     /**
-     *
      * 地理过程驱动
+     *
      * @param aid
      * @param uid
      * @return
@@ -778,16 +794,16 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         return gFileById(resList, uid);
     }
 
-    private ResourceEntity gFileById(List<ResourceEntity> resList, String uid){
-        for (ResourceEntity res: resList){
-            if (!res.getFolder()){
-                if (res.getUid().equals(uid)){
+    private ResourceEntity gFileById(List<ResourceEntity> resList, String uid) {
+        for (ResourceEntity res : resList) {
+            if (!res.getFolder()) {
+                if (res.getUid().equals(uid)) {
                     return res;
                 }
-            }else {
+            } else {
                 ArrayList<ResourceEntity> resChildren = res.getChildren();
                 ResourceEntity resourceEntity = gFileById(resChildren, uid);
-                if (resourceEntity != null){
+                if (resourceEntity != null) {
                     return resourceEntity;
                 }
             }
@@ -797,18 +813,18 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
 
     @Override
-    public ArrayList<ResourceEntity> getFilesByIds(String aid, HashSet<String> uids){
+    public ArrayList<ResourceEntity> getFilesByIds(String aid, HashSet<String> uids) {
         List<ResourceEntity> resList = activityResDao.queryByAid(aid);
         return gFilesByIds(resList, uids, new ArrayList<>());
     }
 
-    private ArrayList<ResourceEntity> gFilesByIds(List<ResourceEntity> resList, HashSet<String> uids, ArrayList<ResourceEntity> queriedRes){
-        for (ResourceEntity res: resList){
-            if (!res.getFolder()){
-                if (uids.contains(res.getUid())){
+    private ArrayList<ResourceEntity> gFilesByIds(List<ResourceEntity> resList, HashSet<String> uids, ArrayList<ResourceEntity> queriedRes) {
+        for (ResourceEntity res : resList) {
+            if (!res.getFolder()) {
+                if (uids.contains(res.getUid())) {
                     queriedRes.add(res);
                 }
-            }else {
+            } else {
                 gFilesByIds(res.getChildren(), uids, queriedRes);
             }
         }
@@ -823,18 +839,21 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Override
     public List<ResourceEntity> getAllPublicService() {
-        ArrayList<ResourceEntity> allResource = (ArrayList<ResourceEntity>)activityResDao.findAll();
+        ArrayList<ResourceEntity> allResource = (ArrayList<ResourceEntity>) activityResDao.findAll();
         List<ResourceEntity> publicResource = new ArrayList<>();
         gAllPublicResource(allResource, publicResource);
         return publicResource;
     }
 
-    private List<ResourceEntity> gAllPublicResource(ArrayList<ResourceEntity> resource, List<ResourceEntity> publicResource){
-        for (ResourceEntity item : resource){
-            if (item.getFolder()){
-                gAllPublicResource(item.getChildren(), publicResource);
-            }else {
-                if (item.getPrivacy().equals("public")){
+    private List<ResourceEntity> gAllPublicResource(ArrayList<ResourceEntity> resource, List<ResourceEntity> publicResource) {
+        for (ResourceEntity item : resource) {
+            //try-catch item.getFolder() == null
+            if (item.getFolder() != null && item.getFolder()) {
+                if (item.getChildren() != null) {
+                    gAllPublicResource(item.getChildren(), publicResource);
+                }
+            } else {
+                if (item.getPrivacy() != null && item.getPrivacy().equals("public")) {
                     publicResource.add(item);
                 }
             }
@@ -844,11 +863,11 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
 
     @Override
-    public Map<String, ArrayList<ResourceEntity>>  getAllFileInProjects(HashSet<String> aids) {
+    public Map<String, ArrayList<ResourceEntity>> getAllFileInProjects(HashSet<String> aids) {
         HashMap<String, ArrayList<ResourceEntity>> projectFile = new HashMap<>();
         try {
             Iterator<String> iterator = aids.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 String aid = iterator.next();
                 List<ResourceEntity> resList = activityResDao.queryByAid(aid);
                 ArrayList<ResourceEntity> fileList = Lists.newArrayList();
@@ -856,7 +875,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                 projectFile.put(aid, fileList);
             }
             return projectFile;
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.toString());
             return null;
         }

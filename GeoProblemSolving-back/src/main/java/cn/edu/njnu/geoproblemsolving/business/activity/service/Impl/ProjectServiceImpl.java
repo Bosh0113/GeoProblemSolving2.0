@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -45,8 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final FolderDaoImpl folderDao;
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -54,6 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.folderDao = folderDao;
         this.projectUtil = projectUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -230,15 +233,14 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             //补充绑定对于 purpose 的工具
-            ActivityType activityType = update.getType();
-            String oldPurpose = project.getPurpose();
-            if(oldPurpose == null) oldPurpose = ActivityType.Activity_Default.toString();
-            String purpose = update.getPurpose();
-
-            if (purpose != null && activityType.equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)){
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit)
+                    && !project.getType().equals(ActivityType.Activity_Unit)
+                    || !project.getPurpose().equals(update.getPurpose()))) {
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
                 HashSet<String> toolSet = new HashSet<>();
-                for(Tool tool : relevantPurposeTool){
+                for (Tool tool : relevantPurposeTool) {
                     toolSet.add(tool.getTid());
                 }
                 project.setToolList(toolSet);
@@ -444,6 +446,9 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
+
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             staticPagesBuilder.projectDetailPageBuilder(project);
 
@@ -488,6 +493,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.setActiveTime(dateFormat.format(new Date()));
 
             projectRepository.save(project);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
@@ -526,6 +532,7 @@ public class ProjectServiceImpl implements ProjectService {
             //save
             projectRepository.save(project);
             userRepository.save(user);
+            nodeService.userExitActivity(aid, userId);
 
             //退出子活动
             projectUtil.quitSubProject(aid, userId, 0);

@@ -196,10 +196,15 @@
           </div>
           <div id="steps"></div>
 
-          <div v-if="collaborating && permissionIdentity(
+          <div v-if="
+          Array.isArray(participants) && participants.length !=0
+          && collaborating
+          && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;"><strong>collaborating:</strong>
+                )"
+               style="margin-top: 20px;">
+            <strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -723,6 +728,224 @@
         </template>
       </div>
     </Modal>
+    <Modal
+      class="link-protocol"
+      v-model="viewLinkModal"
+      title="View link protocol"
+      width="800"
+      :styles="{ top: '30px' }"
+    >
+      <div slot="footer">
+        <div>
+          <Button type="primary" @click="viewLinkModal = false">Ok</Button>
+        </div>
+      </div>
+
+      <Divider orientation="left">Person link</Divider>
+      <div style="margin: 0 20px">
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="margin-top: 5px; width: 150px">
+            Type of person protocol:
+          </div>
+          <Select
+            v-model="viewLinkProtocolForm.roleProtocol"
+            style="width: 200px"
+            placeholder="Select"
+            disabled
+          >
+            <Option value="None">None</Option>
+            <Option value="All">All</Option>
+            <Option value="Constraints">Constraints</Option>
+          </Select>
+        </div>
+        <template v-if="viewLinkProtocolForm.roleProtocol === 'Constraints'">
+          <div style="display: flex; margin-bottom: 10px">
+            <div style="margin-top: 10px; width: 100px">Role:</div>
+            <Select
+              v-model="viewLinkProtocolForm.roles"
+              multiple
+              placeholder="Which roles of participants could join the next activity?"
+              disabled
+            >
+              <Option value="manager">Manager</Option>
+              <Divider style="margin: 5px 0"></Divider>
+              <Option value="core" disabled>Core team</Option>
+              <Option value="researcher">Researcher</Option>
+              <Option value="expert">Expert</Option>
+              <Option value="decision-maker">Decision-maker</Option>
+              <Option value="core-member">Core-member</Option>
+              <Divider style="margin: 5px 0"></Divider>
+              <Option value="ordinary" disabled>Ordinary team</Option>
+              <Option value="stakeholder">Stakeholder</Option>
+              <Option value="consultant">Consultant</Option>
+              <Option value="ordinary-member">Ordinary-member</Option>
+            </Select>
+          </div>
+          <div style="display: flex; margin-bottom: 10px">
+            <div style="margin-top: 10px; width: 100px">Domains:</div>
+            <Select
+              v-model="viewLinkProtocolForm.domains"
+              multiple
+              :max-tag-count="4"
+              placeholder="Which domains of participants could join the next activity?"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.domains"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+          </div>
+          <div style="display: flex; margin-bottom: 10px">
+            <div style="margin-top: 10px; width: 100px">Organizations:</div>
+            <Select
+              v-model="viewLinkProtocolForm.organizations"
+              multiple
+              :max-tag-count="4"
+              placeholder="Which organizations of participants could join the next activity?"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.organizations"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+          </div>
+        </template>
+      </div>
+
+      <Divider orientation="left">Resource link</Divider>
+      <div style="margin: 0 20px">
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="width: 150px">Update automatically:</div>
+          <i-switch
+            v-model="viewLinkProtocolForm.autoUpdate"
+            disabled
+          />
+        </div>
+        <div style="display: flex; margin-bottom: 15px">
+          <div style="margin-top: 5px; width: 150px">
+            Type of resource protocol:
+          </div>
+          <Select
+            v-model="viewLinkProtocolForm.resProtocol"
+            style="width: 200px"
+            placeholder="Select"
+            disabled
+          >
+            <Option value="None">None</Option>
+            <Option value="All">All</Option>
+            <Option value="Constraints">Constraints</Option>
+          </Select>
+        </div>
+        <template v-if="viewLinkProtocolForm.resProtocol === 'Constraints'">
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Types:</div>
+            <Select
+              v-model="viewLinkProtocolForm.types"
+              multiple
+              :max-tag-count="2"
+              placeholder="Type of resources"
+              style="width: 267px"
+              disabled
+            >
+              <Option value="data">Data</Option>
+              <Option value="paper">Papers</Option>
+              <Option value="document">Documents</Option>
+              <Option value="model">Models</Option>
+              <Option value="image">Images</Option>
+              <Option value="video">Videos</Option>
+              <Option value="variable">Variables</Option>
+              <Option value="others">Others</Option>
+            </Select>
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              Formats:
+            </div>
+            <Select
+              v-model="viewLinkProtocolForm.formats"
+              multiple
+              style="width: 267px"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.formats"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+          </div>
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Scales:</div>
+            <Select
+              v-model="viewLinkProtocolForm.scales"
+              multiple
+              style="width: 267px"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.scales"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              References:
+            </div>
+            <Select
+              v-model="viewLinkProtocolForm.references"
+              multiple
+              style="width: 267px"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.references"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+          </div>
+          <div style="display: flex; margin-bottom: 15px">
+            <div style="margin-top: 5px; width: 72px">Units:</div>
+            <Select
+              v-model="viewLinkProtocolForm.units"
+              multiple
+              style="width: 267px"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.units"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+              Concepts:
+            </div>
+            <Select
+              v-model="viewLinkProtocolForm.concepts"
+              multiple
+              style="width: 267px"
+              disabled
+            >
+              <Option
+                v-for="(item, index) in viewLinkProtocolForm.concepts"
+                :value="item"
+                :key="index"
+              >{{item}}
+              </Option>
+            </Select>
+          </div>
+        </template>
+      </div>
+    </Modal>
     <login-modal
       :tempLoginModal="tempLoginModal"
       @changeLoginModal="changeLoginModal"
@@ -754,6 +977,8 @@
         removeLinkBtn: false,
         nodePositionBtn: false,
         //link
+        viewLinkModal: false,
+        viewLinkProtocolForm: {},
         // relation
         protocolType: "Sequence",
         linkStep: 0,
@@ -1019,7 +1244,7 @@
             this.$Notice.info({
               title: `${senderName}  join the page of pathway.`,
             });
-            //如果有人正在进行活动连接，则将内容发送过去
+            //Send content if an active connection is in progress.
             if (this.linkBuildModal) {
               let senderId = messageJson.sender;
               let initLinkInfo = {
@@ -1035,7 +1260,7 @@
                 sender: this.userInfo.userId,
                 senderName: this.userInfo.name,
                 type: "general",
-                receivers: [senderId],
+                receiver: senderId,
                 content: initLinkInfo,
               };
               socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);
@@ -1551,6 +1776,7 @@
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
               this.viewLinkModal = true;
+              this.viewLinkProtocolForm = res.data.data;
             }
           })
           .catch(e=>{})

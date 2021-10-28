@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
@@ -39,6 +40,9 @@ public class ProjectUtil {
 
     @Value("${userServerLocation}")
     String userServer;
+
+    @Autowired
+    NodeService nodeService;
 
     @Value("${client_id}")
     String clientId;
@@ -120,6 +124,8 @@ public class ProjectUtil {
                     if (userId.equals(memberId)) {
                         members.remove(item);
                         subprojectRepository.save(subproject);
+                        //update node
+                        nodeService.userExitActivity(aid, userId);
                     }
                 });
 

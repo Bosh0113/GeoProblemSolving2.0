@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
@@ -39,6 +40,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -48,7 +50,7 @@ public class ActivityServiceImpl implements ActivityService {
                                FolderDaoImpl folderDao,
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
-                               ToolService toolService) {
+                               ToolService toolService, NodeService nodeService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
@@ -57,6 +59,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectRepository = projectRepository;
         this.projectUtil = httpUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -238,11 +241,12 @@ public class ActivityServiceImpl implements ActivityService {
             if (!result.isPresent()) return ResultUtils.error(-1, "Fail: activity does not exist.");
             Activity activity = (Activity) result.get();
 
-            String oldPurpose = activity.getPurpose();
-            if(oldPurpose == null) oldPurpose = ActivityType.Activity_Default.toString();
             String purpose = update.getPurpose();
-
-            if (purpose != null && activity.getType().equals(ActivityType.Activity_Unit) && !oldPurpose.equals(purpose)) {
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit) &&
+                    !activity.getType().equals(ActivityType.Activity_Unit) ||
+                    !activity.getPurpose().equals(purpose))) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : tools) {
@@ -604,6 +608,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             activityRepository.save(activity);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
+
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -631,6 +638,9 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            //update node
+            nodeService.userExitActivity(aid, userId);
+
             //完成当前项目的退出，需要将子项目推出
             projectUtil.quitSubProject(aid, userId, 2);
 
@@ -673,6 +683,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {

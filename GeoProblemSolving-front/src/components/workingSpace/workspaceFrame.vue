@@ -925,7 +925,7 @@ export default {
                 this.$store.commit("userLogout");
                 this.tempLoginModal = true;
               } else if (res.data.code == 0) {
-                this.$Notice.info({ title: "Result", desc: "Success!" });
+                this.$Notice.success({ title: "Result", desc: "Success!" });
                 // updata slctActivity
                 this.slctActivity.name = this.editActivityForm.name;
                 this.slctActivity.description =
@@ -941,7 +941,7 @@ export default {
                 // change content
                 this.setContent(this.slctActivity);
               } else {
-                this.$Notice.info({ title: "Result", desc: res.data.msg });
+                this.$Notice.error({ title: "Result", desc: res.data.msg });
                 this.activityEditModal = false;
               }
             })

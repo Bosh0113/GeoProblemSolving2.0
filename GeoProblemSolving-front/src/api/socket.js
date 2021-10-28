@@ -1,12 +1,12 @@
-var websockets = {};
-var callbacks = {};
-var websockLinked = {};
-//当前连接
+let websockets = {};
+let callbacks = {};
+let websockLinked = {};
+//linking people
 let connectorNum = {};
 
-var socketSites = [];
+let socketSites = [];
 
-var timer = null;
+let timer = null;
 
 
 function initWebSocket(para) { //初始化websocket
@@ -86,14 +86,16 @@ function sendSock(param, agentData, callback) {
 function websocketonmessage(e, param) {
   try {
     var data = JSON.parse(e.data);
-    if (data.type == "ping") return;
-    else if (data.type == "members") {
+    if (data.type == "members") {
       connectorNum[param] = data.participants.length;
-    } else {
+    }
+    if (data.type != "ping") {
       let socketCallback = callbacks[param];
       if (socketCallback != null && socketCallback != "" && socketCallback != undefined) {
         socketCallback(data);
       }
+    } else {
+      return;
     }
   } catch (err) {
   };
