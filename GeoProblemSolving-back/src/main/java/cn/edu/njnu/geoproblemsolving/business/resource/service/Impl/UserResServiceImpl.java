@@ -147,7 +147,7 @@ public class UserResServiceImpl implements UserResService {
                         newFileName = storeResult.getData().toString();
                     else
                         return storeResult;
-                    pathURL = "resource/images/" + newFileName;
+                    pathURL = "/GeoProblemSolving/resource/images/" + newFileName;
                     break;
                 }
             }
