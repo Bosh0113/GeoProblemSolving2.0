@@ -105,9 +105,7 @@
           >Delete</Button
         >
         <Button
-          v-if="
-            slctActivity.level == 0 && slctActivity.type != 'Activity_Default'
-          "
+          v-if=" slctActivity.level == 0 "
           type="primary"
           icon="ios-bookmark"
           size="small"
