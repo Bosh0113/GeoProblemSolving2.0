@@ -29,6 +29,8 @@ import java.io.*;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserResServiceImpl implements UserResService {
@@ -120,27 +122,32 @@ public class UserResServiceImpl implements UserResService {
             }
 
             //新建存储文件夹
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            if (!path.exists()) {
-                path = new File("");
-            }
-            File imgLocation = new File(path.getAbsolutePath(), "static/images/res");
-            if (!imgLocation.exists()) {
-                imgLocation.mkdirs();
-            }
+            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            File folder = new File(servicePath + "resource/images");
+            if (!folder.exists()) folder.mkdirs();
+
+
+            // File path = new File(ResourceUtils.getURL("classpath:").getPath());
+            // if (!path.exists()) {
+            //     path = new File("");
+            // }
+            // File imgLocation = new File(path.getAbsolutePath(), "static/images/res");
+            // if (!imgLocation.exists()) {
+            //     imgLocation.mkdirs();
+            // }
 
             Collection<Part> parts = request.getParts();
             for (Part part : parts) {
                 if (part.getName().equals("picture")) {
                     String filePath = part.getSubmittedFileName();
-                    String folderPath = imgLocation.getPath();
+                    String folderPath = folder.getPath();
 
                     JsonResult storeResult = CommonUtil.fileStore(part, filePath, folderPath);
                     if (storeResult.getCode() == 0)
                         newFileName = storeResult.getData().toString();
                     else
                         return storeResult;
-                    pathURL = "/GeoProblemSolving/images/res/" + newFileName;
+                    pathURL = "/GeoProblemSolving/resource/images/" + newFileName;
                     break;
                 }
             }
