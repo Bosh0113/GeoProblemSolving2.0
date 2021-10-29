@@ -178,21 +178,6 @@
             <version>20180130</version>
         </dependency>
 
-
-        <!--        是否要删除-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hutool</groupId>-->
-<!--            <artifactId>hutool-all</artifactId>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>dom4j</groupId>-->
-<!--            <artifactId>dom4j</artifactId>-->
-<!--            <version>1.6.1</version>-->
-<!--        </dependency>-->
-<!--        ===============================================================-->
-<!--                         =======zhengzhong=========                    -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -269,28 +254,6 @@
             <systemPath>${project.basedir}/src/main/resources/lib/commons-lang-2.5.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>dom4j-2.1.1</groupId>
-            <artifactId>dom4j-2.1.1</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>dom4j-2.1.1-javadoc</groupId>
-            <artifactId>dom4j-2.1.1-javadoc</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1-javadoc.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>dom4j-2.1.1-sources</groupId>
-            <artifactId>dom4j-2.1.1-sources</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/dom4j-2.1.1-sources.jar</systemPath>
-        </dependency>
-
-        <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>21.0.1</version>
@@ -321,6 +284,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
             </plugin>
             <plugin>

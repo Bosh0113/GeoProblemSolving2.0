@@ -19,12 +19,20 @@
           title="Back to the parent folder"
           style="color: lightgray; cursor: default"
         />
+        <Button
+          shape="circle"
+          size="small"
+          icon="md-refresh"
+          @click="refreshResource"
+          title="Refresh resources"
+          style="margin-left: 5px"
+        ></Button>
         <Label style="margin-left: 5px">Select:</Label>
         <Select
           v-model="resouceType"
           size="small"
           @on-change="changeResType"
-          style="width: 150px; margin: 5px"
+          style="width: 120px; margin: 5px"
         >
           <Option value="all">All resources</Option>
           <Option value="data">Data</Option>
@@ -36,7 +44,7 @@
             shape="circle"
             size="small"
             icon="md-shuffle"
-            style="margin-right: 10px"
+            style="margin-right: 7px"
             title="Get resources"
           ></Button>
           <div slot="content" >
@@ -57,10 +65,10 @@
                   activityInfo.permission,
                   userRole,
                   'upload_resource'
-                )
+                ) && activityInfo.level > 0
               "
               @click="getPreviousRes()"
-              style="margin-top: 10px;"
+              style="margin-top: 7px;"
               title="Get resources from the previous activities"
             > Get resources from the previous activities</Button>
           </div>
@@ -71,45 +79,16 @@
               activityInfo.permission,
               userRole,
               'upload_resource'
-            )
+            ) && activityInfo.level > 0
           "
           shape="circle"
           size="small"
           icon="md-cloud-outline"
           @click="shareToParentModalShow()"
-          style="margin-right: 10px"
+          style="margin-right: 7px"
           title="Share resources"
         ></Button>
-        <!-- <Button
-          v-if="
-            permissionIdentity(
-              activityInfo.permission,
-              userRole,
-              'upload_resource'
-            )
-          "
-          shape="circle"
-          size="small"
-          icon="md-cloud-outline"
-          @click="shareModalShow()"
-          style="margin-right: 10px"
-          title="Get resources from your personal space"
-        ></Button> -->
-        <!-- <Button
-          v-if="
-            permissionIdentity(
-              activityInfo.permission,
-              userRole,
-              'upload_resource'
-            )
-          "
-          shape="circle"
-          size="small"
-          icon="md-shuffle"
-          @click="getPreviousRes()"
-          style="margin-right: 10px"
-          title="Get resources from the previous activities"
-        ></Button> -->
+        
         <Button
           v-if="
             permissionIdentity(
@@ -121,7 +100,7 @@
           shape="circle"
           size="small"
           icon="md-cloud-upload"
-          style="margin-right: 10px"
+          style="margin-right: 7px"
           @click="dataUploadModalShow"
           title="Upload resources"
         ></Button>
@@ -153,10 +132,11 @@
           >
           </Button>
         </template>
+        
       </div>
       <div style="display: flex; justify-content: space-between">
         <div style="width: 100%">
-          <div style="text-align: center" v-if="fileList.length == 0">
+          <div style="text-align: center; margin: 70px 0;" v-if="fileList.length == 0">
             <h2 style="color: #808695">No resource</h2>
             <small
               style="color: #dcdee2"
@@ -570,8 +550,8 @@
     >
       <div>
         <vue-scroll :ops="ops" style="height: 300px">
-          <Card dis-hover v-if="fileList.length == 0" style="text-align: center; border: transparent; margin-top: 70px">
-            <h2 style="color: #808695">No Resource</h2>
+          <Card dis-hover v-if="fileListChoosed.length == 0" style="text-align: center; border: transparent; margin-top: 70px">
+            <h2 style="color: #808695;">No Resource</h2>
             <small style="color: #dcdee2"
               >*You do not have any resource.</small
             >
@@ -1387,7 +1367,7 @@ export default {
     getParentActivities() {
       this.parentActivitiesID = [];
       this.parentActivitiesName = [];
-      if (this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
+      if (this.activityInfo.level > 0 && this.activityInfo.aid != "" && this.activityInfo.aid != undefined) {
         let url = "";
         let aid = this.activityInfo.aid;
         if (this.activityInfo.level == 1) {
@@ -1474,6 +1454,10 @@ export default {
             throw err;
           });
       }
+    },
+    refreshResource(){
+      this.getResList();
+      this.getParentActivities();
     },
     filterData() {
       var filterdata = this.activityResList.filter((item) => {
@@ -2517,14 +2501,14 @@ export default {
 </script>
 <style scoped>
 .res-content {
-  width: 90px;
+  width: 85px;
   height: 85px;
   float: left;
   margin: 5px;
   cursor: pointer;
 }
 .res-content-parents {
-  width: 90px;
+  width: 85px;
   height: 85px;
   float: left;
   margin: 5px;
@@ -2532,7 +2516,7 @@ export default {
   background-color: #cceeff;
 }
 .res-content-edit {
-  width: 90px;
+  width: 85px;
   height: 85px;
   float: left;
   margin: 5px;
@@ -2603,7 +2587,7 @@ export default {
   max-height: calc(100vh - 165px);
 }
 .resCard >>> .ivu-card-head {
-  padding: 6px 16px;
+  padding: 6px 8px;
 }
 .resCard >>> .ivu-card-body {
   padding: 5px;
