@@ -1256,7 +1256,7 @@
                             let formData = new FormData();
                             formData.append("picture", file);
                             axios
-                                .post("/GeoProblemSolving/resource/image", formData)
+                                .post("/GeoProblemSolving/res/image", formData)
                                 .then(res => {
                                     if (res.data.code === 0) {
                                         this.pictureUrl = res.data.data;

@@ -500,8 +500,11 @@ export default {
       socketApi.sendSock("NoticeSocket", data, this.getSocketMessage);
     },
     getSocketMessage(data) {
-      this.unreadNoticeCount++;
-      this.$Message.info("You have a new notice!");
+      if (data.type != "members"){
+        this.unreadNoticeCount++;
+        this.$Message.info("You have a new notice!");
+      }
+
       // console.log(data);
     },
     readNotificationNum() {
