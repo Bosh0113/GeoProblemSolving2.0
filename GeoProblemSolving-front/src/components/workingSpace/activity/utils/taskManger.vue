@@ -1542,7 +1542,6 @@ export default {
           this.todoLoading = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
           } else {
@@ -1564,7 +1563,6 @@ export default {
           this.doingLoading = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
           } else {
@@ -1586,7 +1584,6 @@ export default {
           this.doneLoading = false;
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            this.tempLoginModal = true;
           } else if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
           } else {
@@ -1700,7 +1697,7 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
-            
+
             // update activity doc
             this.operationApi.taskUpdate(
               this.activityInfo.aid,
@@ -1711,7 +1708,7 @@ export default {
               behavior: "remove",
               task: this.taskList.splice(this.selectTaskIndex, 1)[0],
             });
-            
+
             // 协同
             let sockMsg = {};
             sockMsg["type"] = "task";

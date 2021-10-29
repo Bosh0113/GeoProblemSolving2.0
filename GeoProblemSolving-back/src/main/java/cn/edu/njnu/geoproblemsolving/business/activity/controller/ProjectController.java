@@ -111,6 +111,10 @@ public class ProjectController {
             ArrayList<Project> projects = new ArrayList<>();
             for (String projectId: projectIds){{
                 JsonResult findResult = projectService.findProject(projectId);
+                Integer code = findResult.getCode();
+                if (code != 0){
+                    return findResult;
+                }
                 Project project = (Project)findResult.getData();
                 projects.add(project);
             }}

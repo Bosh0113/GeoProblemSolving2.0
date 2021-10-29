@@ -113,7 +113,7 @@
                 cursor: pointer;
               "
             >
-              <p slot="title" :title="item.name">{{ item.name }}</p>
+              <p slot="title" :title="item.name" class="activityTitle">{{ item.name }}</p>
               <div slot="extra" style="margin-top: -10px; margin-right: -5px">
                 <Tooltip
                   trigger="hover"
@@ -547,14 +547,20 @@
         >
       </div>
     </Modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
   </div>
 </template>
 <script>
 import { get, del, post, put } from "@/axios";
 import Avatar from "vue-avatar";
+import loginModal from "../../user/userState/loginModal.vue";
 export default {
   components: {
     Avatar,
+    loginModal,
   },
   props: [
     "activityInfo",
@@ -574,6 +580,8 @@ export default {
       // Members
       creatorInfo: {},
       participants: [],
+      // login
+      tempLoginModal: false,
       // add
       potentialMembers: [],
       invitingMembers: [],
@@ -728,6 +736,9 @@ export default {
         "/" +
         this.activityInfo.aid;
     },
+    changeLoginModal(status) {
+      this.tempLoginModal = status;
+    },
     preCreation() {
       if (
         !this.permissionIdentity(
@@ -764,7 +775,10 @@ export default {
           this.axios
             .post(url, this.activityForm)
             .then((res) => {
-              if (res.data.code == 0) {
+              if (res.data == "Offline") {
+                this.$store.commit("userLogout");
+                this.tempLoginModal = true;
+              } else if (res.data.code == 0) {
                 this.operationApi.activityRecord(
                   "",
                   "create",
@@ -1234,7 +1248,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
-          if (result.data == "Success") {            
+          if (result.data == "Success") {
             this.$store.commit("addNotification", notice);
             // this.$Notice.info({ desc: "Send notice successfully" });
           } else {
@@ -1258,6 +1272,7 @@ export default {
 <style scoped>
 .childrenCard >>> .ivu-card-head {
   padding: 5px 10px;
+  width: 90%;
 }
 .memberImg {
   width: 40px;
@@ -1296,7 +1311,7 @@ export default {
 }
 .childDescription {
   display: -webkit-box;
-  word-break: break-all;
+  word-break: break-word;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5;
   overflow: hidden;
