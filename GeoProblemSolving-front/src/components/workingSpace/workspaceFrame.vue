@@ -105,9 +105,7 @@
           >Delete</Button
         >
         <Button
-          v-if="
-            slctActivity.level == 0 && slctActivity.type != 'Activity_Default'
-          "
+          v-if="slctActivity.level == 0"
           type="primary"
           icon="ios-bookmark"
           size="small"
@@ -367,8 +365,7 @@ export default {
       }
     });
   },
-  created() {
-  },
+  created() {},
   mounted() {
     // load activity doc
     let urlInfo = this.getUrlInfo();
@@ -747,7 +744,7 @@ export default {
       this.nameConfirm = [];
       // child activities normalization
       let role = this.roleIdentity(ancestors[0]);
-      if (children.length > 0 && role != 'visitor' ) {
+      if (children.length > 0 && role != "visitor") {
         for (var i = 0; i < children.length; i++) {
           children[i].children = [];
           this.nameConfirm.push(children[i].name);
@@ -817,13 +814,13 @@ export default {
     },
     typeChanged(data) {
       this.slctActivity.type = data.type;
-      if(this.slctActivity.level == 0){
+      if (this.slctActivity.level == 0) {
         this.projectInfo.type = data.type;
       }
       this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
-    activityInfo(data){
+    activityInfo(data) {
       this.activityInfo = data;
     },
     setContent(activity) {
@@ -835,7 +832,11 @@ export default {
       //   null,
       //   valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       // );
-      this.$router.push({name: "workspaceContent", params: {projectId: this.projectInfo.aid}, query:{aid: activity.aid, level: activity.level }});
+      this.$router.push({
+        name: "workspaceContent",
+        params: { projectId: this.projectInfo.aid },
+        query: { aid: activity.aid, level: activity.level },
+      });
       this.contentId = Math.random();
       if (
         this.roleIdentity(activity) == "visitor" &&
@@ -952,7 +953,7 @@ export default {
       });
     },
     updatePathway(type, content) {
-      if(this.parentActivity){
+      if (this.parentActivity) {
         if (this.parentActivity.pathway != undefined) {
           if (type === "name") {
             let pathway = JSON.stringify(this.parentActivity.pathway);
@@ -965,7 +966,9 @@ export default {
             this.parentActivity.pathway = JSON.parse(newpathway);
           } else if (type === "type") {
             for (let i = 0; i < this.parentActivity.pathway.length; i++) {
-              if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+              if (
+                this.parentActivity.pathway[i].aid === this.slctActivity.aid
+              ) {
                 this.parentActivity.pathway[i].category =
                   this.getStepCategroy(content);
               }

@@ -442,9 +442,9 @@
       contentHeightCompute: function () {
         let tempHeight = "";
         if (this.selectedTaskType.length == 2){
-          tempHeight = 380;
+          tempHeight = 280;
         }else if (this.selectedTaskType.length == 3){
-          tempHeight = 600;
+          tempHeight = 570;
         }
         return tempHeight;
       }
