@@ -295,6 +295,19 @@ public class NodeServiceImpl implements NodeService {
         putNodeUser(aid, userId, role, "add");
     }
 
+    @Override
+    public void addUserToNodeBatch(String aid, HashSet<String> userIds) {
+        Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        if (!byId.isPresent()) return;
+        ActivityNode node = byId.get();
+        HashMap<String, String> members = node.getMembers();
+        for (String uid: userIds){
+            String userTag = getUserTag(uid, "ordinary-member");
+            members.put(uid, userTag);
+        }
+        nodeRepository.save(node);
+    }
+
     @Autowired
     MongoTemplate mongoTemplate;
 

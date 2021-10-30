@@ -32,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -455,6 +456,55 @@ public class ProjectServiceImpl implements ProjectService {
             return ResultUtils.success(project);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult joinProject(String aid, HashSet<String> userIds) throws IOException {
+        Optional<Project> optional = projectRepository.findById(aid);
+        if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project( "+ aid + ")does not exist.");
+        Project project = optional.get();
+        JSONArray members = project.getMembers();
+        if (members == null) members = new JSONArray();
+        try {
+            //Do not process if the user exists.
+            for (Object member : members){
+                String userId =  (String)((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    if (uid.equals(userId)){
+                        it.remove();
+                    }
+                }
+            }
+            for (String uid : userIds){
+                Optional<UserEntity> byId = userRepository.findById(uid);
+                if (!byId.isPresent()) continue;
+                UserEntity userEntity = byId.get();
+                JSONObject newMember = new JSONObject();
+                newMember.put("userId", uid);
+                newMember.put("role", "ordinary-member");
+                members.add(newMember);
+                ArrayList<String> joinedProjects = userEntity.getJoinedProjects();
+                joinedProjects.remove(uid);
+                joinedProjects.add(uid);
+                //update user
+                userRepository.save(userEntity);
+            }
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+            projectRepository.save(project);
+
+            //update node
+            nodeService.addUserToNodeBatch(aid, userIds);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
+            staticPagesBuilder.projectDetailPageBuilder(project);
+
+            return ResultUtils.success(project);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
         }
     }
 

@@ -1316,4 +1316,7 @@ export default {
   -webkit-line-clamp: 5;
   overflow: hidden;
 }
+  .activityTitle >>> .ivu-card-head p{
+    width: 90%;
+  }
 </style>

@@ -217,10 +217,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             uploadInfos.uploaded.add(res);
                             //======活动链接相关操作======================================
                             //资源自动更新内容, public can auto update
-                            if (res.getPrivacy().equals("public")){
-                                String resTag = TagUtil.setResourceTag(res);
-                                resTagMap.put(uid, resTag);
-                            }
+                            String resTag = TagUtil.setResourceTag(res);
+                            resTagMap.put(uid, resTag);
                             //===================================================
                             //如果不是最后一个，则进入下一次循环
                             if (fileNum != 0) {

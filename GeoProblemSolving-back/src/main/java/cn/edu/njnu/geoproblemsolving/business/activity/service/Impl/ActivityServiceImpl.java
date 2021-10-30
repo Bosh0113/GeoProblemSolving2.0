@@ -619,6 +619,45 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    public JsonResult joinActivity(String aid, HashSet<String> userIds) {
+        Activity activity = findActivityById(aid);
+        if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+        JSONArray members = activity.getMembers();
+        if (members == null) members = new JSONArray();
+        try {
+            //Do not process if the user exists.
+            for (Object member : members){
+                String userId =  (String)((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    if (uid.equals(userId)){
+                        it.remove();
+                    }
+                }
+            }
+            for (String uid : userIds){
+                Optional<UserEntity> byId = userRepository.findById(uid);
+                if (!byId.isPresent()) continue;
+                JSONObject newMember = new JSONObject();
+                newMember.put("userId", uid);
+                newMember.put("role", "ordinary-member");
+                members.add(newMember);
+            }
+            //update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+            activityRepository.save(activity);
+
+            //update node
+            nodeService.addUserToNodeBatch(aid, userIds);
+
+            return ResultUtils.success(members);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
+        }
+    }
+
+    @Override
     public JsonResult quitActivity(String aid, String userId) {
         try {
             Activity activity = findActivityById(aid);
