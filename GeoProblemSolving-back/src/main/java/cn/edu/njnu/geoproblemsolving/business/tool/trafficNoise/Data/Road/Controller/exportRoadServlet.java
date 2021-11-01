@@ -2,9 +2,14 @@ package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Road.Contr
 
 //import cn.edu.njnu.trafficNoiseCaculating.UserData.Domain.EDataType;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
 import cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.fileUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.prepareData.copyDbfFile;
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.prepareData.prepareRoadData;
@@ -28,6 +36,12 @@ import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Ser
 @RestController
 @RequestMapping(value = "/exportRoadServlet")
 public class exportRoadServlet extends HttpServlet {
+
+    @Autowired
+    ActivityResDaoImpl ripDao;
+
+    @Autowired
+    GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${dataContainer}")
     String dataContainerIp;
@@ -43,13 +57,16 @@ public class exportRoadServlet extends HttpServlet {
         // 解析shapefile压缩包
         try {
             JSONObject map = JSONObject.parseObject(data);
-            String roadId = map.getString("uid");
+            String aid = map.getString("aid");
+            String graphId = map.getString("graphId");
+            String id = map.getString("uid");
+            String name = map.getString("name");
 
 
             String inputDataDir = req.getServletContext().getRealPath("./") + "data" + File.separator + "TrafficNoise" + File.separator;
-            String roadDir = inputDataDir + roadId + File.separator + "temp" + File.separator;
+            String roadDir = inputDataDir + id + File.separator + "temp" + File.separator;
             if(!new File(roadDir).exists()) {
-                genShpZipFile(roadDir, inputDataDir + roadId, ROAD_FILE_NAME);
+                genShpZipFile(roadDir, inputDataDir + id, ROAD_FILE_NAME);
             }
             File roadCenterLineFile = new File(roadDir + ROAD_FILE_NAME + ".zip");
 
@@ -73,6 +90,30 @@ public class exportRoadServlet extends HttpServlet {
                 }
                 String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
 
+                // 将资源保存至活动中
+                ResourceEntity outputEntity = new ResourceEntity();
+                String uid = UUID.randomUUID().toString();
+                outputEntity.setUserUpload(false);
+                outputEntity.setUid(uid);
+                outputEntity.setName(name+"_RLS90");
+                outputEntity.setSuffix(".zip");
+                outputEntity.setType("data");
+                outputEntity.setUploadTime(new Date());
+                outputEntity.setPrivacy("private");
+                outputEntity.setAddress(address);
+                outputEntity.setActivityId(aid);
+                outputEntity.setFolder(false);
+                outputEntity.setDescription("Road data for RLS-90 model.");
+                ripDao.addResource(outputEntity);
+
+                // 将资源保存至过程中
+                HashMap<String, String> resTagMap = new HashMap<>();
+                String resTag = TagUtil.setResourceTag(outputEntity);
+                resTagMap.put(uid ,resTag);
+                //资源自动更新
+                if(graphId != null && graphId != ""){
+                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                }
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
             } else {
@@ -81,7 +122,7 @@ public class exportRoadServlet extends HttpServlet {
                 return respJson.toJSONString();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return respJson.toString();
     }

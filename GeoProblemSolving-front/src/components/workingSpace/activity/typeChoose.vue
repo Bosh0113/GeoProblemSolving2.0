@@ -10,19 +10,14 @@
             margin-buttom: 2%;
           "
         >
-          <span style="margin: 25px 0; font-size: 20px" title="Activity name"
+          <!-- <span style="margin: 25px 0; font-size: 20px" title="Activity name"
             >{{activityInfo.name}}</span
-          >
+          > -->
           <span style="margin: 0px 10px; font-size: 14px;overflow: hidden;width: 90%;display: inline-block;text-overflow: ellipsis;" title="Activity description">{{
             activityInfo.description
           }}</span>
         </div>
-      </div>
-      <div style="text-align: center; margin-top: 10px; color: grey">
-        Activity contains workspaces to support collaborative geo-problem
-        solving. Here provides two activity types for different solutions of
-        geo-problems.
-      </div>
+      </div>     
       <Row
         type="flex"
         justify="space-around"
@@ -82,6 +77,11 @@
           </Card>
         </Col>
       </Row>
+       <div style="text-align: center; margin-top: 10px; color: grey">
+        Activity contains workspaces to support collaborative geo-problem
+        solving. Here provides two activity types for different solutions of
+        geo-problems.
+      </div>
     </Col>
     <Modal
       v-model="selectTypeModal"

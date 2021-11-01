@@ -40,7 +40,7 @@
           <!-- <Option value="toolData">Results</Option> -->
         </Select>
         <Poptip placement="bottom">
-          <Button 
+          <Button
             shape="circle"
             size="small"
             icon="md-shuffle"
@@ -153,7 +153,7 @@
               >*You do not have permission to manage resource.</small
             >
           </div>
-          <vue-scroll :ops="ops" style="max-height: calc(100vh - 670px)" v-else>
+          <vue-scroll :ops="ops" style="max-height: calc(50vh - 220px)" v-else>
             <Card class="res-content"
               ><Icon
                 type="ios-add"
@@ -667,7 +667,7 @@
           </CheckboxGroup>
         </vue-scroll>
       </div>
-     
+
       <div slot="footer" style="display: inline-block">
         <Button type="primary" @click="shareToParent()" style="float: right"
           >Submit
@@ -733,7 +733,7 @@
             placeholder="Enter the name for file..."
           />
         </FormItem>
-        <FormItem label="Description" prop="description" style="width: 100%"> 
+        <FormItem label="Description" prop="description" style="width: 100%">
           <Input
             type="textarea"
             :rows="3"
@@ -1556,6 +1556,7 @@ export default {
             // }
             formData.append("aid", this.activityInfo.aid);
             formData.append("paths", temp.toString());
+            formData.append("graphId", this.activityInfo.parent);
             this.progressModalShow = true;
 
             if (
@@ -1572,7 +1573,6 @@ export default {
                 data: formData,
               })
                 .then((res) => {
-                  console.log(res);
                   if (res.data != "Fail") {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
@@ -1629,16 +1629,25 @@ export default {
                         },
                       });
                     }
+                    if (uploadedList.length > 0){
+                      let sucFileName = uploadedList.map((item)=>{
+                        return item.name + item.suffix;
+                      });
+                      this.$Notice.success({
+                        title: "Upload result",
+                        desc: "Upload successfully",
+                        render: (h) =>{
+                          return h("span", sucFileName.join(";"));
+                        }
+                      });
+                    }
 
                     // 初始化上传数据列表
                     this.toUploadFiles = [];
                   } else {
                     this.$Message.warning("Upload fail.");
                   }
-                  this.$Notice.success({
-                    title: "Upload result",
-                    desc: "Upload successfully",
-                  });
+
                   this.progressModalShow = false;
                   this.uploadProgress = 0;
                 })

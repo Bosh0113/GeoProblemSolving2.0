@@ -2,35 +2,40 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ProjectService;
+import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -42,8 +47,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final FolderDaoImpl folderDao;
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -51,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.folderDao = folderDao;
         this.projectUtil = projectUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -227,15 +234,14 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             //补充绑定对于 purpose 的工具
-            ActivityType activityType = update.getType();
-            ActivityType oldType = project.getType();
-            String oldPurpose = project.getPurpose();
-            String purpose = update.getPurpose();
-            if (activityType.equals(ActivityType.Activity_Unit) && !oldType.equals(ActivityType.Activity_Unit) || (oldPurpose != null &&!oldPurpose.equals(purpose))
-            ){
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit)
+                    && !project.getType().equals(ActivityType.Activity_Unit)
+                    || !project.getPurpose().equals(update.getPurpose()))) {
+                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
                 HashSet<String> toolSet = new HashSet<>();
-                for(Tool tool : relevantPurposeTool){
+                for (Tool tool : relevantPurposeTool) {
                     toolSet.add(tool.getTid());
                 }
                 project.setToolList(toolSet);
@@ -441,12 +447,64 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
+
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             staticPagesBuilder.projectDetailPageBuilder(project);
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult joinProject(String aid, HashSet<String> userIds) throws IOException {
+        Optional<Project> optional = projectRepository.findById(aid);
+        if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project( "+ aid + ")does not exist.");
+        Project project = optional.get();
+        JSONArray members = project.getMembers();
+        if (members == null) members = new JSONArray();
+        try {
+            //Do not process if the user exists.
+            for (Object member : members){
+                String userId =  (String)((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    if (uid.equals(userId)){
+                        it.remove();
+                    }
+                }
+            }
+            for (String uid : userIds){
+                Optional<UserEntity> byId = userRepository.findById(uid);
+                if (!byId.isPresent()) continue;
+                UserEntity userEntity = byId.get();
+                JSONObject newMember = new JSONObject();
+                newMember.put("userId", uid);
+                newMember.put("role", "ordinary-member");
+                members.add(newMember);
+                ArrayList<String> joinedProjects = userEntity.getJoinedProjects();
+                joinedProjects.remove(uid);
+                joinedProjects.add(uid);
+                //update user
+                userRepository.save(userEntity);
+            }
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            project.setActiveTime(dateFormat.format(new Date()));
+            projectRepository.save(project);
+
+            //update node
+            nodeService.addUserToNodeBatch(aid, userIds);
+
+            StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
+            staticPagesBuilder.projectDetailPageBuilder(project);
+
+            return ResultUtils.success(project);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
         }
     }
 
@@ -485,6 +543,7 @@ public class ProjectServiceImpl implements ProjectService {
             project.setActiveTime(dateFormat.format(new Date()));
 
             projectRepository.save(project);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(project);
         } catch (Exception ex) {
@@ -523,6 +582,7 @@ public class ProjectServiceImpl implements ProjectService {
             //save
             projectRepository.save(project);
             userRepository.save(user);
+            nodeService.userExitActivity(aid, userId);
 
             //退出子活动
             projectUtil.quitSubProject(aid, userId, 0);

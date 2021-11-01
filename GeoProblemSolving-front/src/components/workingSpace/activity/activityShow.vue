@@ -113,7 +113,7 @@
                 cursor: pointer;
               "
             >
-              <p slot="title" :title="item.name">{{ item.name }}</p>
+              <p slot="title" :title="item.name" class="activityTitle">{{ item.name }}</p>
               <div slot="extra" style="margin-top: -10px; margin-right: -5px">
                 <Tooltip
                   trigger="hover"
@@ -1259,7 +1259,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/save", notice)
         .then((result) => {
-          if (result.data == "Success") {            
+          if (result.data == "Success") {
             this.$store.commit("addNotification", notice);
             // this.$Notice.info({ desc: "Send notice successfully" });
           } else {
@@ -1283,6 +1283,7 @@ export default {
 <style scoped>
 .childrenCard >>> .ivu-card-head {
   padding: 5px 10px;
+  width: 90%;
 }
 .memberImg {
   width: 40px;
@@ -1321,9 +1322,12 @@ export default {
 }
 .childDescription {
   display: -webkit-box;
-  word-break: break-all;
+  word-break: break-word;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 5;
   overflow: hidden;
 }
+  .activityTitle >>> .ivu-card-head p{
+    width: 90%;
+  }
 </style>

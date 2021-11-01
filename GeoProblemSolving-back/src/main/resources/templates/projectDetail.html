@@ -6,7 +6,7 @@
     <meta http-equiv="expires" content="0">
     <link rel="shortcut icon" href="/GeoProblemSolving/static/favicon.ico">
     <title th:text="${projectInfo.name}+' | Geo-ProblemSolving'"></title>
-    <meta http-equiv="Content-Type" content=" charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="charset=UTF-8"/>
     <meta name="description" th:attr="content=${projectInfo.description}">
     <meta name="keywords" th:attr="content=${projectInfo.tag}">
     <meta name="author" content="OpenGMS">
@@ -1256,7 +1256,7 @@
                             let formData = new FormData();
                             formData.append("picture", file);
                             axios
-                                .post("/GeoProblemSolving/resource/image", formData)
+                                .post("/GeoProblemSolving/res/image", formData)
                                 .then(res => {
                                     if (res.data.code === 0) {
                                         this.pictureUrl = res.data.data;

@@ -1,29 +1,33 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.SubprojectService;
+import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class SubprojectServiceImpl implements SubprojectService {
@@ -35,8 +39,9 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final FolderDaoImpl folderDao;
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
-    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
@@ -44,6 +49,7 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.folderDao = folderDao;
         this.projectUtil = projectUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -158,7 +164,12 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = (Subproject) result.get();
 
             String purpose = update.getPurpose();
-            if ( !subproject.getType().equals(ActivityType.Activity_Unit) && update.getType().equals(ActivityType.Activity_Unit) || (subproject.getPurpose() != null && !subproject.getPurpose().equals(purpose))){
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit) &&
+                    !subproject.getType().equals(ActivityType.Activity_Unit) ||
+                    !subproject.getPurpose().equals(purpose)
+            )){
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : relevantPurposeTool){
@@ -380,9 +391,54 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
+
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult joinSubproject(String aid, HashSet<String> userIds) {
+        Optional<Subproject> optional = subprojectRepository.findById(aid);
+        if (!optional.isPresent()) return ResultUtils.error(-1, "Fail: project( "+ aid + ")does not exist.");
+        Subproject subproject = optional.get();
+        JSONArray members = subproject.getMembers();
+        if (members == null) members = new JSONArray();
+        try {
+            //Do not process if the user exists.
+            for (Object member : members){
+                String userId =  (String)((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    if (uid.equals(userId)){
+                        it.remove();
+                    }
+                }
+            }
+            for (String uid : userIds){
+                Optional<UserEntity> byId = userRepository.findById(uid);
+                if (!byId.isPresent()) continue;
+                JSONObject newMember = new JSONObject();
+                newMember.put("userId", uid);
+                newMember.put("role", "ordinary-member");
+                members.add(newMember);
+            }
+
+            // Update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            subproject.setActiveTime(dateFormat.format(new Date()));
+
+            subprojectRepository.save(subproject);
+
+            //update node
+            nodeService.addUserToNodeBatch(aid, userIds);
+
+            return ResultUtils.success(members);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
         }
     }
 
@@ -418,6 +474,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(subproject);
         } catch (Exception ex) {
@@ -449,6 +506,8 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
+            //update node
+            nodeService.userExitActivity(aid, userId);
 
             //退出activity
             projectUtil.quitSubProject(aid, userId, 1);

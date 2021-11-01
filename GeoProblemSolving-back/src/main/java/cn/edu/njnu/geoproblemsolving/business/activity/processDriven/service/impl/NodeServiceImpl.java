@@ -13,8 +13,16 @@ import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResS
 import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,7 +37,7 @@ import java.util.stream.Collectors;
  * @Date 2021/8/18
  **/
 @Service
-public class NodeServiceImpl implements NodeService{
+public class NodeServiceImpl implements NodeService {
     @Autowired
     ActivityResServiceImpl activityResService;
     @Autowired
@@ -73,7 +81,7 @@ public class NodeServiceImpl implements NodeService{
     public HashMap<String, String> getActivityResourceTag(String aid) {
         ArrayList<ResourceEntity> files = activityResService.getAllFileInProject(aid);
         HashMap<String, String> fileTagMap = new HashMap<>();
-        for (ResourceEntity file : files){
+        for (ResourceEntity file : files) {
             // 仅流动项目中的 public 资源
             if (file.getPrivacy().equals("private")) continue;
             String fileTagStr = TagUtil.setResourceTag(file);
@@ -95,7 +103,7 @@ public class NodeServiceImpl implements NodeService{
         String getTagUrl = "http://" + userServer + "/user/tag/" + userId;
         try {
             JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
-            if (response.getInteger("code") != 0){
+            if (response.getInteger("code") != 0) {
                 System.out.println("Fail: getUserTagFromUserServer ->" + response.getString("msg"));
                 return null;
             }
@@ -106,7 +114,7 @@ public class NodeServiceImpl implements NodeService{
             userTagMap.put("domain", domain);
             userTagMap.put("organization", organization);
             return userTagMap;
-        }catch (HttpException exception){
+        } catch (HttpException exception) {
             //后面改用 AOP 方式写日志
             System.out.println("Fail: getUserTagFromUserServer ->" + exception.toString());
             return null;
@@ -114,11 +122,11 @@ public class NodeServiceImpl implements NodeService{
     }
 
 
-    public HashMap<String, String> getActivityUserTag(String aid, Integer level){
+    public HashMap<String, String> getActivityUserTag(String aid, Integer level) {
         Activity activity;
-        if (level == 0){
+        if (level == 0) {
             activity = subprojectRepository.findById(aid).get();
-        }else {
+        } else {
             activity = activityRepository.findById(aid).get();
         }
         JSONArray members = activity.getMembers();
@@ -140,13 +148,13 @@ public class NodeServiceImpl implements NodeService{
         String getTagUrl = "http://" + userServer + "/user/tags/" + userIdStr;
         try {
             JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
-            if (response.getInteger("code") != 0){
+            if (response.getInteger("code") != 0) {
                 System.out.println("Fail: getUsersTag ->" + response.getString("msg"));
                 return null;
             }
             HashMap<String, String> userTagMap = new HashMap<>();
             HashMap<String, HashMap<String, ArrayList<String>>> usersTags = JSONObject.parseObject(response.getJSONObject("data").toJSONString(), HashMap.class);
-            for (Map.Entry<String, HashMap<String, ArrayList<String>>> item : usersTags.entrySet()){
+            for (Map.Entry<String, HashMap<String, ArrayList<String>>> item : usersTags.entrySet()) {
                 String userId = item.getKey();
                 String role = idRoleMap.get(userId);
                 HashMap<String, ArrayList<String>> value = JSONObject.parseObject(JSONObject.toJSONString(item.getValue()), HashMap.class);
@@ -156,74 +164,89 @@ public class NodeServiceImpl implements NodeService{
                 userTagMap.put(userId, tags);
             }
             return userTagMap;
-        }catch (HttpException exception){
+        } catch (HttpException exception) {
             System.out.println("Fail: getUsersTag -> " + exception.toString());
             return null;
         }
     }
 
-    //节点、活动层面同步的内容
-    private HashMap<String, String> putNodeUser(String aid, String userId,String role, String operationType){
-        Optional<ActivityNode> byId = nodeRepository.findById(aid);
-        //无此节点，返回 null
-        if (!byId.isPresent()) return null;
-        ActivityNode node = byId.get();
-        //members 同 node 中 members 字段地址相同
-        HashMap<String, String> members = node.getMembers();
-        switch (operationType){
-            case "add":
-                //涉及到人的信息变动，直接从全部更新即可
-                String userTag = getUserTag(userId, role);
-                members.put(userId, userTag);
-                break;
-            case "del":
-                members.remove(userId);
-                break;
-            default:
-                return null;
-        }
-        return members;
-    }
 
     //只关注当前节点上的操作
-    private HashMap<String, String> putNodeResource(String aid, String operationType, ResourceEntity res){
+    private HashMap<String, String> putNodeResource(String aid, Object res, String operationType) {
         Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        //无此节点，未进行过连接；等待连接即可。
         if (!byId.isPresent()) return null;
         ActivityNode node = byId.get();
         HashMap<String, String> resources = node.getResources();
-        String uid = res.getUid();
-        switch (operationType){
+        switch (operationType) {
             case "add":
-                String resTag = TagUtil.setResourceTag(res);
-                resources.put(uid, resTag);
+                ResourceEntity addRes = (ResourceEntity) res;
+                String resTag = TagUtil.setResourceTag(addRes);
+                resources.put(addRes.getUid(), resTag);
+                break;
+            case "addBatch":
+                HashMap<String, String> resInfo = JSONObject.parseObject((JSONObject.toJSONString(res)), HashMap.class);
+                resources.putAll(resInfo);
                 break;
             case "del":
-                resources.remove(uid);
+                resources.remove(res);
+                break;
+            case "delBatch":
+                HashSet<String> uids = (HashSet<String>) res;
+                Iterator<String> iterator = uids.iterator();
+                while (iterator.hasNext()) {
+                    resources.remove(iterator.next());
+                }
                 break;
             case "put":
+                ResourceEntity putRes = (ResourceEntity) res;
+                String uid = putRes.getUid();
                 String resTagStr = resources.get(uid);
                 HashMap<String, String> tagMap = TagUtil.recoveryResTag(resTagStr);
-                String type = res.getType();
-                if (type != null && !type.equals("")){
+                String type = putRes.getType();
+                if (type != null && !type.equals("")) {
                     tagMap.put("type", type);
                 }
-                String suffix = res.getSuffix();
-                if (suffix != null && !suffix.equals("")){
+                String suffix = putRes.getSuffix();
+                if (suffix != null && !suffix.equals("")) {
                     tagMap.put("suffix", suffix);
                 }
                 String resourceTag = TagUtil.setResourceTag(tagMap);
                 resources.put(uid, resourceTag);
                 break;
         }
+        nodeRepository.save(node);
         return resources;
     }
 
     @Override
+    public void addResToNode(String aid, ResourceEntity res) {
+        putNodeResource(aid, res, "add");
+    }
+
+    @Override
+    public void addResToNodeBatch(String aid, HashMap<String, String> resInfo) {
+        putNodeResource(aid, resInfo, "addBatch");
+    }
+
+    @Override
+    public void delResInNode(String aid, String uid) {
+        putNodeResource(aid, uid, "del");
+    }
+
+    @Override
+    public void delResInNodeBatch(String aid, HashSet<String> uid) {
+        putNodeResource(aid, uid, "delBatch");
+    }
+
+    @Override
+    public void putResInNode(String aid, ResourceEntity res) {
+        // todo 等待接入metadata，现在的无法修改
+    }
+
+    @Override
     public void addOrPutUserToNode(String aid, String userId, String userRole) {
-        HashMap<String, String> users = putNodeUser(aid, userId, userRole, "add");
-        ActivityNode node = nodeRepository.findById(aid).get();
-        node.setMembers(users);
-        nodeRepository.save(node);
+        putNodeUser(aid, userId, userRole, "add");
     }
 
     @Override
@@ -240,9 +263,106 @@ public class NodeServiceImpl implements NodeService{
 
     @Override
     public void userExitActivity(String aid, String userId) {
-        HashMap<String, String> members = putNodeUser(aid, userId, null, "del");
-        ActivityNode node = nodeRepository.findById(aid).get();
-        node.setMembers(members);
+        putNodeUser(aid, userId, null, "del");
+    }
+
+
+    //节点、活动层面同步的内容
+    private ActivityNode putNodeUser(String aid, String userId, String role, String operationType) {
+        Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        //无此节点，返回 null
+        if (!byId.isPresent()) return null;
+        ActivityNode node = byId.get();
+        //members 同 node 中 members 字段地址相同
+        HashMap<String, String> members = node.getMembers();
+        switch (operationType) {
+            case "add":
+                //涉及到人的信息变动，直接从全部更新即可
+                String userTag = getUserTag(userId, role);
+                members.put(userId, userTag);
+                break;
+            case "del":
+                members.remove(userId);
+                break;
+            default:
+                return null;
+        }
+        return nodeRepository.save(node);
+    }
+
+    @Override
+    public void addUserToNode(String aid, String userId, String role) {
+        putNodeUser(aid, userId, role, "add");
+    }
+
+    @Override
+    public void addUserToNodeBatch(String aid, HashSet<String> userIds) {
+        Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        if (!byId.isPresent()) return;
+        ActivityNode node = byId.get();
+        HashMap<String, String> members = node.getMembers();
+        for (String uid: userIds){
+            String userTag = getUserTag(uid, "ordinary-member");
+            members.put(uid, userTag);
+        }
         nodeRepository.save(node);
+    }
+
+    @Autowired
+    MongoTemplate mongoTemplate;
+
+    @Override
+    public void putUserInfoToNode(String userId, ArrayList<String> organizations, ArrayList<String> domains) {
+        String key = "members." + userId;
+        Criteria criteria = Criteria.where(key).exists(true);
+        Query query = new Query(criteria);
+        try {
+            List<ActivityNode> activityNodes = mongoTemplate.find(query, ActivityNode.class);
+            for (ActivityNode item : activityNodes) {
+                HashMap<String, String> members = item.getMembers();
+                String userTag = members.get(userId);
+                int fIndex = userTag.indexOf("O517");
+                int lIndex = userTag.lastIndexOf("O517");
+                String oOrgs = userTag.substring(lIndex + 4);
+                String oDomain = userTag.substring(fIndex + 4, lIndex);
+                String oRole = userTag.substring(0, fIndex);
+                if (organizations != null) {
+                    JSONArray orgs = JSONArray.parseArray(JSONObject.toJSONString(organizations));
+                    oOrgs = TagUtil.array2String(orgs);
+                }
+                if (domains != null) {
+                    JSONArray domain = JSONArray.parseArray(JSONObject.toJSONString(domains));
+                    oDomain = TagUtil.array2String(domain);
+                }
+                String newUserTag = TagUtil.addFlagInTags(oRole, oDomain, oOrgs);
+                members.put(userId, newUserTag);
+                mongoTemplate.save(item);
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+    }
+
+    @Override
+    public void putUserInfoToNode(String userId,
+                                  ArrayList<String> localOrg,
+                                  ArrayList<String> serverOrg,
+                                  ArrayList<String> localDomain,
+                                  ArrayList<String> serverDomain) {
+
+        if (localOrg == null) localOrg = new ArrayList<>();
+        if (serverOrg == null) serverOrg = new ArrayList<>();
+        if (localDomain == null) localDomain = new ArrayList<>();
+        if (serverDomain == null) serverDomain = new ArrayList<>();
+        boolean orgEq = localOrg.containsAll(serverOrg) && serverOrg.containsAll(localOrg);
+        boolean domainEq = localDomain.containsAll(serverDomain) && serverDomain.containsAll(localDomain);
+        if (!orgEq && !domainEq) {
+            putUserInfoToNode(userId, serverOrg, serverDomain);
+        } else if (!orgEq && domainEq) {
+            putUserInfoToNode(userId, serverOrg, null);
+        } else if (orgEq && !domainEq) {
+            putUserInfoToNode(userId, null, serverDomain);
+        }
     }
 }

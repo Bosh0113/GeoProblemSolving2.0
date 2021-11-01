@@ -2,8 +2,13 @@ package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Controller
 
 //import cn.edu.njnu.trafficNoiseCaculating.UserData.Domain.EDataType;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.genBoundBoxUdxData;
@@ -27,6 +34,12 @@ import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Ser
 @RestController
 @RequestMapping(value = "/exportRegionServlet")
 public class exportRegionServlet extends HttpServlet {
+
+    @Autowired
+    ActivityResDaoImpl ripDao;
+
+    @Autowired
+    GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${dataContainer}")
     String dataContainerIp;
@@ -40,7 +53,9 @@ public class exportRegionServlet extends HttpServlet {
         // 解析shapefile压缩包
         try {
             JSONObject map = JSONObject.parseObject(data);
-            String roadId = map.getString("uid");
+            String aid = map.getString("aid");
+            String graphId = map.getString("graphId");
+//            String id = map.getString("uid");
             String top = map.getString("top");
             String bottom = map.getString("bottom");
             String right = map.getString("right");
@@ -50,6 +65,7 @@ public class exportRegionServlet extends HttpServlet {
             String resultId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + resultId + File.separator;
             String resultDir = req.getServletContext().getRealPath("./") + zipUrl;
+            new File(resultDir).mkdirs();
 
             String boundBoxValue = left + ", " + bottom + ", " + right + ", " + top;
             genBoundBoxUdxData(resultDir, boundBoxValue);
@@ -75,7 +91,30 @@ public class exportRegionServlet extends HttpServlet {
                     return respJson.toJSONString();
                 }
                 String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
+                // 将资源保存至活动中
+                ResourceEntity outputEntity = new ResourceEntity();
+                String uid = UUID.randomUUID().toString();
+                outputEntity.setUserUpload(false);
+                outputEntity.setUid(uid);
+                outputEntity.setName("udx_xml_RegionBBox");
+                outputEntity.setSuffix(".xml");
+                outputEntity.setType("data");
+                outputEntity.setUploadTime(new Date());
+                outputEntity.setPrivacy("private");
+                outputEntity.setAddress(address);
+                outputEntity.setActivityId(aid);
+                outputEntity.setDescription("Traffic noise simulation area.");
+                outputEntity.setFolder(false);
+                ripDao.addResource(outputEntity);
 
+                // 将资源保存至过程中
+                HashMap<String, String> resTagMap = new HashMap<>();
+                String resTag = TagUtil.setResourceTag(outputEntity);
+                resTagMap.put(uid ,resTag);
+                //资源自动更新
+                if(graphId != null && graphId != ""){
+                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                }
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
             } else {
@@ -84,7 +123,7 @@ public class exportRegionServlet extends HttpServlet {
                 return respJson.toJSONString();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return respJson.toString();
     }

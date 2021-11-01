@@ -196,17 +196,21 @@
           </div>
           <div id="steps"></div>
 
-          <div v-if="collaborating && permissionIdentity(
+          <div v-if="
+          Array.isArray(participants) && participants.length !=0
+          && collaborating
+          && permissionIdentity(
                   activityInfo.permission,
                   'manage_child_activity'
-                )" style="margin-top: 20px;">
+                )"
+               style="margin-top: 20px;">
             <strong>collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
             >
               <avatar-list
-                v-show="item.collLinkUser.length > 0"
+                v-if="item.collLinkUser.length > 0"
                 :list="item.collLinkUser"
                 :key="index"
                 @click.native="joinLinkCollaboration(index)"
@@ -736,7 +740,7 @@
           <Button type="primary" @click="viewLinkModal = false">Ok</Button>
         </div>
       </div>
-      
+
       <Divider orientation="left">Person link</Divider>
       <div style="margin: 0 20px">
         <div style="display: flex; margin-bottom: 15px">
@@ -1240,7 +1244,7 @@
             this.$Notice.info({
               title: `${senderName}  join the page of pathway.`,
             });
-            //如果有人正在进行活动连接，则将内容发送过去
+            //Send content if an active connection is in progress.
             if (this.linkBuildModal) {
               let senderId = messageJson.sender;
               let initLinkInfo = {
@@ -1256,7 +1260,7 @@
                 sender: this.userInfo.userId,
                 senderName: this.userInfo.name,
                 type: "general",
-                receivers: [senderId],
+                receiver: senderId,
                 content: initLinkInfo,
               };
               socketApi.sendSock(this.socketId, sockMsg, this.socketOnMessage);

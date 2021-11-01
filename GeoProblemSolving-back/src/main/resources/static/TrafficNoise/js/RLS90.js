@@ -166,6 +166,10 @@ function getSocketOperation(data) {
                 }
                 break;
             }
+            case "data-visualization": {
+                loadResultTiff(content.data);
+                break
+            }
             case "road-edit-start": {
                 var prop = content.propInfo;
                 roadCenterLayer.eachLayer((layer) => {
@@ -486,7 +490,11 @@ function exportData(dataType) {
             return;
         } else {
             data = {
-                uid: roadData.uid
+                aid: window.parent.activityInfo.aid,
+                uid: roadData.uid,
+                name: roadData.name,
+                user: userId,
+                graphId: window.parent.activityInfo.parent,
             }
         }
     } else if (dataType === "Building") {
@@ -495,7 +503,11 @@ function exportData(dataType) {
             return;
         } else {
             data = {
-                uid: buildingData.uid
+                aid: window.parent.activityInfo.aid,
+                uid: buildingData.uid,
+                name: buildingData.name,
+                user: userId,
+                graphId: window.parent.activityInfo.parent,
             }
         }
     } else if (dataType === "Barrier") {
@@ -504,7 +516,11 @@ function exportData(dataType) {
             return;
         } else {
             data = {
-                uid: barrierData.uid
+                aid: window.parent.activityInfo.aid,
+                uid: barrierData.uid,
+                name: barrierData.name,
+                user: userId,
+                graphId: window.parent.activityInfo.parent,
             }
         }
     } else if (dataType === "Region") {
@@ -518,17 +534,20 @@ function exportData(dataType) {
             var lowerRightPoint = proj4("EPSG:4326", "EPSG:2437", [southEastPoint.lng, southEastPoint.lat]);
 
             data = {
+                aid: window.parent.activityInfo.aid,
                 top: upperLeftPoint[1],
                 right: lowerRightPoint[0],
                 bottom: lowerRightPoint[1],
                 left: upperLeftPoint[0],
+                user: userId,
+                graphId: window.parent.activityInfo.parent,
             }
         }
     }
 
     $.ajax({
         type: "post",
-        url: "/GeoProblemSolving/export" + selectedDataType + "Servlet",
+        url: "/GeoProblemSolving/export" + dataType + "Servlet",
         data: JSON.stringify(data),
         processData: false,
         contentType: 'application/json',
@@ -549,6 +568,16 @@ function importData() {
     if (selectedDataType === "Result") {
         $("#loadDataModal").modal("hide");
         loadResultTiff(selectedData.address);
+
+        // collaboration
+        window.parent.sendCustomOperation({
+            type: "operation",
+            sender: userId,
+            behavior: "data-visualization",
+            content: {
+                data: selectedData.address,
+            },
+        });
     } else {
         if (selectedDataType === "Road") {
             roadData = selectedData;
@@ -1139,7 +1168,7 @@ function onRunModel() {
                     content: "run-start",
                 });
 
-                window.parent.sendModelOperation(window.parent.activityInfo.aid, "33eabfc9fa8fad6c35c862c48c0c3349", "172.21.213.105", "8061", inputs, outputs);
+                window.parent.sendModelOperation(window.parent.activityInfo.aid, "da09d518ee0b8f7c50c2d4b695b98553", "172.21.213.105", "8061", inputs, outputs);
 
             } else {
                 $("#waitting").hide();

@@ -1356,6 +1356,7 @@ export default {
             formData.append("privacy", this.uploadValidate.privacy);
             formData.append("aid", this.activityInfo.aid);
             formData.append("paths", temp.toString());
+            formData.append("graphId", this.activityInfo.parent);
             this.progressModalShow = true;
             this.axios({
               url: "/GeoProblemSolving/rip/file/upload",
@@ -1391,7 +1392,7 @@ export default {
                       uploadedList[i],
                       metadata
                     );
-                      
+
                     // 生成临时操作记录
                     let resOperation = {
                       id: operationId,
@@ -1424,10 +1425,15 @@ export default {
                   this.$Message.warning("Upload fail.");
                 }
                 //上传成功
-                this.$Notice.success({
-                  title: "Upload result",
-                  desc: "Upload successfully",
-                });
+                if (uploadedList.length > 0){
+                  this.$Notice.success({
+                    title: "Upload result",
+                    render: (h) =>{
+                      return h("span", uploadedList.join(";"))
+                    },
+                    desc: "Upload successfully",
+                  });
+                }
                 this.progressModalShow = false;
                 this.uploadProgress = 0;
               })

@@ -1697,7 +1697,7 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data == "Success") {
-            
+
             // update activity doc
             this.operationApi.taskUpdate(
               this.activityInfo.aid,
@@ -1708,7 +1708,7 @@ export default {
               behavior: "remove",
               task: this.taskList.splice(this.selectTaskIndex, 1)[0],
             });
-            
+
             // 协同
             let sockMsg = {};
             sockMsg["type"] = "task";

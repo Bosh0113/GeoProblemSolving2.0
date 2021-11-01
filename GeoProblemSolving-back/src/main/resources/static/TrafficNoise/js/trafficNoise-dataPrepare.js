@@ -10,6 +10,7 @@ window.onpageshow = function (e) {
             userId = userInfo.userId;
             userName = userInfo.name;
             currentResources = resources;
+            activityInfo = activityInfo;
             isLogin();
 
         } else {

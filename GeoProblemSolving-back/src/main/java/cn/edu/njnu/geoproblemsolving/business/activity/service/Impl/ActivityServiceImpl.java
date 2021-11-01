@@ -1,20 +1,21 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
+import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityService;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.user.repository.UserRepository;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -38,6 +40,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
+    private final NodeService nodeService;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -47,7 +50,7 @@ public class ActivityServiceImpl implements ActivityService {
                                FolderDaoImpl folderDao,
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
-                               ToolService toolService) {
+                               ToolService toolService, NodeService nodeService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
@@ -56,6 +59,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectRepository = projectRepository;
         this.projectUtil = httpUtil;
         this.toolService = toolService;
+        this.nodeService = nodeService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -238,7 +242,11 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             String purpose = update.getPurpose();
-            if (!activity.getType().equals(ActivityType.Activity_Unit) && update.getType().equals(ActivityType.Activity_Unit) || (activity.getPurpose()!= null && !activity.getPurpose().equals(purpose))) {
+            if (
+                    update.getType() != null && update.getPurpose() != null &&
+                    (update.getType().equals(ActivityType.Activity_Unit) &&
+                    !activity.getType().equals(ActivityType.Activity_Unit) ||
+                    !activity.getPurpose().equals(purpose))) {
                 List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
                 for (Tool tool : tools) {
@@ -600,10 +608,52 @@ public class ActivityServiceImpl implements ActivityService {
 
             activityRepository.save(activity);
 
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
+
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
+        }
+    }
+
+    @Override
+    public JsonResult joinActivity(String aid, HashSet<String> userIds) {
+        Activity activity = findActivityById(aid);
+        if (activity == null) return ResultUtils.error(-1, "Fail: activity does not exist.");
+        JSONArray members = activity.getMembers();
+        if (members == null) members = new JSONArray();
+        try {
+            //Do not process if the user exists.
+            for (Object member : members){
+                String userId =  (String)((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    if (uid.equals(userId)){
+                        it.remove();
+                    }
+                }
+            }
+            for (String uid : userIds){
+                Optional<UserEntity> byId = userRepository.findById(uid);
+                if (!byId.isPresent()) continue;
+                JSONObject newMember = new JSONObject();
+                newMember.put("userId", uid);
+                newMember.put("role", "ordinary-member");
+                members.add(newMember);
+            }
+            //update active time
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            activity.setActiveTime(dateFormat.format(new Date()));
+            activityRepository.save(activity);
+
+            //update node
+            nodeService.addUserToNodeBatch(aid, userIds);
+
+            return ResultUtils.success(members);
+        }catch (Exception e){
+            return ResultUtils.error(-2, e.toString());
         }
     }
 
@@ -627,6 +677,9 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            //update node
+            nodeService.userExitActivity(aid, userId);
+
             //完成当前项目的退出，需要将子项目推出
             projectUtil.quitSubProject(aid, userId, 2);
 
@@ -669,6 +722,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+            nodeService.addOrPutUserToNode(aid, userId, role);
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {
