@@ -2,7 +2,6 @@
 .extendedPanel >>> .ivu-tabs-bar {
   margin-bottom: 0;
 }
-
 .chatPanel {
   display: flex;
   width: 100%;
@@ -19,7 +18,7 @@
   /* display: flex;
   flex-direction: column;
   flex: auto; */
-  height: 100%;
+  height: 350px;
   width: 100%;
 }
 
@@ -33,7 +32,7 @@
 
 /* 发送信息部分 */
 .contentFooter {
-  height: 160px;
+  height: 210px;
   width: 100%;
   padding: 4px 5px 4px 5px;
   background-color: lightgray;
@@ -148,7 +147,7 @@
         <div
           class="contentBody"
           ref="contentBody"
-          style="height: calc(100vh - 160px)"
+          style="height: calc(100vh - 210px)"
         >
           <div v-for="(list, index) in msglist" :key="index">
             <template v-if="list.type == 'members'">
@@ -315,7 +314,7 @@
         </Tabs>
       </div>
 
-      <div class="extendedPanel" v-show="extendedConceptsShow">
+      <div class="extendedPanel" v-if="extendedConceptsShow">
         <Tabs type="card">
           <TabPane label="Concepts">
             <concepts :msgConcepts="msgConcepts"></concepts>
