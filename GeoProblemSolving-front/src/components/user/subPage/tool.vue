@@ -1118,9 +1118,6 @@ export default {
         });
       } else {
         this.loading = true;
-        setTimeout(() => {
-          this.loading = false;
-        }, 2000);
         createToolForm["provider"] = this.$store.getters.userId;
         // let data = await post("/GeoProblemSolving/tool", createToolForm);
         if (createToolForm.toolSet == true) {
@@ -1160,9 +1157,11 @@ export default {
                   });
                 }
               }
+              this.loading = false;
             })
             .catch((err) => {
               this.$Notice.error({ title: "Create failed" });
+              this.loading = false;
             });
         } else {
           this.axios
@@ -1170,6 +1169,7 @@ export default {
             .then((res) => {
               // ？？？ 判断返回值，进行下一步操作
               if (res.data.code == 0) {
+                this.loading = false;
                 this.createToolModal = false;
                 this.editToolInfo = {};
                 this.toolInfo = {};
@@ -1189,10 +1189,14 @@ export default {
                     desc: "No Corresponding service",
                   });
                 }
+              }else {
+                this.$Notice.error({ title: "Create failed" });
               }
+              this.loading = false;
             })
             .catch((err) => {
               this.$Notice.error({ title: "Create failed" });
+              this.loading = false;
             });
         }
       }

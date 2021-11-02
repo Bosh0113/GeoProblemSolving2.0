@@ -426,7 +426,9 @@ public class CollaborationService {
                         数据方法的话，新开线程阻塞等待计算结果即可
                          */
                         Callable<JSONObject> callable = new Callable<JSONObject>() {
-                            int index = 0;
+                            //一个线程执行完毕之后会自动结束，如果在运行过程中发生异常也会提前结束。
+                            //保证线程读取时标志位是最新数据
+                            private volatile int index = 0;
                             @Override
                             public JSONObject call() throws Exception {
                                 int refreshStatus = 0;
@@ -444,7 +446,10 @@ public class CollaborationService {
                                         resJson.put("outputs", outputs);
                                         resJson.put("tid", dataJson.getString("tid"));
                                     } else {
-                                        if (index > 60 && refreshStatus == 0) return null;
+                                        if (index > 60 && refreshStatus == 0) {
+                                            Thread.currentThread().interrupt();
+                                            return null;
+                                        }
                                         System.out.println("Waiting for computation: "+ (++index) + "+++status: " + refreshStatus);
                                     }
 
@@ -472,7 +477,11 @@ public class CollaborationService {
                          */
                         System.out.println("end: " + groupKey);
                         System.out.println(collaborationConfig);
-                        if (resJson == null) return;
+                        if (resJson == null) {
+                            computeMsg.setOutputs("Fail");
+                            collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
+                            return;
+                        }
                         String sucTaskTid = resJson.getString("tid");
                         HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
                         ComputeMsg sucMessage = computeList.get(sucTaskTid);
@@ -539,9 +548,7 @@ public class CollaborationService {
                         invokeJson.put("params", paramsArray);
                         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(invokeJson);
                         //新开线程处理
-                        Callable<JSONObject> dataComputeCallable = ()->{
-                           return  restTemplate.exchange(dataMethodUrl, HttpMethod.POST, httpEntity, JSONObject.class).getBody();
-                        };
+                        Callable<JSONObject> dataComputeCallable = ()-> restTemplate.exchange(dataMethodUrl, HttpMethod.POST, httpEntity, JSONObject.class).getBody();
                         FutureTask<JSONObject> futureTask = new FutureTask<>(dataComputeCallable);
                         Thread dataComputeThread = new Thread(futureTask);
                         dataComputeThread.start();
@@ -549,7 +556,9 @@ public class CollaborationService {
                         // 后续做持久化可能会有用
                         Integer code = jsonObject.getInteger("code");
                         if (code != 0){
-                            //发送错误消息
+                            //Send error info
+                            computeMsg.setOutputs("Fail");
+                            collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                         }else {
                             Map<String, String> outputs = jsonObject.getObject("urls", HashMap.class);
                             for (Map.Entry item: outputs.entrySet()){

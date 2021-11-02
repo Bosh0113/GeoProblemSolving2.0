@@ -161,6 +161,16 @@ public class ToolServiceImpl implements ToolService {
         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(searchJson, headers);
         try {
             ResponseEntity<JSONObject> searchRes = restTemplate.exchange(url, HttpMethod.POST, httpEntity, JSONObject.class);
+            //集合类型相同地址
+            ArrayList dataMethodArray = searchRes.getBody().getJSONObject("data").getObject("list", ArrayList.class);
+            if (dataMethodArray != null && dataMethodArray.size() != 0){
+                for (int i = dataMethodArray.size() - 1; i >= 0; i--){
+                    JSONObject dataMethodJson = JSONObject.parseObject(JSONObject.toJSONString(dataMethodArray.get(i)));
+                    if (dataMethodJson.get("invokeServices") == null){
+                        dataMethodArray.remove(i);
+                    }
+                }
+            }
             return searchRes.getBody().getJSONObject("data");
         } catch (Exception e) {
             return null;
@@ -296,23 +306,23 @@ public class ToolServiceImpl implements ToolService {
                     // tool.setDataMethodMeta(dataMethodMeta);
 
                     //从数据容器读取测试数据直接存入工具库中
-                    ArrayList<ToolTestData> toolTestDatas = new ArrayList<>();
-                    String url = "http://" + proxyServerLocation + "/files?id=" + dataMethodId + "&token=" + encodeToken;
-                    JSONObject testDataJson = restTemplate.getForEntity(url, JSONObject.class).getBody();
-                    JSONArray testIds = testDataJson.getJSONArray("id");
-                    for (int i = 0; i < testIds.size(); i++) {
-                        ToolTestData toolTestData = new ToolTestData();
-                        toolTestData.setTestDataId(UUID.randomUUID().toString());
-                        JSONObject testDataId = JSONObject.parseObject(JSONObject.toJSONString(testIds.get(i)));
-                        String fileName = testDataId.getString("file_name");
-                        String[] fileNameSplit = fileName.split("\\.");
-                        String dataUrl = testDataId.getString("url");
-                        toolTestData.setFileName(fileNameSplit[0]);
-                        toolTestData.setSuffix(fileNameSplit[1]);
-                        toolTestData.setUrl(dataUrl);
-                        toolTestDatas.add(toolTestData);
-                    }
-                    tool.setToolTestData(toolTestDatas);
+                    // ArrayList<ToolTestData> toolTestDatas = new ArrayList<>();
+                    // String url = "http://" + proxyServerLocation + "/files?id=" + dataMethodId + "&token=" + encodeToken;
+                    // JSONObject testDataJson = restTemplate.getForEntity(url, JSONObject.class).getBody();
+                    // JSONArray testIds = testDataJson.getJSONArray("id");
+                    // for (int i = 0; i < testIds.size(); i++) {
+                    //     ToolTestData toolTestData = new ToolTestData();
+                    //     toolTestData.setTestDataId(UUID.randomUUID().toString());
+                    //     JSONObject testDataId = JSONObject.parseObject(JSONObject.toJSONString(testIds.get(i)));
+                    //     String fileName = testDataId.getString("file_name");
+                    //     String[] fileNameSplit = fileName.split("\\.");
+                    //     String dataUrl = testDataId.getString("url");
+                    //     toolTestData.setFileName(fileNameSplit[0]);
+                    //     toolTestData.setSuffix(fileNameSplit[1]);
+                    //     toolTestData.setUrl(dataUrl);
+                    //     toolTestDatas.add(toolTestData);
+                    // }
+                    // tool.setToolTestData(toolTestDatas);
                 }catch (Exception e){
                     System.out.println("Data proxy server error: " + e.toString());
                     return null;

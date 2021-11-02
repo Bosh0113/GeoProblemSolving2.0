@@ -13,7 +13,7 @@ function initWebSocket(para) { //初始化websocket
   let IP_Port = window.location.host;
   var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/GeoProblemSolving/${para}`;
   if (IP_Port == "localhost:8080") {
-    wsurl = `ws://localhost:8081/GeoProblemSolving/${para}`;
+    wsurl = `ws://172.21.213.137:8081/GeoProblemSolving/${para}`;
   }
   //switch 使用时提供一个参数type
   let websock = new WebSocket(wsurl);
