@@ -945,20 +945,20 @@ export default {
         let user = this.potentialMembers[index];
         inviteList.push(user.userId);
       }
-
+      
       let url = "";
       if (activity.level == 1) {
        url =
           "/GeoProblemSolving/subproject/" +
           activity.aid +
-          "/user?userId=" +
-          user.userId;
+          "/userBatch?userIds=" +
+          inviteList.toString();
       } else if (activity.level > 1) {
         url =
           "/GeoProblemSolving/activity/" +
           activity.aid +
-          "/user?userId=" +
-          user.userId;
+          "/userBatch?userIds=" +
+          inviteList.toString();
       } else {
         return;
       }
