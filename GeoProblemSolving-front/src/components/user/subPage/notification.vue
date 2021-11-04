@@ -63,9 +63,9 @@
                           <span style="font-weight: 400; font-size: 17px;display:-moz-inline-box; display:inline-block; width:90%;">{{item.content.description}}</span> 
                           <small style="font-size: 13px; position: absolute; right:120px; bottom:5px">{{item.createdTime}}</small>
                           <div style="position:absolute; border-left: 1px solid lightgray; right:10px; top:10px; height:60px; width:80px">
-                            <Icon  v-if="item.type=='apply'" type="md-close" title="refuse" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
-                            <Icon  v-if="item.type=='apply'" type="md-checkmark" title="approve" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
-                            <Icon  v-if="item.type=='notice'" type="md-checkmark" title="read" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
+                            <Icon  v-if="item.type=='apply'" type="md-close" title="Refuse" class="applyBtn" style="color: #ff9900;" @click="refuseApply(item)"/>
+                            <Icon  v-if="item.type=='apply'" type="md-checkmark" title="Approve" class="applyBtn" style="color: #47cb89" @click="approveApply(item)"/>
+                            <Icon  v-if="item.type=='notice'" type="md-checkmark" title="Read" class="applyBtn" style="color: #47cb89" @click="readNotice(item.noticeId)"/>
                             <Icon  v-if="item.type=='reply'" type="md-checkmark" class="applyBtn" style="color: #47cb89"/>
                           </div>
                         </Card>
@@ -825,6 +825,16 @@
           .then((res) => {
             if (res.data.code == 0) {
               this.$Message.info("Successfully approval.");
+              
+            // update activity doc
+              this.operationApi.participantUpdate(
+                apply.content.activityId,
+                "join",
+                apply.content.userId,
+                apply.content.userName,
+                "ordinary-member",
+                apply.content.userDomain
+              );
             } else if (res.data.code == -3) {
               this.$Message.info(
                 "The applicant has already been a member of the activity: " +

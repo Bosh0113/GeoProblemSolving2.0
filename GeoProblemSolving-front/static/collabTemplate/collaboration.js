@@ -337,8 +337,8 @@ var taskList = [];
 //////////
 {
     // user related
-    var participants = null;
-    var onlineMembers = null;
+    var participants = [];
+    var onlineMembers = [];
     let UserServer = "/userServer";
     if (window.location.hostname == "localhost") {
         UserServer = "http://172.21.212.103:8088/userServer";
@@ -401,10 +401,16 @@ var taskList = [];
         for (let i = 0; i < members.length; i++) {
             $(`#${members[i].userId}`).css("background-color", "white");
         }
+        onlineMembers = members;
     }
 
     function personOffline(member) {
         $(`#${member.userId}`).css("background-color", "lightgrey");
+        for(let i = 0; i<onlineMembers.length; i++) {
+            if(onlineMembers[i].userId === member.userId){
+                onlineMembers.splice(i, 1);
+            }
+        }
     }
 }
 
@@ -730,7 +736,7 @@ var taskList = [];
                     }
                 ],
                 params: [],
-                participants: participants
+                participants: onlineMembers
             }
 
             // collaboration message
@@ -1187,7 +1193,7 @@ var taskList = [];
                         if (data.behavior == "on") {
                             personOnline(data.participants);
                         } else if (data.behavior == "off") {
-                            personOffline(activeUser);
+                            personOffline(data.activeUser);
                         }
 
                         if (participantChannel != undefined && typeof participantChannel == "function") {

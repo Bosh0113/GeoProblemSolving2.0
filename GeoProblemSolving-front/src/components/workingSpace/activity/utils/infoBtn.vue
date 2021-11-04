@@ -562,17 +562,16 @@ export default {
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
-              user.role = "ordinary-member";
               this.participants.push(user);
               this.$Notice.info({ desc: "Invite member successfully" });
 
               // update activity doc
               this.operationApi.participantUpdate(
                 activity.aid,
-                "invite",
+                "join",
                 user.userId,
                 user.name,
-                user.role,
+                "ordinary-member",
                 user.domain
               );
 
@@ -728,7 +727,6 @@ export default {
       this.axios
         .delete(url)
         .then((res) => {
-          console.log(res);
           if (res.data.code == 0) {
             // update activity doc
             this.operationApi.participantUpdate(
