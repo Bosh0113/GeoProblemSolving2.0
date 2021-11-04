@@ -1131,15 +1131,15 @@ export default {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
             this.enterActivity(this.slctActivity);
 
-            // update activity doc
-              this.operationApi.participantUpdate(
-                this.slctActivity.aid,
-                "join",
-                this.userInfo.userId,
-                this.userInfo.name,
-                "ordinary-member",
-                this.userInfo.domain
-              );
+            // // update activity doc
+            // this.operationApi.participantUpdate(
+            //   this.slctActivity.aid,
+            //   "join",
+            //   this.userInfo.userId,
+            //   this.userInfo.name,
+            //   "ordinary-member",
+            //   this.userInfo.domain
+            // );
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
