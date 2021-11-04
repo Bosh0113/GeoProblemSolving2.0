@@ -736,7 +736,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     @Override
     public void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
         if (graphId == null || graphId.equals("") || graphId.equals("null")) return;
+        //Get the connection point with this node.
         Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
+        //Get the point where resources can flow to.
         HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTag);
         if (flowNode != null){
             resFlow(nodeId, flowNode);

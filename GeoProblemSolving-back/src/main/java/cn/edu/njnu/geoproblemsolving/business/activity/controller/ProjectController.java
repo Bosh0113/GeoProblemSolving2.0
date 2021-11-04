@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 @CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
@@ -111,6 +112,10 @@ public class ProjectController {
             ArrayList<Project> projects = new ArrayList<>();
             for (String projectId: projectIds){{
                 JsonResult findResult = projectService.findProject(projectId);
+                Integer code = findResult.getCode();
+                if (code != 0){
+                    return findResult;
+                }
                 Project project = (Project)findResult.getData();
                 projects.add(project);
             }}
@@ -170,6 +175,16 @@ public class ProjectController {
         JsonResult result = projectService.joinProject(aid, userId);
 
         if(result.getCode() == 0) {
+            staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
+            staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/{aid}/userBatch", method = RequestMethod.POST)
+    public JsonResult joinProjectBatch(@PathVariable String aid, @RequestParam HashSet<String> userIds) throws IOException {
+        JsonResult result = projectService.joinProject(aid, userIds);
+        if (result.getCode() == 0){
             staticPagesBuilder.projectDetailPageBuilder((Project) result.getData());
             staticPagesBuilder.projectListPageBuilder(projectService.findProjectsByPage(1, 18));
         }

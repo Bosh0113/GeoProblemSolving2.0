@@ -36,6 +36,8 @@ public interface NodeService {
     //用户申请加入活动 或 活动中用户状态发生改变的时候
     void addOrPutUserToNode(String aid, String userId, String userRole);
 
+    void addUserToNodeBatch(String aid, HashSet<String> userIds);
+
     void addUserToNode(String aid, String userId, String role);
 
     void putUserInfoToNode(String userId, ArrayList<String> organizations, ArrayList<String> domains);
