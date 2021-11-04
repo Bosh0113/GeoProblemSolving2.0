@@ -546,6 +546,7 @@
 						if (res.data.code == 0) {
 							// this.$set(this, "projectInfo", res.data.data[0])
 							this.projectInfo = res.data.data;
+							console.log(res.data.data);
 							this.getProjectFinish = true;
 							this.userRole = this.roleIdentity(this.projectInfo);
 							this.operationApi.getActivityDoc(this.projectInfo.aid);
@@ -750,8 +751,8 @@
 							this.selectVertex = cell;
 
 							//临时实验
-							this.selectVertex.backendType = "modelItem";
-							this.selectVertex.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
+							this.selectVertex.backendType = "dataMethod";
+							this.selectVertex.tid = "cc94e0c1-5958-4715-a4e0-4360d5fa6e06";
 							this.selectVertex.toolUrl = null;
 
 							// this.vertexInfoShow = true;
@@ -769,6 +770,7 @@
 							//临时实验
 							this.tempToolInfo.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
 							this.getToolInfo();
+
 						}
 					});
 				},

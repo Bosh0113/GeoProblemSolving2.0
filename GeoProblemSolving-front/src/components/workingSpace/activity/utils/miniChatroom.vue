@@ -15,8 +15,7 @@
         <TabPane name="chats" label="Chat" style="margin-top: -16px">
           <div>
             <div class="contentPanel">
-              <div class="contentBody" id="contentBody">
-                <vue-scroll :ops="scrollOps" style="height: 345px">
+              <div class="contentBody topnav_box" id="contentBody" style="height: 355px">
                   <div
                     style="display: flex"
                     v-for="(item, index) in allChatMsgs"
@@ -111,7 +110,6 @@
                       </div>
                     </template>
                   </div>
-                </vue-scroll>
               </div>
               <div class="contentFooter">
                 <div class="input_panel">
@@ -152,7 +150,7 @@
                     :key="record.recordId"
                   >
                     <h4 style="margin-bottom: 5px">{{ record.createdTime }}</h4>
-                    <div class="message-text">
+                    <div class="message-text" v-if="getRecordsFinish">
                       Participants:
                       <span
                         v-for="user in record.participants"
@@ -286,6 +284,7 @@ export default {
       // records
       recordsShow: false,
       recordListShow: true,
+      getRecordsFinish: false,
       msgRecords: [],
       msgRecordDatails: [],
     };
@@ -310,6 +309,11 @@ export default {
         this.allChatMsgs.push(this.receivedChatMsgs.shift());
       }
     }
+    this.$nextTick(() => {
+      //滑块跨到最底端
+      var div = this.$el.querySelector(".contentBody");
+      div.scrollTop = div.scrollHeight;
+    });
   },
   mounted() {
     this.startWebSocket();
@@ -382,6 +386,8 @@ export default {
                 record.createdTime = date.Format("yyyy-MM-dd HH:mm:ss");
                 this.msgRecords.push(record);
               }
+              console.log(this.msgRecords);
+              this.getRecordsFinish = true;
             } else {
               console.log(res.data.msg);
             }
@@ -560,9 +566,11 @@ export default {
   border-color: #fff;
 }
 .contentPanel {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  flex: auto;
+  flex: auto; */
+  height: 100%;
+  width: 100%;
 }
 .contentBody {
   flex: 1;
@@ -717,4 +725,20 @@ export default {
   word-wrap: break-word;
   width: 100%;
 }
+
+.topnav_box::-webkit-scrollbar {  
+  width: 5px;  
+  height:10px;     
+  background-color:transparent;
+}  
+.topnav_box::-webkit-scrollbar-track {
+  border-radius: 10px; 
+  background-color:transparent;    
+    
+}
+.topnav_box::-webkit-scrollbar-thumb {  
+  border-radius: 10px;
+  height: 30px;
+  background-color:#b5b1b1;
+} 
 </style>

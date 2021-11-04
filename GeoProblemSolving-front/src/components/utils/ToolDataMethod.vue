@@ -5,8 +5,8 @@
     <div id="collab-tool-content" class="scrollbar">
       <el-row>
         <el-col
-          span="22"
-          offset="1"
+          :span="22"
+          :offset="1"
           v-if="dataService.hasOwnProperty('metaDetail')"
         >
           <vue-scroll

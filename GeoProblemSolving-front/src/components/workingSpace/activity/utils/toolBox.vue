@@ -39,20 +39,24 @@
   <div>
     <Card dis-hover class="toolCard" >
       <div slot="title">
-        <h4>Tools</h4>
-      </div>
-      <div
-        slot="extra"
-        v-if="
-          permissionIdentity(activityInfo.permission, userRole, 'manage_tool')
-        "
-      >
+        <span style="font-weight: 700;">Tools</span>
+        <Button
+          shape="circle"
+          size="small"
+          icon="md-refresh"
+          @click="refreshTool"
+          title="Refresh Tool"
+          style=" float:right; margin-top: -5px; margin-right: 15px;"
+        ></Button>
         <manage-tools
+          v-if="
+            permissionIdentity(activityInfo.permission, userRole, 'manage_tool')
+          "
           :activity-info="activityInfo"
           :tool-list="toolList"
           @updateStepTools="stepToolListChanged"
           title="Manage toolsets and tools"
-          style="margin-top: -10px"
+          style="margin-top: -5px;margin-right: 10px;float:right;"
         ></manage-tools>
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -203,6 +207,10 @@
         Note: Jupyter notebooks will be accessed by all members in this project.
       </h3>
     </Modal>
+    <login-modal
+      :tempLoginModal="tempLoginModal"
+      @changeLoginModal="changeLoginModal"
+    ></login-modal>
     <!-- <Modal v-model="openToolModal" title="Open tool">
       <h2>How would you like to open this tool?</h2>
       <small style="color: #ff9900"
@@ -223,11 +231,13 @@
 import manageTools from "@/components/tools/toolToStepModal";
 import Avatar from "vue-avatar";
 import { get, del, post, put } from "@/axios";
+import loginModal from "../../../user/userState/loginModal.vue";
 export default {
   props: ["activityInfo","projectInfo"],
   components: {
     manageTools,
     Avatar,
+    loginModal,
   },
   watch: {
     activityInfo(val) {
@@ -252,8 +262,10 @@ export default {
       jupyterModal: false,
       selectedTool: {},
       operationStore: false,
-      toolSetId: false
+      toolSetId: false,
       // openToolModal: false,
+      //恢复登录的模态框
+      tempLoginModal: false,
     };
   },
   beforeDestroy() {
@@ -329,6 +341,52 @@ export default {
     //       this.$Message.error("Loading project failed.")
     //     })
     // },
+    
+    changeLoginModal(status) {
+      this.tempLoginModal = status;
+      console.log(status);
+      //刷新工具
+      if( status == false){
+        this.back2LastLevel();
+      }
+    },
+    refreshTool() {
+      this.toolsetLevel = 0;
+      this.lastLevelList = [];
+
+      //重新获取this.activityInfo.toolList
+      let aid = this.activityInfo.aid;
+      let level = this.activityInfo.level;
+      let url = "";
+      if (level == 0 || level == null) {
+        url = "/GeoProblemSolving/project/" + aid;
+      } else if (level == 1) {
+        url = "/GeoProblemSolving/subproject/" + aid;
+      } else if (level > 1) {
+        url = "/GeoProblemSolving/activity/" + aid;
+      }
+      this.axios
+        .get(url)
+        .then((res) => {
+          console.log(res);
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
+            this.toolIdList = res.data.data.toolList;
+            if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
+              this.getToolInfos();
+            }
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
+    },
+
     getAllTools() {
       this.toolIdList = this.activityInfo.toolList;
       if (this.toolIdList != undefined && this.toolIdList.length !== 0) {
@@ -336,8 +394,23 @@ export default {
       }
     },
     async getToolInfos() {
-      let data = await get("/GeoProblemSolving/tool/all/" + this.toolIdList.toString())
-      this.$set(this, "toolList", data);
+      // let data = await get("/GeoProblemSolving/tool/all/" + this.toolIdList.toString())
+      this.axios
+        .get(
+          "/GeoProblemSolving/tool/all/" +
+            this.toolIdList.toString()
+        )
+        .then((res) => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            // this.$router.push({ name: "Login" });
+            this.tempLoginModal = true;
+          } else {
+            let data = res.data.data;
+            this.$set(this, "toolList", data);
+          }
+        })
+        .catch((err) => {});
     },
     stepToolListChanged(tools, toolsets) {
       this.toolIdList = toolsets;

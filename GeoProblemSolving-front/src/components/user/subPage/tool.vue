@@ -634,6 +634,7 @@
       <template-general
         @generalInfo="getGeneralInfo"
         :step="currentStep"
+        :info="toolInfo"
       ></template-general>
       <div slot="footer">
         <Button
@@ -1395,10 +1396,40 @@ export default {
     },
     createToolModalShow() {
       this.chooseCreateModal = false;
+      this.toolInfo = {
+        toolName: "",
+        modelInfo: {
+          stateId: "",
+          oid: "",
+          mdlId: "",
+        },
+        description: "",
+        toolUrl: "",
+        recomStep: [],
+        categoryTag: [],
+        toolImg: "",
+        privacy: "Private",
+        detail: "",
+      };
       this.createToolModal = true;
     },
     createToolsetModalShow() {
       this.chooseCreateModal = false;
+      this.toolInfo = {
+        toolName: "",
+        modelInfo: {
+          stateId: "",
+          oid: "",
+          mdlId: "",
+        },
+        description: "",
+        toolUrl: "",
+        recomStep: [],
+        categoryTag: [],
+        toolImg: "",
+        privacy: "Private",
+        detail: "",
+      };
       this.createToolsetModal = true;
     },
     getToolList(list) {
