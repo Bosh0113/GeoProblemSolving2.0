@@ -45,7 +45,6 @@ public class MsgSocketServer {
 
     @OnError
     public void onError(Throwable error) {
-        System.out.println("Error!");
         error.printStackTrace();
     }
 }

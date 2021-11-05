@@ -232,6 +232,9 @@ public class UserResController {
     public JsonResult getAllFileList(HttpServletRequest req) {
         String userId = (String) req.getSession().getAttribute("userId");
         JSONArray allFileList = resService.getAllFileList(userId);
+        if (allFileList == null){
+            return ResultUtils.error(-2, "Fail");
+        }
         return ResultUtils.success(allFileList);
     }
 

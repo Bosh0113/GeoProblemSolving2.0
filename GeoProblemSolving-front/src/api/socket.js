@@ -13,7 +13,7 @@ function initWebSocket(para) { //初始化websocket
   let IP_Port = window.location.host;
   var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/GeoProblemSolving/${para}`;
   if (IP_Port == "localhost:8080") {
-    wsurl = `ws://172.21.213.137:8081/GeoProblemSolving/${para}`;
+    wsurl = `ws://localhost:8081/GeoProblemSolving/${para}`;
   }
   //switch 使用时提供一个参数type
   let websock = new WebSocket(wsurl);
@@ -26,6 +26,13 @@ function initWebSocket(para) { //初始化websocket
     removeTimer();
     websockLinked[para] = false;
     connectorNum[para] = -1;
+    let index = socketSites.indexOf(para);
+    if (index > -1){
+      socketSites.splice(index, 1);
+    }
+    if (socketSites.length == 0){
+      removeTimer();
+    }
   }
   //连接成功的回调函数
   websock.onopen = function () {
@@ -33,17 +40,23 @@ function initWebSocket(para) { //初始化websocket
     setTimer();
     websockLinked[para] = true;
     connectorNum[para] = 1;
+    socketSites.push(para);
   }
 
   //连接发生错误的回调方法
   websock.onerror = function () {
     console.log("WebSocket error");
-    removeTimer();
     websockLinked[para] = false;
     connectorNum[para] = -1;
+    let index = socketSites.indexOf(para);
+    if (index > -1){
+      socketSites.splice(index, 1);
+    }
+    if (socketSites.length == 0 ){
+      removeTimer();
+    }
   }
 
-  socketSites.push[para];
   websockets[para] = websock;
 }
 
@@ -115,13 +128,14 @@ function websocketOpen(e) {
   console.log("Connect successfully");
 }
 
+//keep beating
 function setTimer() {
   timer = setInterval(() => {
     var messageJson = { type: "ping" };
     for (let i = 0; i < socketSites.length; i++) {
       websocketsend(socketSites[i], messageJson);
     }
-  }, 20000);
+  }, 50000);
 }
 
 function removeTimer() {

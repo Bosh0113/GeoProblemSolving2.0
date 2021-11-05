@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -65,6 +66,9 @@ public class CollaborationService {
     ActivityResDaoImpl ripDao;
 
     @Autowired
+    DocInterpret activityDocParse;
+
+    @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${managerServerIpAndPort}")
@@ -72,6 +76,7 @@ public class CollaborationService {
 
     @Value("${dataMethodProxyServerLocation}")
     String dataProxyServer;
+
 
     private CollaborationConfig collaborationConfig;
     //global static
@@ -219,6 +224,7 @@ public class CollaborationService {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Message Websocket Error_Transfer");
             ex.printStackTrace();
         }
     }
@@ -512,6 +518,9 @@ public class CollaborationService {
 
                             String resTag = TagUtil.setResourceTag(resourceEntity);
                             resTagMap.put(uid ,resTag);
+
+                            //Save it in the activity document todo
+                            activityDocParse.uploadResource(aid, resourceEntity);
                         }
                         //资源自动更新
                         if(graphId != null && graphId != ""){
@@ -585,6 +594,8 @@ public class CollaborationService {
 
                                     String resTag = TagUtil.setResourceTag(outputEntity);
                                     resTagMap.put(uid ,resTag);
+
+                                    //Save it in the activity document todo
                                 }
                                 //资源自动更新
                                 if(graphId != null && graphId != ""){
