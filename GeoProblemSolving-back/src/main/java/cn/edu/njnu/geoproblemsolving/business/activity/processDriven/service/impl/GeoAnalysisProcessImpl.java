@@ -135,9 +135,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         获得协议的上层节点，用于协议内部的资源流动
         需要完成将协议添加到图中的操作,才能实现此步骤
          */
-        HashMap<String, HashMap<String, LinkRestriction>> relevantUpperNode = getRelevantUpperNode(adjacencyMap, nodeIdList);
+        // HashMap<String, HashMap<String, LinkRestriction>> relevantUpperNode = getRelevantUpperNode(adjacencyMap, nodeIdList);
         //完成关系内资源流动
-        resFlowInProtocol(relevantUpperNode, type, nodeIdList, linkRestriction);
+        resFlowInProtocol(null, type, nodeIdList, linkRestriction);
         //关系下层资源流动
         resFlowInLowerNode(rootAid, nodeIdList);
 

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import sun.awt.image.GifImageDecoder;
 
 import java.util.*;
 
@@ -356,6 +357,7 @@ public class DocInterpret implements ActivityDocParser {
     ActivityResServiceImpl ripServer;
     //Store the flow resource in the document.
     public Object flowResourceUpload(String fromAid, String endAid, HashSet<String> uids) throws DocumentException {
+        if (uids == null || uids.size() == 0) return null;
         syncGlobalVariables(endAid);
         ActivityDoc activityDoc = docRepository.findById(fromAid).get();
         Document fromDocXML = DocumentHelper.parseText(activityDoc.getDocument());
@@ -435,6 +437,7 @@ public class DocInterpret implements ActivityDocParser {
         if (activityDocXml == null) return "Fail";
         Element activityEle = activityDocXml.getRootElement();
         String type = activityEle.attributeValue("type");
+
         Document workflowTemplate = DocumentHelper.createDocument();
         Element workflowEle = workflowTemplate.addElement("workflow");
         Element resourceCollectionEle = workflowEle.addElement("ResourceCollection");
@@ -465,10 +468,52 @@ public class DocInterpret implements ActivityDocParser {
             }
         }
         if (type.equals(ActivityType.Activity_Group)){
-
+            List<Node> childNodes = activityEle.selectNodes("/ChildActivities/Child");
         }
         return null;
     }
+
+    // private Element a2WorkflowTemplate(List<Node> childActivitiesNode, Document rootActivity) throws DocumentException {
+    //     for (int i = 0; i < childActivitiesNode.size(); i++) {
+    //         Element childEle = (Element)childActivitiesNode.get(0);
+    //         String aid = childEle.attributeValue("id");
+    //         Optional<ActivityDoc> byId = docRepository.findById(aid);
+    //         if (!byId.isPresent()) continue;
+    //         ActivityDoc activityDoc = byId.get();
+    //         Document docXML = DocumentHelper.parseText(activityDoc.getDocument());
+    //         Element activityEle = docXML.getRootElement();
+    //         String type = activityEle.attributeValue("type");
+    //
+    //
+    //         if (type.equals(ActivityType.Activity_Unit)){
+    //             List<Node> geoAnalysisNodes = activityEle.selectNodes("/OperationRecords//Operation[@type = 'geo-analysis']");
+    //             for (int i = 0; i < geoAnalysisNodes.size(); i++){
+    //                 Element gaNode = (Element)geoAnalysisNodes.get(i);
+    //                 String toolId = gaNode.attributeValue("toolRef");
+    //                 Element toolEle =  (Element)activityEle.selectSingleNode("/ToolBox/Tool[@id = 'toolId']");
+    //                 toolBoxEle.add(toolEle);
+    //                 List<Node> modelRelationNode = gaNode.selectNodes("/ResRef[@tyep != 'param']");
+    //                 for (int j = 0; j < modelRelationNode.size(); j++){
+    //                     Element inoutNode =  (Element)modelRelationNode.get(i);
+    //                     String resId = inoutNode.attributeValue("idRef");
+    //                     Element resEle =  (Element)activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'resId']");
+    //                     resourceCollectionEle.add(resEle);
+    //                 }
+    //                 List<Node> personNodes = gaNode.selectNodes("/PersonRef");
+    //                 for (int k = 0; k < personNodes.size(); k++){
+    //                     Element modelPersonEle =  (Element)personNodes.get(i);
+    //                     String personId = modelPersonEle.attributeValue("idRef");
+    //                     Element personEle =  (Element)activityEle.selectSingleNode("/Participants/Person[@id = 'personId']");
+    //                     participantsEle.add(personEle);
+    //                 }
+    //             }
+    //         }
+    //         if (type.equals(ActivityType.Activity_Group)){
+    //             List<Node> childNodes = activityEle.selectNodes("/ChildActivities/Child");
+    //             a2WorkflowTemplate(childNodes, rootActivity);
+    //         }
+    //     }
+    // }
 
 
 }

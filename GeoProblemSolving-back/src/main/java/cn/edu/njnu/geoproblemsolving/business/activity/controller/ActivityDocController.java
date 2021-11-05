@@ -2,8 +2,11 @@ package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocService;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
+import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -14,6 +17,8 @@ import java.util.HashSet;
 public class ActivityDocController {
 
     private final ActivityDocService activityDocService;
+    @Autowired
+    DocInterpret docParse;
 
     public ActivityDocController(ActivityDocService activityDocService) {
         this.activityDocService = activityDocService;
@@ -55,5 +60,11 @@ public class ActivityDocController {
     @RequestMapping(value = "/{aids}",method = RequestMethod.GET)
     public JsonResult inquiryActivityDocs(@PathVariable HashSet<String> aids){
         return activityDocService.findDocuments(aids);
+    }
+
+    @RequestMapping(value = "/workflow/{aid}",method = RequestMethod.GET)
+    public JsonResult activityDoc2WorkflowTemplate(@PathVariable String aid) throws DocumentException {
+        docParse.activity2WorkflowTemplate(aid);
+        return null;
     }
 }
