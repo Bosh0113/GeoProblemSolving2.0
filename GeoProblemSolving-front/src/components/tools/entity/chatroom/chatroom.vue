@@ -2,7 +2,6 @@
 .extendedPanel >>> .ivu-tabs-bar {
   margin-bottom: 0;
 }
-
 .chatPanel {
   display: flex;
   width: 100%;
@@ -19,7 +18,7 @@
   /* display: flex;
   flex-direction: column;
   flex: auto; */
-  height: 100%;
+  height: 350px;
   width: 100%;
 }
 
@@ -33,7 +32,7 @@
 
 /* 发送信息部分 */
 .contentFooter {
-  height: 160px;
+  height: 210px;
   width: 100%;
   padding: 4px 5px 4px 5px;
   background-color: lightgray;
@@ -148,7 +147,7 @@
         <div
           class="contentBody"
           ref="contentBody"
-          style="height: calc(100vh - 160px)"
+          style="height: calc(100vh - 210px)"
         >
           <div v-for="(list, index) in msglist" :key="index">
             <template v-if="list.type == 'members'">
@@ -315,7 +314,7 @@
         </Tabs>
       </div>
 
-      <div class="extendedPanel" v-show="extendedConceptsShow">
+      <div class="extendedPanel" v-if="extendedConceptsShow">
         <Tabs type="card">
           <TabPane label="Concepts">
             <concepts :msgConcepts="msgConcepts"></concepts>
@@ -425,7 +424,7 @@ export default {
     this.initSize();
     this.supportNotify();
   },
-  methods: { 
+  methods: {
     avatarUrl(url) {
       let avatarUrl = this.$store.state.UserServer + url;
       return avatarUrl;
@@ -549,7 +548,7 @@ export default {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.msglist.push(chatMsg);
         } else if (chatMsg.behavior == "off") {
-          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          chatMsg["content"] = chatMsg.activeUser.name + " quit the meeting.";
           this.msglist.push(chatMsg);
         }
         this.updateParticipants(chatMsg.participants);
@@ -566,12 +565,26 @@ export default {
             let time = new Date(this.msglist[i].time);
             let current = new Date();
             let threshold = 1000 * 60 * 3;
-            if (this.msglist[i].status == "sending" && this.msglist[i].time == chatMsg.time) {
+            if (
+              this.msglist[i].status == "sending" &&
+              this.msglist[i].time == chatMsg.time
+            ) {
               this.msglist[i].status = "done";
               msgCheck = true;
-            } else if (this.msglist[i].status == "sending" && (current - time > threshold)) {
+            } else if (
+              this.msglist[i].status == "sending" &&
+              current - time > threshold
+            ) {
               this.msglist[i].status = "failed";
             }
+          }
+          try {
+            if (chatMsg.type === "message_tool") {
+              let content = chatMsg.content;
+              chatMsg.content = JSON.parse(content);
+            }
+          } catch (err) {
+            console.log(err);
           }
 
           if (!msgCheck) {
@@ -613,7 +626,7 @@ export default {
       } else if (chatMsg.type == "message-cache") {
         for (let i = 0; i < chatMsg.content.length; i++) {
           if (chatMsg.content[i] != "") {
-            if(chatMsg.content[i].sender.userId == this.userInfo.userId){
+            if (chatMsg.content[i].sender.userId == this.userInfo.userId) {
               chatMsg.content[i].status = "done";
             }
             this.msglist.push(chatMsg.content[i]);

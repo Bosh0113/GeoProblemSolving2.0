@@ -856,6 +856,7 @@
         <a
           :href="selectData.address"
           :download="selectData.name + selectData.suffix"
+          target="_blank"
           v-if="
             permissionIdentity(
               activityInfo.permission,

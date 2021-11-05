@@ -261,7 +261,7 @@ public class CollaborationService {
                     break;
                 }
                 case "mode": {
-                    String mode = messageObject.getString("mode");
+                    String mode = messageObject.getString("content");
                     collaborationConfig.setMode(CollaborationMode.valueOf(mode));
                     collaborationConfig.setOperator("");
                     collaborationConfig.setApplyQueue(new ArrayList<>());
@@ -273,14 +273,19 @@ public class CollaborationService {
                 case "control-apply": {
                     List<String> applyQueue = collaborationConfig.getApplyQueue();
                     if(applyQueue == null) applyQueue = new ArrayList<>();
-                    if(applyQueue.size() == 0) {
-                        collaborationConfig.setOperator(sender.getUserId());
-                    }
-                    applyQueue.add(sender.getUserId());
-                    collaborationConfig.setApplyQueue(applyQueue);
-                    groups.put(groupKey, collaborationConfig);
 
+                    if(collaborationConfig.getOperator().equals("")) {
+                        collaborationConfig.setOperator(sender.getUserId());
+                    } else {
+                        if(!applyQueue.contains(sender.getUserId())){
+                            applyQueue.add(sender.getUserId());
+                            collaborationConfig.setApplyQueue(applyQueue);
+                        }
+                    }
+
+                    groups.put(groupKey, collaborationConfig);
                     collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
+
                     break;
                 }
                 case "control-stop": {
@@ -296,7 +301,7 @@ public class CollaborationService {
                         }
                         groups.put(groupKey, collaborationConfig);
 
-                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, collaborationBehavior.getMemberInfo(ctrUser, null), messageType);
+                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
                     } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
                         collaborationConfig.setOperator("");
                         groups.put(groupKey, collaborationConfig);
@@ -326,9 +331,16 @@ public class CollaborationService {
                         }
                         // 判断操作权限
                         if(collaborationConfig.getOperator().equals(sender.getUserId())){
+                            collaborationConfig.resetTime();
                             collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
+                            if(collaborationConfig.resetOperator(sender.getUserId())){
+                                // reset operator successfully
+                                collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
+                            } else {
+                                // fail to reset operator
+                                collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
+                            }
                         }
                     } else if (mode.equals(CollaborationMode.Free)) {
                         collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);

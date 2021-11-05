@@ -5,7 +5,7 @@
       nameKey="name"
       valueKey="frequency"
       :color="myColors"
-      :showTooltip="true"
+      :showTooltip="false"
       :wordClick="wordClickHandler"
       :rotate="rotate"
     ></word-cloud>

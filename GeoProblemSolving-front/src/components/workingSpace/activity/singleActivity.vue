@@ -374,10 +374,10 @@ export default {
               // update actvitiy doc
               this.operationApi.participantUpdate(
                 this.activityInfo.aid,
-                "invite",
+                "join",
                 user.userId,
                 user.name,
-                user.role,
+                "ordinary-member",
                 user.domain
               );
               //notice

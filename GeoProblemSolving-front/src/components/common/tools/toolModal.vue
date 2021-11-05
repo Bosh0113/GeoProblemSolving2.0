@@ -153,14 +153,14 @@ export default {
 
     async getPublicTools() {
       let data = await get(
-        "/GeoProblemSolving/tool/inquiry/?key=privacy&value=Public"
+        "/GeoProblemSolving/tool/privacy/Public"
       );
       this.$set(this, "publicTools", data);
     },
 
     async getPersonalTools() {
       let data = await get(
-        `/GeoProblemSolving/tool/findByProvider/${this.userId}`
+        `/GeoProblemSolving/tool/provider/${this.userId}`
       );
       this.$set(this, "personalTools", data);
     },

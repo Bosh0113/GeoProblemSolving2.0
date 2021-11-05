@@ -847,6 +847,10 @@ svg {
 .operator {
     height: 30px;
     padding: 8px 0;
+    overflow: hidden;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 } 
 .operation-waiting {
     height: 30px;

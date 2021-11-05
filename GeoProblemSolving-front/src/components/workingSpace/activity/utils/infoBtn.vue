@@ -534,73 +534,80 @@ export default {
     },
     inviteMembers() {
       let activity = this.activityInfo;
+      let inviteList = [];
 
       // add members
       for (var i = 0; i < this.invitingMembers.length; i++) {
         let index = this.invitingMembers[i];
         if (this.participants.contains(this.potentialMembers[index])) continue;
-
         let user = this.potentialMembers[index];
-        let url = "";
-        if (activity.level == 1) {
-          url =
-            "/GeoProblemSolving/subproject/" +
-            activity.aid +
-            "/user?userId=" +
-            user.userId;
-        } else if (activity.level > 1) {
-          url =
-            "/GeoProblemSolving/activity/" +
-            activity.aid +
-            "/user?userId=" +
-            user.userId;
-        } else {
-          return;
-        }
+        inviteList.push(user.userId);
+      }
+      
+      let url = "";
+      if (activity.level == 1) {
+       url =
+          "/GeoProblemSolving/subproject/" +
+          activity.aid +
+          "/userBatch?userIds=" +
+          inviteList.toString();
+      } else if (activity.level > 1) {
+        url =
+          "/GeoProblemSolving/activity/" +
+          activity.aid +
+          "/userBatch?userIds=" +
+          inviteList.toString();
+      } else {
+        return;
+      }
 
         this.axios
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
-              user.role = "ordinary-member";
-              this.participants.push(user);
-              this.$Notice.info({ desc: "Invite member successfully" });
+              for (var i = 0; i < this.invitingMembers.length; i++) {
+                let index = this.invitingMembers[i];
+                if (this.participants.contains(this.potentialMembers[index])) continue;
+                let user = this.potentialMembers[index];
+                this.participants.push(user);
+                this.$Notice.info({ desc: "Invite member successfully" });
 
-              // update activity doc
-              this.operationApi.participantUpdate(
-                activity.aid,
-                "invite",
-                user.userId,
-                user.name,
-                user.role,
-                user.domain
-              );
+                // update activity doc
+                this.operationApi.participantUpdate(
+                  activity.aid,
+                  "join",
+                  user.userId,
+                  user.name,
+                  "ordinary-member",
+                  user.domain
+                );
 
-              //notice
-              let notice = {
-                recipientId: user.userId,
-                type: "notice",
-                content: {
-                  title: "Join activity",
-                  description:
-                    "You have been invited by " +
-                    this.userInfo.name +
-                    " to join the activity: " +
-                    activity.name +
-                    " in project: " +
-                    this.projectInfo.name +
-                    " , and now you are a member in this activity!",
-                  approve: "unknow",
-                  projectId: this.projectInfo.aid,
-                  projectName: this.projectInfo.name,
-                  activityId: activity.aid,
-                  activityName: activity.name,
-                  activityLevel: activity.level,
-                  invitorName: this.userInfo.name,
-                  invitorId: this.userInfo.userId,
-                },
-              };
-              this.sendNotice(notice);
+                //notice
+                let notice = {
+                  recipientId: user.userId,
+                  type: "notice",
+                  content: {
+                    title: "Join activity",
+                    description:
+                      "You have been invited by " +
+                      this.userInfo.name +
+                      " to join the activity: " +
+                      activity.name +
+                      " in project: " +
+                      this.projectInfo.name +
+                      " , and now you are a member in this activity!",
+                    approve: "unknow",
+                    projectId: this.projectInfo.aid,
+                    projectName: this.projectInfo.name,
+                    activityId: activity.aid,
+                    activityName: activity.name,
+                    activityLevel: activity.level,
+                    invitorName: this.userInfo.name,
+                    invitorId: this.userInfo.userId,
+                  },
+                };
+                this.sendNotice(notice);
+              }
             } else {
               console.log(res.data.msg);
             }
@@ -608,7 +615,7 @@ export default {
           .catch((err) => {
             throw err;
           });
-      }
+      
     },
     updateUserRole() {
       let member = this.slctRoleMember;
@@ -728,7 +735,6 @@ export default {
       this.axios
         .delete(url)
         .then((res) => {
-          console.log(res);
           if (res.data.code == 0) {
             // update activity doc
             this.operationApi.participantUpdate(

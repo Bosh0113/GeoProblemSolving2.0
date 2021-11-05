@@ -873,7 +873,7 @@ export function participantUpdate(aid, behavior, userId, name, role, domains) {
   }
 
   // Participants
-  if (behavior === "invite") {
+  if (behavior === "join") {
 
     let Person = xmlDoc.getElementById(userId);
     if (Person !== null && Person.localName == "Person") {

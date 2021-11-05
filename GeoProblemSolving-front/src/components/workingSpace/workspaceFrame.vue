@@ -1130,6 +1130,16 @@ export default {
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
             this.enterActivity(this.slctActivity);
+
+            // // update activity doc
+            // this.operationApi.participantUpdate(
+            //   this.slctActivity.aid,
+            //   "join",
+            //   this.userInfo.userId,
+            //   this.userInfo.name,
+            //   "ordinary-member",
+            //   this.userInfo.domain
+            // );
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
@@ -1162,6 +1172,7 @@ export default {
             userEmail: this.userInfo.email,
             userName: this.userInfo.name,
             userId: this.userInfo.userId,
+            userDomain: this.userInfo.domain,
             description: this.applyJoinForm.reason,
             approve: "unknow",
           },
