@@ -255,6 +255,7 @@
       ok-text="Link"
       cancel-text="Cancel"
       @on-visible-change='linkModalStatus'
+      :mask= "false"
     >
       <div slot="footer">
         <div style="display: inline-block; position: absolute; left: 30px">

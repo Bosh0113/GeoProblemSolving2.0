@@ -439,7 +439,16 @@ export default {
 
     getSocketComputation: function (data) {
       if (data != undefined && data != null) {
-        this.getStateEventOut(data.computeOutputs);
+        let computeOutputs = data.computeOutputs;
+        if (computeOutputs !== "Fail") {
+          this.getStateEventOut(data.computeOutputs);
+        } else {
+          this.fullscreenLoading.close();
+          this.$Notice.error({
+            title: "Fail",
+            desc: "Compute fail, try again or connect with admin.",
+          });
+        }
       }
     },
 

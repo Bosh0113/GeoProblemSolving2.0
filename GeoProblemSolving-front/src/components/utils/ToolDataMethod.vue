@@ -397,21 +397,24 @@ export default {
     // webSocket 回调函数
     getSocketComputation: function (data) {
       let output = data.computeOutputs;
-      let keys = Object.keys(output);
-      keys.forEach((key) => {
-        this.outputData.forEach((item, index) => {
-          if (item.name == key) {
-            this.$set(this.outputData[index], "url", output[key]);
-          }
+      if (output !== "Fail") {
+        let keys = Object.keys(output);
+        keys.forEach((key) => {
+          this.outputData.forEach((item, index) => {
+            if (item.name == key) {
+              this.$set(this.outputData[index], "url", output[key]);
+            }
+          });
         });
-      });
-      this.$refs.invokeButton.$el.innerHTML = null;
-      this.fullscreenLoading.close();
-      // if (data.behavior == "data") {
-      //   this.inputData = data.content.inputs;
-      // } else if (data.behavior == "message") {
-      //
-      // }
+        this.$refs.invokeButton.$el.innerHTML = null;
+        this.fullscreenLoading.close();
+      } else {
+        this.fullscreenLoading.close();
+        this.$Notice.error({
+          title: "Fail",
+          desc: "Compute fail, try again or connect with admin.",
+        });
+      }
     },
 
     getSocketOperation: function (data) {

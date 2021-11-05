@@ -47,7 +47,6 @@ public class OperationSocketServer {
      */
     @OnMessage
     public void onMessage(@PathParam("toolId") String toolId, @PathParam("aid") String aid, String message) throws IOException {
-        String groupKey = toolId + aid;
         collaborationService.operationTransfer(toolId, aid, message);
     }
 

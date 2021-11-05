@@ -6,6 +6,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -41,6 +42,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final DocInterpret docParse;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -50,7 +52,7 @@ public class ActivityServiceImpl implements ActivityService {
                                FolderDaoImpl folderDao,
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
-                               ToolService toolService, NodeService nodeService) {
+                               ToolService toolService, NodeService nodeService, DocInterpret docParse) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
@@ -60,6 +62,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectUtil = httpUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParse = docParse;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -611,6 +614,15 @@ public class ActivityServiceImpl implements ActivityService {
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
 
+            //Save it in the activity doc.
+            HashMap<String, String> userInfoMap = new HashMap<>();
+            userInfoMap.put("userId", user.getUserId());
+            userInfoMap.put("email", user.getEmail());
+            userInfoMap.put("name", user.getName());
+            userInfoMap.put("role", "ordinary-member");
+            docParse.inActivity(aid, userInfoMap);
+
+
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -650,6 +662,10 @@ public class ActivityServiceImpl implements ActivityService {
 
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
+
+            //Store it in the activity doc. todo
+            docParse.insActivity(aid, userIds);
+
 
             return ResultUtils.success(members);
         }catch (Exception e){
