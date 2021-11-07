@@ -32,7 +32,13 @@
 
 /* 发送信息部分 */
 .contentFooter {
-  height: 210px;
+  height: 160px;
+  width: 100%;
+  padding: 4px 5px 4px 5px;
+  background-color: lightgray;
+}
+.contentFooter2 {
+  height: 200px;
   width: 100%;
   padding: 4px 5px 4px 5px;
   background-color: lightgray;
@@ -145,9 +151,10 @@
     <div class="chatPanel">
       <div class="contentPanel">
         <div
+          v-if="useChatCss"
           class="contentBody"
           ref="contentBody"
-          style="height: calc(100vh - 210px)"
+          style="height: calc(100vh - 160px)"
         >
           <div v-for="(list, index) in msglist" :key="index">
             <template v-if="list.type == 'members'">
@@ -161,7 +168,124 @@
             </template>
           </div>
         </div>
-        <div class="contentFooter">
+        <div
+          v-else
+          class="contentBody"
+          ref="contentBody"
+          style="height: calc(100vh - 200px)"
+        >
+          <div v-for="(list, index) in msglist" :key="index">
+            <template v-if="list.type == 'members'">
+              <div class="chat-notice">{{ list.content }}</div>
+            </template>
+            <template v-else-if="list.sender.userId === userInfo.userId">
+              <bubble-right :message="list"></bubble-right>
+            </template>
+            <template v-else>
+              <bubble-left :message="list"></bubble-left>
+            </template>
+          </div>
+        </div>
+        <div class="contentFooter" v-if="useChatCss">
+          <Row>
+            <Col :span="24">
+              <Row>
+                <Col :span="14" style="display: flex">
+                  <div class="send_emoji">
+                    <twemoji-picker
+                      :emojiData="emojiDataAll"
+                      :emojiGroups="emojiGroups"
+                      :pickerHeight="300"
+                      :pickerWidth="500"
+                      @emojiUnicodeAdded="addEmoji"
+                      title="Emoji"
+                    ></twemoji-picker>
+                  </div>
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-time"
+                      @click.native="showRecords()"
+                      size="25"
+                      title="Messge records"
+                      class="send_icon"
+                    />
+                  </div>
+                  <div class="chatbox_btn" title="Send image">
+                    <Upload multiple :before-upload="beforeUploadPic" action>
+                      <Icon type="md-image" size="25" class="send_icon" />
+                    </Upload>
+                  </div>
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-body"
+                      size="25"
+                      class="send_icon"
+                      title="Online participants"
+                      @click.native="showParticipants()"
+                    />
+                  </div>
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-hammer"
+                      size="25"
+                      class="send_icon"
+                      title="Send tool"
+                      @click.native="toolModalShow = true"
+                    />
+                  </div>
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-water"
+                      size="25"
+                      class="send_icon"
+                      title="Geographic concepts"
+                      @click.native="showConcepts()"
+                    />
+                  </div>
+
+                  <div class="chatbox_btn">
+                    <Icon
+                      type="md-send"
+                      @click.native="sendMsg"
+                      title="Send message"
+                      size="25"
+                      class="send_icon"
+                    />
+                  </div>
+                </Col>
+                <Col :span="10" style="width: 250px; display: flex">
+                  <div class="send_people">
+                    <div class="sent_to_tip">Send to</div>
+                  </div>
+                  <div class="send_people">
+                    <el-select v-model="sendToMemberId" class="select">
+                      <el-option
+                        v-for="item in selectReceiver"
+                        :value="item.userId"
+                        :label="item.name"
+                        :key="item.userId"
+                        >{{ item.name }}</el-option
+                      >
+                    </el-select>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col :span="24">
+                  <Input
+                    :rows="4"
+                    type="textarea"
+                    class="inputText"
+                    v-model="message"
+                    @keydown.native="handleKeyCode($event)"
+                  ></Input>
+                  <!-- <div id="a" contentEditable="true" >{{message}}</div> -->
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </div>
+        <div class="contentFooter2" v-else>
           <Row>
             <Col :span="24">
               <Row>
@@ -390,6 +514,7 @@ export default {
       msglist: [],
       panelHeight: 0,
       panelWidth: 0,
+      useChatCss: true,
 
       windowStatus: "focus", //监听浏览器失焦事件
       //在线成员
@@ -416,6 +541,8 @@ export default {
   },
 
   mounted() {
+    this.reSize();
+    window.addEventListener("resize", this.reSize);
     window.addEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.addEventListener("focus", this.winFocus, true); //监听浏览器失焦事件
     window.addEventListener("resize", this.initSize, true);
@@ -425,6 +552,13 @@ export default {
     this.supportNotify();
   },
   methods: { 
+    reSize() {
+        if (window.innerWidth < 610) {
+          this.useChatCss = false;
+        } else {
+          this.useChatCss = true;
+        }
+    },
     avatarUrl(url) {
       let avatarUrl = this.$store.state.UserServer + url;
       return avatarUrl;
@@ -745,6 +879,8 @@ export default {
 
   beforeDestroy() {
     this.socketApi.close("MsgServer/" + this.activityInfo.aid);
+    
+    window.removeEventListener("resize", this.reSize);
     window.removeEventListener("resize", this.initSize);
     window.removeEventListener("blur", this.winBlur, true); //监听浏览器失焦事件
     window.removeEventListener("focus", this.winFocus, true); //监听浏览器失焦事件
