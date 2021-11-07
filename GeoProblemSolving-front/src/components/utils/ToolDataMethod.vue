@@ -396,7 +396,9 @@ export default {
     },
     // webSocket 回调函数
     getSocketComputation: function (data) {
-      let output = data.computeOutputs;
+      let output = data.outputInfo;
+      let outputRes = data.outputRes;
+
       if (output !== "Fail") {
         let keys = Object.keys(output);
         keys.forEach((key) => {
@@ -484,6 +486,9 @@ export default {
       let index = this.inputIndex;
       this.dataService.metaDetail.input[index].url = val.address;
       this.dataService.metaDetail.input[index].urlName = val.name;
+      this.dataService.metaDetail.input[index].uid = val.uid;
+
+
       this.selectDataDialogShow = false;
 
       this.inputData = this.dataService.metaDetail.input;

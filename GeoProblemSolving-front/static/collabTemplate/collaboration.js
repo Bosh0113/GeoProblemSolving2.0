@@ -384,7 +384,7 @@ var taskList = [];
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" onerror="src='/static/collabTemplate/img/icon_avatar.png'"/>
+                                <img src="${avatar}" class="participant-avatar" onerror="src='./static/collabTemplate/img/icon_avatar.png'"/>
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -902,14 +902,14 @@ var taskList = [];
             if(Object.prototype.toString.call(operator) == "[object Object]") {
                 user = Object.assign({}, operator);
                 operator = operator.userId
-            } else {                
+            } else {
                 for (let i = 0; i < participants.length; i++) {
                     if (participants[i].userId == operator) {
                         user = participants[i];
                     }
                 }
             }
-            
+
             if (operator != userInfo.userId) {
                 $("#operation-apply").show();
                 $("#operation-stop").hide();
@@ -1312,7 +1312,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-    
+
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话

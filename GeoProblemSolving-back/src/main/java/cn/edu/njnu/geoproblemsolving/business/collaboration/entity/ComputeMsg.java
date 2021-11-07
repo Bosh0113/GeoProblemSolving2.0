@@ -23,6 +23,8 @@ public class ComputeMsg {
 
     private String aid;
 
+    private String oid;
+
     //invoke 时参与的人
     private ArrayList<CollaborationUser> receivers;
 

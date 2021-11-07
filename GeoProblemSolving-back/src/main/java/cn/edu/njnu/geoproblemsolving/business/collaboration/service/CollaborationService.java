@@ -2,7 +2,6 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -66,9 +65,6 @@ public class CollaborationService {
     ActivityResDaoImpl ripDao;
 
     @Autowired
-    DocInterpret activityDocParse;
-
-    @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${managerServerIpAndPort}")
@@ -77,8 +73,6 @@ public class CollaborationService {
     @Value("${dataMethodProxyServerLocation}")
     String dataProxyServer;
 
-
-    private CollaborationConfig collaborationConfig;
     //global static
     private static final Map<String, CollaborationConfig> groups = new ConcurrentHashMap<>(); // collaboration groups
 
@@ -388,12 +382,13 @@ public class CollaborationService {
                         String servicePort = messageObject.getString("servicePort");
                         String serviceMd5 = messageObject.getString("serviceMd5");
                         JSONArray inputs = messageObject.getJSONArray("inputs");
-                        // JSONArray outputs = messageObject.getJSONArray("outputs");
+                        String operationId = messageObject.getString("operationId");
 
                         computeMsg.setServiceIp(serviceIp);
                         computeMsg.setServicePort(servicePort);
                         computeMsg.setServiceId(serviceMd5);
                         computeMsg.setInputs(inputs);
+                        computeMsg.setOid(operationId);
 
                         String invokeUrl = "http://" + mangeServiceLocation + "/GeoModeling/computableModel/invoke";
                         JSONObject invokeJson = new JSONObject();
@@ -505,7 +500,7 @@ public class CollaborationService {
                         ComputeMsg sucMessage = computeList.get(sucTaskTid);
                         JSONArray sucOutputs = resJson.getJSONArray("outputs");
                         //将所有返回内容存入项目中,不做持久化暂时没用
-                        sucMessage.setOutputs(sucOutputs);
+                        ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                         for (int i = 0; i < sucOutputs.size(); i++) {
                             JSONObject outItem = sucOutputs.getJSONObject(i);
                             String address = outItem.getString("url").split("\\?")[0];
@@ -527,13 +522,15 @@ public class CollaborationService {
                             resourceEntity.setFolder(false);
                             //已经将数据存入资源中心
                             ripDao.addResource(resourceEntity);
+                            outputRes.add(resourceEntity);
 
                             String resTag = TagUtil.setResourceTag(resourceEntity);
                             resTagMap.put(uid ,resTag);
-
-                            //Save it in the activity document todo
-                            activityDocParse.uploadResource(aid, resourceEntity);
                         }
+                        JSONObject output = new JSONObject();
+                        output.put("outputInfo", sucOutputs);
+                        output.put("outputRes", outputRes);
+                        sucMessage.setOutputs(output);
                         //资源自动更新
                         if(graphId != null && graphId != ""){
                             geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
@@ -582,6 +579,7 @@ public class CollaborationService {
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                         }else {
                             Map<String, String> outputs = jsonObject.getObject("urls", HashMap.class);
+                            ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                             for (Map.Entry item: outputs.entrySet()){
                                 String outputName = (String)item.getKey();
                                 if (!outputName.equals("undefined")){
@@ -603,18 +601,20 @@ public class CollaborationService {
                                     outputEntity.setActivityId(aid);
                                     outputEntity.setFolder(false);
                                     ripDao.addResource(outputEntity);
+                                    outputRes.add(outputEntity);
 
                                     String resTag = TagUtil.setResourceTag(outputEntity);
                                     resTagMap.put(uid ,resTag);
-
-                                    //Save it in the activity document todo
                                 }
                                 //资源自动更新
                                 if(graphId != null && graphId != ""){
                                     geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
                                 }
                             }
-                            computeMsg.setOutputs(outputs);
+                            JSONObject output = new JSONObject();
+                            output.put("outputInfo", outputs);
+                            output.put("outputRes", outputRes);
+                            computeMsg.setOutputs(output);
                             HashMap<String, CollaborationUser> oldParticipants = computeMsg.getReceivers();
                             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                             collaborationBehavior.sendComputeResult(participants, oldParticipants, computeMsg);

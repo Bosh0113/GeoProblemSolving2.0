@@ -395,6 +395,7 @@ export default {
           let url = content.inputs.url;
           let urlName = content.inputs.urlName;
           this.$set(this.stateList[stateIndex].Event[eventIndex], "url", url);
+          this.$set(this.stateList[stateIndex].Event[eventIndex], "uid", uid);
           this.$set(
             this.stateList[stateIndex].Event[eventIndex],
             "urlName",
@@ -439,9 +440,15 @@ export default {
 
     getSocketComputation: function (data) {
       if (data != undefined && data != null) {
-        let computeOutputs = data.computeOutputs;
+        let computeOutputs = data.outputInfo;
         if (computeOutputs !== "Fail") {
           this.getStateEventOut(data.computeOutputs);
+          //Array
+          let outputRes = data.outputRes;
+          //String
+          let operationId = data.operationId;
+
+
         } else {
           this.fullscreenLoading.close();
           this.$Notice.error({
@@ -536,6 +543,8 @@ export default {
             if (events[j].hasOwnProperty("url")) {
               detail["tag"] = events[j].name;
               detail["url"] = events[j].url;
+
+              detail["uid"] = events[j].uid;
               input.push(detail);
             } else {
               continue;
@@ -815,7 +824,12 @@ export default {
         "urlName",
         val.name
       );
-
+      //set input id
+      this.$set(
+        this.stateList[stateIndex].Event[eventIndex],
+        "uid",
+        val.uid
+      );
       this.selectDataDialogShow = false;
       //将stateIndex 与 eventIndex
       let content = {
@@ -823,6 +837,7 @@ export default {
         eventIndex: eventIndex,
         url: val.address,
         urlName: val.name,
+        uid: uid
       };
 
       selectDataOperation(content, "add");

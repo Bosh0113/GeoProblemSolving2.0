@@ -543,7 +543,7 @@ export default {
         let user = this.potentialMembers[index];
         inviteList.push(user.userId);
       }
-      
+
       let url = "";
       if (activity.level == 1) {
        url =
@@ -615,7 +615,7 @@ export default {
           .catch((err) => {
             throw err;
           });
-      
+
     },
     updateUserRole() {
       let member = this.slctRoleMember;

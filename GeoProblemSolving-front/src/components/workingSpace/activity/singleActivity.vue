@@ -7,7 +7,7 @@
         <Menu
           mode="horizontal"
           :active-name="activeMenu"
-          style="height: 45px; line-height: 45px; z-index: 1"
+          style="height: 38px; line-height: 38px; z-index: 1"
           @on-select="changeMenuItem"
         >
           <MenuItem name="Workspace">

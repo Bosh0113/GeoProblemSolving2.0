@@ -349,7 +349,12 @@ public class CollaborationBehavior {
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "computation");
-        messageObject.put("computeOutputs", computeResult.getOutputs());
+        JSONObject output = JSONObject.parseObject(JSONObject.toJSONString(computeResult.getOutputs()));
+        //模型运算输出
+        messageObject.put("outputInfo", output.get("outputInfo"));
+        //生成的资源
+        messageObject.put("outputRes", output.get("outputRes"));
+        messageObject.put("operationId", computeResult.getOid());
         for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
             for (int i = 0; i < oldReceiverStr.size(); i++) {
                 if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())) {

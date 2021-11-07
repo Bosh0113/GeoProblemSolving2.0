@@ -747,7 +747,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String fullName = res.getName();
             String name = fullName.split("\\.")[0];
             String suffix = fullName.split("\\.")[1];
-            res.setSuffix(suffix);
+            res.setSuffix("." + suffix);
             res.setUserUpload(false);
             res.setName(name);
         }

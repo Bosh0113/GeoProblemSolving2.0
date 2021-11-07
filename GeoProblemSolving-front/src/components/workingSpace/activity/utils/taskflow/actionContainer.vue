@@ -479,7 +479,7 @@ export default {
 #background2 {
   width: 100%;
   height: calc(100vh - 325px);
-  background-image: url("/static/Images/logogrey.png");
+  background-image: url("../../../../../../static/Images/logogrey.png");
   background-repeat: no-repeat;
   position: absolute;
   top: 100px;

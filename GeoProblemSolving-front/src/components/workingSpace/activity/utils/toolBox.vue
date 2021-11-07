@@ -95,7 +95,7 @@
                 v-if="tool.toolSet"
               >
                 <div
-                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  style="text-align: center; cursor: pointer"
                   @click="expandTool(tool)"
                 >
                   <Tooltip placement="bottom" max-width="400" :transfer="true">
@@ -145,7 +145,7 @@
                 class= "tool-content" v-else
               >
                 <div
-                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  style="text-align: center; cursor: pointer"
                   @click="useTool(tool)"
                 >
                   <Tooltip placement="bottom" max-width="400" :transfer="true">
@@ -341,7 +341,7 @@ export default {
     //       this.$Message.error("Loading project failed.")
     //     })
     // },
-    
+
     changeLoginModal(status) {
       this.tempLoginModal = status;
       console.log(status);

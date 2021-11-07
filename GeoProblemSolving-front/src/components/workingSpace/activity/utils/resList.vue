@@ -88,7 +88,7 @@
           style="margin-right: 7px"
           title="Share resources"
         ></Button>
-        
+
         <Button
           v-if="
             permissionIdentity(
@@ -132,7 +132,7 @@
           >
           </Button>
         </template>
-        
+
       </div>
       <div style="display: flex; justify-content: space-between">
         <div style="width: 100%">

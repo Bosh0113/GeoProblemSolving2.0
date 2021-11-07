@@ -17,7 +17,7 @@
             activityInfo.description
           }}</span>
         </div>
-      </div>     
+      </div>
       <Row
         type="flex"
         justify="space-around"

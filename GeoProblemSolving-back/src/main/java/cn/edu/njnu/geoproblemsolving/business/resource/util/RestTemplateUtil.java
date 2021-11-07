@@ -24,8 +24,7 @@ public class RestTemplateUtil {
     // @Autowired
     // RestTemplate restTemplate;
 
-    @Autowired
-    RestTemplate restTemplate;
+    RestTemplate restTemplate = new RestTemplate();
 
     @Value("${client_id}")
     String clientId;

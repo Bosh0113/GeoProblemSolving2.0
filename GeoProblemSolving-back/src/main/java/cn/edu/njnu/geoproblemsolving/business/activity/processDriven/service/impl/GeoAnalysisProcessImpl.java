@@ -15,7 +15,6 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityGraphR
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityLinkProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
@@ -68,10 +67,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Autowired
     NodeService nodeService;
-
-    @Autowired
-    DocInterpret docParse;
-
 
     @Value("${userServerLocation}")
     String userServer;
@@ -279,14 +274,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     HashMap<String, String> endNodeResourceTagMap = addResourceToNode(startId, keyNodeId, approvedRes);
                     keyNode.setResources(endNodeResourceTagMap);
                     nodeRepository.save(keyNode);
-
-                    //todo
-                    try {
-                        docParse.flowResourceUpload(startId, keyNodeId, approvedRes);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
                 }
                 break;
             case "Branch":
@@ -299,12 +286,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     endNode.setResources(endNodeResourceTagMap);
                     nodeRepository.save(endNode);
 
-                    //todo
-                    try {
-                        docParse.flowResourceUpload(keyNodeId, endNodeId, approvedRes);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
                 }
                 break;
             case "Loop":
@@ -316,14 +297,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     HashMap<String, String> endNodeResourceTag = addResourceToNode(startId, endNodeId, approvedResId);
                     endNode.setResources(endNodeResourceTag);
                     nodeRepository.save(endNode);
-
-                    //todo
-                    try {
-                        docParse.flowResourceUpload(startId, endNodeId, approvedResId);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
                 }
                 break;
             case "Sequence":
@@ -335,15 +308,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     ActivityNode endNode = nodeRepository.findById(endId).get();
                     endNode.setResources(endNodeResourceTag);
                     nodeRepository.save(endNode);
-
-
-                    //todo
-                    try {
-                        docParse.flowResourceUpload(startId, endId, flowApprove);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
                 }
                 break;
         }
@@ -419,14 +383,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 ActivityNode node = nodeRepository.findById(nextNodeId).get();
                 node.setResources(resTagMap);
                 nodeRepository.save(node);
-
-                //todo
-                try {
-                    docParse.flowResourceUpload(resNodeId, nextNodeId, resId);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
             }
         }
     }

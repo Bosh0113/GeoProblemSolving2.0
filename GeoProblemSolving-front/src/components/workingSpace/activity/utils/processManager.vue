@@ -204,7 +204,7 @@
                   'manage_child_activity'
                 )"
                style="margin-top: 20px;">
-            <strong>collaborating:</strong>
+            <strong>Collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"

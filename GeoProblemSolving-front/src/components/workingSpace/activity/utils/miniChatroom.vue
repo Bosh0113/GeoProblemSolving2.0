@@ -287,6 +287,7 @@ export default {
       getRecordsFinish: false,
       msgRecords: [],
       msgRecordDatails: [],
+      aid: "",
     };
   },
   computed: {
@@ -425,6 +426,7 @@ export default {
       }
     },
     startWebSocket() {
+      this.aid = this.activityInfo.aid;
       this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
       let send_msg = {
         type: "test",
@@ -527,6 +529,9 @@ export default {
       this.typingMsg = "";
     },
   },
+  beforeDestroy() {
+    this.socketApi.close("MsgServer/" + this.aid);
+  }
 };
 </script>
 <style scoped>
@@ -726,19 +731,19 @@ export default {
   width: 100%;
 }
 
-.topnav_box::-webkit-scrollbar {  
-  width: 5px;  
-  height:10px;     
+.topnav_box::-webkit-scrollbar {
+  width: 5px;
+  height:10px;
   background-color:transparent;
-}  
-.topnav_box::-webkit-scrollbar-track {
-  border-radius: 10px; 
-  background-color:transparent;    
-    
 }
-.topnav_box::-webkit-scrollbar-thumb {  
+.topnav_box::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color:transparent;
+
+}
+.topnav_box::-webkit-scrollbar-thumb {
   border-radius: 10px;
   height: 30px;
   background-color:#b5b1b1;
-} 
+}
 </style>

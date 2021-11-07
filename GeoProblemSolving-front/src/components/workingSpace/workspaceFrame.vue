@@ -53,7 +53,7 @@
       dis-hover
       class="workspaceCard"
       id="ActivityContent"
-      style="height: calc(100vh - 130px)"
+      style="height: calc(100vh - 120px)"
     >
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
@@ -1269,6 +1269,6 @@ export default {
 }
 
 .workspaceCard >>> .ivu-card-body {
-  padding: 0px 10px;
+  padding: 5px;
 }
 </style>
