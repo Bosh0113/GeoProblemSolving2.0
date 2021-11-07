@@ -1912,7 +1912,7 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              console.log(res.data.data);
+              // console.log(res.data.data);
               selectedRes = res.data.data;
               for (var j = 0; j < selectedRes.length; j++) {
                 selectedRes[j].key = mockData.length.toString();
@@ -1977,7 +1977,7 @@ export default {
             // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
-            console.log(res.data.data);
+            // console.log(res.data.data);
             this.inheritResModal = false;
             // this.getResList();
             let resList = res.data.data;

@@ -1065,7 +1065,6 @@ export default {
             this.$router.push({ name: "Login" });
           } else if (res.data.code == 0) {
             let tempTools = res.data.data;
-            console.log(res.data.data);
 
             for (let i = 0; i < tempTools.length; i++) {
               if (

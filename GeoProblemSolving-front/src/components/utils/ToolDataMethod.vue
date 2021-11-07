@@ -9,10 +9,7 @@
           :offset="1"
           v-if="dataService.hasOwnProperty('metaDetail')"
         >
-          <vue-scroll
-            :ops="scrollOps"
-            style="height: calc(100vh - 100px)"
-          >
+          <vue-scroll :ops="scrollOps" style="height: calc(100vh - 100px)">
             <el-divider
               direction="vertical"
               style="height: 1000px; float: left"
@@ -392,6 +389,20 @@ export default {
         }
       }
       runTool();
+
+      let operationId = guid();
+      this.operationApi.analysisRecord(
+        this.aid,
+        operationId,
+        "",
+        this.userInfo.userId,
+        this.toolInfo.tid,
+        "Data processing",
+        this.inputData,
+        [],
+        [],
+        onlineMembers
+      );
       sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList);
     },
     // webSocket 回调函数
@@ -408,6 +419,13 @@ export default {
         });
         this.$refs.invokeButton.$el.innerHTML = null;
         this.fullscreenLoading.close();
+
+        // record
+        this.operationApi.analysisRecordUpdate(
+          this.aid,
+          data.operationId,
+          data.outputRes
+        );
       } else {
         this.fullscreenLoading.close();
         this.$Notice.error({

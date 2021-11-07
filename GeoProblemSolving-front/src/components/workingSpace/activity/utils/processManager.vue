@@ -204,7 +204,7 @@
                   'manage_child_activity'
                 )"
                style="margin-top: 20px;">
-            <strong>collaborating:</strong>
+            <strong>Collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -258,8 +258,8 @@
       :mask= "false"
     >
       <div slot="footer">
-        <div style="display: inline-block; position: absolute; left: 30px">
-          <span style="margin-right:10px; font-size:14px; vertical-align:top;"  v-if="collLinkUser.length > 1">online collaborating members: </span>
+        <div style="display: flex; position: absolute; left: 30px">
+          <span style="margin-right:10px; font-size:14px; vertical-align:top;"  v-if="collLinkUser.length > 1">Online collaborating members: </span>
           <avatar-list
             :list="collLinkUser"
             v-if="collLinkUser.length > 1"

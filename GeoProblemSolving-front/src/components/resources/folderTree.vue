@@ -1045,7 +1045,6 @@ export default {
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             let rootRes = res.data.data;
-            console.log(res.data.data);
             this.resToCurrentFolder(rootRes);
             this.indeterminate = false;
             this.checkAll = false;
