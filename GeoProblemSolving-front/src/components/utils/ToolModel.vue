@@ -443,12 +443,8 @@ export default {
         let computeOutputs = data.outputInfo;
         if (computeOutputs !== "Fail") {
           this.getStateEventOut(data.computeOutputs);
-          //Array
-          let outputRes = data.outputRes;
-          //String
-          let operationId = data.operationId;
-
-
+          // record
+          this.operationApi.analysisRecordUpdate(this.aid, data.operationId, data.outputRes);
         } else {
           this.fullscreenLoading.close();
           this.$Notice.error({
@@ -553,7 +549,7 @@ export default {
             //参数
             let template = {};
             let outputTemplate = events[j].datasetItem;
-            console.log(outputTemplate);
+            // console.log(outputTemplate);
             //如果是external template["type"] = id,不然为空
             if (outputTemplate.type === "external") {
               template = {
@@ -585,6 +581,19 @@ export default {
       //传递开始运行信息
       runTool();
       //测试数据没有弄 直接运行 根据ip+id
+      let operationId = guid();
+      this.operationApi.analysisRecord(
+        this.aid,
+        operationId,
+        "",
+        this.userId,
+        this.toolInfo.tid,
+        "Geographical simulation",
+        this.invokeInfo.inputs,
+        [],
+        [],
+        onlineMembers
+      );
       sendModelOperation(
         this.aid,
         this.invokeInfo.serviceId,

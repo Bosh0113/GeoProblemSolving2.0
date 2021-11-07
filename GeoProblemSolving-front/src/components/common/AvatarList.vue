@@ -56,7 +56,7 @@
 
 <style scoped>
   .avatarList {
-    display: inline-block;
+    display: flex;
   }
   .avatar {
     margin-right: -12px;

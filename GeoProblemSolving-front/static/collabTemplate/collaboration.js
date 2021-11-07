@@ -379,7 +379,7 @@ var taskList = [];
         for (let i = 0; i < participants.length; i++) {
             let avatar = ""
             if (participants[i].avatar == undefined || participants[i].avatar == "") {
-                avatar = "/static/collabTemplate/img/icon_avatar.png";
+                avatar = "./static/collabTemplate/img/icon_avatar.png";
             } else {
                 avatar = UserServer + participants[i].avatar;
             }
@@ -471,7 +471,7 @@ var taskList = [];
     function addfolder(folder) {
         let resElement = `<div class="card resource" title="${folder.name}">
                             <input class="form-check-input" type="checkbox" id="${folder.uid}">
-                            <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
+                            <img src="./static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
                             <div class="folder-${folder.uid} res-name">${folder.name}</div>
                         </div>`
         $("#resource-list").append(resElement);
@@ -504,7 +504,7 @@ var taskList = [];
             case "data": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/data.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -512,7 +512,7 @@ var taskList = [];
             case "model": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/model.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -520,7 +520,7 @@ var taskList = [];
             case "paper": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/paper.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -528,7 +528,7 @@ var taskList = [];
             case "document": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/document.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -536,7 +536,7 @@ var taskList = [];
             case "image": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/image.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -544,7 +544,7 @@ var taskList = [];
             case "video": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/video.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -552,7 +552,7 @@ var taskList = [];
             case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
                     <input class="form-check-input" type="checkbox" id="${file.uid}">
-                        <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                        <img src="./static/collabTemplate/img/otherfile.png" class="res-icon" />
                         <div class="res-name">${fileName}</div>
                         </>`
                 break;

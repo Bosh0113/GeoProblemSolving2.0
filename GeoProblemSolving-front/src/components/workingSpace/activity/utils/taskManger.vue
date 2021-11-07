@@ -808,14 +808,14 @@
             <Col span="8">
               <RadioGroup v-model="formValidate.type">
                 <Radio label="simple">Simple task</Radio>
-                <Radio
+                <!-- <Radio
                   label="activity"
                   style="margin-left: 20px"
                   v-show="
                     childActivities != undefined && childActivities.length > 0
                   "
                   >Activity task</Radio
-                >
+                > -->
               </RadioGroup></Col
             >
             <Col span="13" v-show="formValidate.type == 'activity'">
