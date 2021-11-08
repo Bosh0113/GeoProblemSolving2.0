@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.67 - 2021-07-06
+ * kityminder-editor - v1.0.67 - 2021-11-04
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2021 ; Licensed 
@@ -3782,7 +3782,7 @@ angular.module('kityminderEditor')
                                                 if (data.code == 0) {
                                                     var thumbnailPath = data.data;
 
-                                                    resaveResource(fileBlob, {uid: map.uid, thumbnail: thumbnailPath });
+                                                    resaveResource(fileBlob, { thumbnail: thumbnailPath });
 
                                                     // 初始化原始导图
                                                     originalMap = JSON.stringify(editor.minder.exportJson());
@@ -4201,11 +4201,13 @@ angular.module('kityminderEditor')
 						// }
 
 						/*** for collaboration * start ***/
-						function getSocketConnect(data) {
+
+						buildSocketChannel(getSocketOperation, null, null);
+						function getSocketOperation(data) {
 
 							if (data != {}) {
-								if (data.messageType == "operation" && data.event == "contentchange") {
-									var mindmap = JSON.parse(data.value);
+								if (data.type == "operation" && data.behavior == "contentchange") {
+									var mindmap = JSON.parse(data.content);
 									editor.minder.importJson(mindmap);
 									window.localStorage.__dev_minder_content = JSON.stringify(editor.minder.exportJson());
 								}
