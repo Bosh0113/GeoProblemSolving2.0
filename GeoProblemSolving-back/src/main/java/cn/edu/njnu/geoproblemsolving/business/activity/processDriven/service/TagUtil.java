@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * @ClassName TagUtil
@@ -15,12 +16,23 @@ import java.util.HashSet;
  **/
 public class TagUtil {
     public static HashMap<String, String> recoveryResTag(String tagStr){
-        HashMap<String, String> resTagMap = new HashMap<>();
+        HashMap<String, String> resInfo = new HashMap<>();
         String[] tagArray = tagStr.split("O517");
-        //type and suffix 只能有一种
-        resTagMap.put("type", tagArray[0]);
-        resTagMap.put("suffix", tagArray[1]);
-        return resTagMap;
+        String type = tagArray[0];
+        resInfo.put("type", type);
+        if (type.equals("data")) {
+            String format = tagArray[1];
+            if (!format.equals("")) resInfo.put("format", format);
+            String scale = tagArray[2];
+            if (!scale.equals("")) resInfo.put("scale", scale);
+            String reference = tagArray[3];
+            if (!reference.equals("")) resInfo.put("reference", reference);
+            String unit = tagArray[4];
+            if (!unit.equals("")) resInfo.put("unit", unit);
+            String concept = tagArray[5];
+            if (!concept.equals("")) resInfo.put("concept", concept);
+        }
+        return resInfo;
     }
 
     public static HashMap<String, HashSet<String>> recoveryUserTag(String tagStr){
@@ -56,8 +68,42 @@ public class TagUtil {
 
     public static String setResourceTag(HashMap<String,String> res){
         String type = res.get("type");
-        String suffix = res.get("suffix");
-        return addFlagInTags(type, suffix);
+        return addFlagInTags(type);
+    }
+
+    public static String setResTag(HashMap<String, String> resInfo){
+        String type = resInfo.get("type");
+        if (!type.equals("data")){
+            return addFlagInTags(type);
+        }else {
+            String format = "";
+            String scale = "";
+            String reference = "";
+            String unit = "";
+            String concept = "";
+            for (Map.Entry<String, String> item : resInfo.entrySet()){
+                String key = item.getKey();
+                String value = item.getValue();
+                switch (key){
+                    case "format":
+                        format = value;
+                        break;
+                    case "scale":
+                        scale = value;
+                        break;
+                    case "reference":
+                        reference = value;
+                        break;
+                    case "unit":
+                        unit = value;
+                        break;
+                    case "concept":
+                        concept = value;
+                        break;
+                }
+            }
+            return addFlagInTags(type, format, scale, reference, unit, concept);
+        }
     }
 
     public static String setUserTag(String role, JSONArray domainArray, JSONArray orgArray){
@@ -103,6 +149,18 @@ public class TagUtil {
 
     public static String array2String(JSONArray array){
         return jsonArrayToString("#", array);
+    }
+
+    public static String changeSeparator(String str){
+        String[] split = str.split(",");
+        if (split.length == 1){
+            return str;
+        }
+        JSONArray jsonArray = new JSONArray();
+        for (String item : split){
+            jsonArray.add(item);
+        }
+        return array2String(jsonArray);
     }
 
     /**

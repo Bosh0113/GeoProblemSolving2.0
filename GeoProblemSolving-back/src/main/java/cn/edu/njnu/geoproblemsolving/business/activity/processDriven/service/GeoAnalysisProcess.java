@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityGraph;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityLinkProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.LinkRestriction;
+import org.dom4j.DocumentException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public interface GeoAnalysisProcess {
      * @param graphId 根活动的 aid
      * @return
      */
-    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol, Integer level);
+    ActivityLinkProtocol setLinkProtocol(String graphId, ActivityLinkProtocol linkProtocol, Integer level) throws DocumentException;
 
     HashMap<String, HashMap<String, LinkRestriction>> deleteEdge(String graphId, String startId, String endId);
 
@@ -25,9 +26,13 @@ public interface GeoAnalysisProcess {
     String checkUserIsApprovedService(String graphId, String nodeId, String userId);
 
     //要不要用AOP方式切入到上传资源的函数中去
-    void resFlowAutoUpdate(String graphId, String nodeId, String uid);
+    void resFlowAutoUpdate(String graphId, String nodeId, String uid) throws DocumentException;
 
     void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag);
+
+    void batchResFlowAutoUpdate(String graphId, String nodeId, HashSet<String> uids);
+
+    void batchResFlowAutoUpdate(String graphId, String nodeId, String uid);
 
     void updateGraphByProtocol(String rootId, ActivityLinkProtocol protocol);
 

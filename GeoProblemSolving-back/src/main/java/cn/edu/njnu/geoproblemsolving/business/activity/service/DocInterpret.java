@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityDocRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
@@ -22,6 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import sun.awt.image.GifImageDecoder;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -52,6 +54,9 @@ public class DocInterpret implements ActivityDocParser {
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    NodeService nodeService;
+
     @Value("${userServerLocation}")
     String userServer;
 
@@ -62,13 +67,17 @@ public class DocInterpret implements ActivityDocParser {
     private Document activityDocXml;
     private ActivityDoc operatingDoc;
 
-    private void loadXML(String aid) throws DocumentException {
+    private void loadXML(String aid) {
         Optional<ActivityDoc> byId = docRepository.findById(aid);
         if (!byId.isPresent()) {
             return;
         }
         operatingDoc = byId.get();
-        activityDocXml = DocumentHelper.parseText(operatingDoc.getDocument());
+        try {
+            activityDocXml = DocumentHelper.parseText(operatingDoc.getDocument());
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveXML() {
@@ -77,7 +86,7 @@ public class DocInterpret implements ActivityDocParser {
         docRepository.save(operatingDoc);
     }
 
-    private void syncGlobalVariables(String aid) throws DocumentException {
+    private void syncGlobalVariables(String aid) {
         if (operatingDoc == null || !operatingDoc.getAid().equals(aid)) {
             if (operatingDoc != null) saveXML();
             loadXML(aid);
@@ -213,7 +222,7 @@ public class DocInterpret implements ActivityDocParser {
         1. Participants related operations
      */
     @Override
-    public Object inActivity(String aid, HashMap<String, String> userInfo) throws DocumentException {
+    public Object inActivity(String aid, HashMap<String, String> userInfo) {
         syncGlobalVariables(aid);
         if (activityDocXml == null) return null;
         Element participantsEle = (Element) activityDocXml.selectNodes("/Activity/Participants").get(0);
@@ -259,10 +268,10 @@ public class DocInterpret implements ActivityDocParser {
     String clientSecret;
 
     public Object insActivity(String aid, HashSet<String> userIds) throws DocumentException {
-        for (String userId : userIds){
+        for (String userId : userIds) {
             String reqUrl = "http://" + userServer + "/user/" + userId + "/" + userId + "/" + clientId + "/" + clientSecret;
             JSONObject response = restTemplate.getForObject(reqUrl, JSONObject.class);
-            if (response.getInteger("code") == 0){
+            if (response.getInteger("code") == 0) {
                 UserEntity user = response.getObject("data", UserEntity.class);
                 inActivity(aid, user);
             }
@@ -285,7 +294,7 @@ public class DocInterpret implements ActivityDocParser {
         if (domain != null) {
             for (String item : domain) {
                 Element domainEle = personEle.addElement("Domain");
-                domainEle.addAttribute("description",  item);
+                domainEle.addAttribute("description", item);
             }
         }
         ArrayList<String> organization = user.getOrganizations();
@@ -324,7 +333,7 @@ public class DocInterpret implements ActivityDocParser {
      */
 
     @Override
-    public Object uploadResource(String aid, HashMap<String, String> resInfo) throws DocumentException {
+    public Object uploadResource(String aid, HashMap<String, String> resInfo) {
         syncGlobalVariables(aid);
         if (activityDocXml == null) return null;
         Element resourceCollectionNode = (Element) activityDocXml.selectNodes("/Activity/ResourceCollection").get(0);
@@ -339,7 +348,7 @@ public class DocInterpret implements ActivityDocParser {
     }
 
     @Override
-    public Object uploadResource(String aid, ResourceEntity res) throws DocumentException {
+    public Object uploadResource(String aid, ResourceEntity res) {
         syncGlobalVariables(aid);
         if (activityDocXml == null) return null;
         Element resourceCollectionNode = (Element) activityDocXml.selectNodes("/Activity/ResourceCollection").get(0);
@@ -355,15 +364,16 @@ public class DocInterpret implements ActivityDocParser {
 
     @Autowired
     ActivityResServiceImpl ripServer;
+
     //Store the flow resource in the document.
     public Object flowResourceUpload(String fromAid, String endAid, HashSet<String> uids) throws DocumentException {
         if (uids == null || uids.size() == 0) return null;
         syncGlobalVariables(endAid);
         ActivityDoc activityDoc = docRepository.findById(fromAid).get();
         Document fromDocXML = DocumentHelper.parseText(activityDoc.getDocument());
-        Element resCollectionEle = (Element)activityDocXml.selectNodes("/Activity/ResourceCollection").get(0);
-        for (String uid : uids){
-            Element resEle = (Element)fromDocXML.selectNodes("/Activity/ResourceCollection//Resource[@id = uid]").get(0);
+        Element resCollectionEle = (Element) activityDocXml.selectNodes("/Activity/ResourceCollection").get(0);
+        for (String uid : uids) {
+            Element resEle = (Element) fromDocXML.selectNodes("/Activity/ResourceCollection//Resource[@id = uid]").get(0);
             resCollectionEle.add(resEle);
         }
         return null;
@@ -377,7 +387,7 @@ public class DocInterpret implements ActivityDocParser {
     }
 
 
-        @Override
+    @Override
     public Object putRes(String aid, HashMap<String, String> putInfo) {
         return null;
     }
@@ -387,6 +397,76 @@ public class DocInterpret implements ActivityDocParser {
         return null;
     }
 
+    @Override
+    public ArrayList<HashMap<String, String>> getResInfo(String aid, HashSet<String> uids) {
+        syncGlobalVariables(aid);
+        Element activityEle = activityDocXml.getRootElement();
+        ArrayList<HashMap<String, String>> resInfoList = new ArrayList<>();
+        for (Iterator<String> it = uids.iterator(); it.hasNext(); ) {
+            String uid = it.next();
+            Element resourceEle = (Element) activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'uid']");
+            if (resourceEle == null) continue;
+            String type = resourceEle.attributeValue("type");
+            HashMap<String, String> resInfoMap = new HashMap<>();
+            resInfoMap.put("uid", uid);
+            resInfoMap.put("type", type);
+            if (!type.equals("data")) {
+                resInfoList.add(resInfoMap);
+                continue;
+            } else {
+                for (Iterator<Element> mIt = resourceEle.elementIterator("Metadata"); mIt.hasNext(); ) {
+                    Element metaEle = mIt.next();
+                    resInfoMap.put(metaEle.attributeValue("type"), metaEle.attributeValue("description"));
+                }
+                resInfoList.add(resInfoMap);
+            }
+        }
+        return resInfoList;
+    }
+
+    @Override
+    public HashMap<String, String> getResInfo(String aid, String uid) {
+        syncGlobalVariables(aid);
+        Element activityEle = activityDocXml.getRootElement();
+        Element resourceEle = (Element) activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'uid']");
+        if (resourceEle == null) return null;
+        HashMap<String, String> resInfoMap = new HashMap<>();
+        String type = resourceEle.attributeValue("type");
+        resInfoMap.put("uid", uid);
+        resInfoMap.put("type", type);
+        if (type.equals("data")) {
+            for (Iterator<Element> mIt = resourceEle.elementIterator("Metadata"); mIt.hasNext(); ) {
+                Element metaEle = mIt.next();
+                resInfoMap.put(metaEle.attributeValue("type"), metaEle.attributeValue("description"));
+            }
+        }
+        return resInfoMap;
+    }
+
+    @Override
+    public ArrayList<HashMap<String, String>> getAllResInfo(String aid) {
+        syncGlobalVariables(aid);
+        ArrayList<HashMap<String, String>> resInfoList = new ArrayList<>();
+        Element activityEle = activityDocXml.getRootElement();
+        for (Iterator<Element> resIt = activityEle.elementIterator("Resource"); resIt.hasNext(); ) {
+            Element resEle = resIt.next();
+            HashMap<String, String> resInfo = new HashMap<>();
+            String uid = resEle.attributeValue("id");
+            String type = resEle.attributeValue("type");
+            resInfo.put("uid", uid);
+            resInfo.put("type", type);
+            if (!type.equals("data")) {
+                continue;
+            } else {
+                for (Iterator<Element> mIt = resEle.elementIterator("Metadata"); mIt.hasNext(); ) {
+                    Element metaEle = mIt.next();
+                    resInfo.put(metaEle.attributeValue("type"), metaEle.attributeValue("description"));
+                }
+                resInfoList.add(resInfo);
+            }
+        }
+        return resInfoList;
+    }
 
     //========================Multi activity operation===================================================
     /*
@@ -428,9 +508,6 @@ public class DocInterpret implements ActivityDocParser {
      */
 
 
-
-
-
     //Mapping method
     public Object activity2WorkflowTemplate(String rootAid) throws DocumentException {
         syncGlobalVariables(rootAid);
@@ -444,30 +521,30 @@ public class DocInterpret implements ActivityDocParser {
         Element participantsEle = workflowEle.addElement("Participants");
         Element toolBoxEle = workflowEle.addElement("ToolBox");
 
-        if (type.equals(ActivityType.Activity_Unit)){
+        if (type.equals(ActivityType.Activity_Unit)) {
             List<Node> geoAnalysisNodes = activityEle.selectNodes("/OperationRecords//Operation[@type = geo-analysis]");
-            for (int i = 0; i < geoAnalysisNodes.size(); i++){
-                Element gaNode = (Element)geoAnalysisNodes.get(i);
+            for (int i = 0; i < geoAnalysisNodes.size(); i++) {
+                Element gaNode = (Element) geoAnalysisNodes.get(i);
                 String toolId = gaNode.attributeValue("toolRef");
-                Element toolEle =  (Element)activityEle.selectSingleNode("/ToolBox/Tool[@id = toolId]");
+                Element toolEle = (Element) activityEle.selectSingleNode("/ToolBox/Tool[@id = toolId]");
                 toolBoxEle.add(toolEle);
                 List<Node> modelRelationNode = gaNode.selectNodes("/ResRef[@tyep != param]");
-                for (int j = 0; j < modelRelationNode.size(); j++){
-                    Element inoutNode =  (Element)modelRelationNode.get(i);
+                for (int j = 0; j < modelRelationNode.size(); j++) {
+                    Element inoutNode = (Element) modelRelationNode.get(i);
                     String resId = inoutNode.attributeValue("idRef");
-                    Element resEle =  (Element)activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'resId']");
+                    Element resEle = (Element) activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'resId']");
                     resourceCollectionEle.add(resEle);
                 }
                 List<Node> personNodes = gaNode.selectNodes("/PersonRef");
-                for (int k = 0; k < personNodes.size(); k++){
-                    Element modelPersonEle =  (Element)personNodes.get(i);
+                for (int k = 0; k < personNodes.size(); k++) {
+                    Element modelPersonEle = (Element) personNodes.get(i);
                     String personId = modelPersonEle.attributeValue("idRef");
-                    Element personEle =  (Element)activityEle.selectSingleNode("/Participants/Person[@id = 'personId']");
+                    Element personEle = (Element) activityEle.selectSingleNode("/Participants/Person[@id = 'personId']");
                     participantsEle.add(personEle);
                 }
             }
         }
-        if (type.equals(ActivityType.Activity_Group)){
+        if (type.equals(ActivityType.Activity_Group)) {
             List<Node> childNodes = activityEle.selectNodes("/ChildActivities/Child");
         }
         return null;
@@ -515,5 +592,248 @@ public class DocInterpret implements ActivityDocParser {
     //     }
     // }
 
+    // @Override
+    // public Object geoAnalysis(String aid, String toolId, ArrayList<ResourceEntity> inRes, ArrayList<String> inParams, ArrayList<ResourceEntity> outRes) {
+    //     syncGlobalVariables(aid);
+    //     if (operatingDoc == null) return null;
+    //     Element activityEle = activityDocXml.getRootElement();
+    //     Element operationREle = (Element) activityEle.selectSingleNode("/OperationRecords");
+    //     operationREle.addElement("Operation");
+    //     operationREle.addAttribute("id", UUID.randomUUID().toString());
+    //     operationREle.addAttribute("type", "geo-analysis");
+    //     operationREle.addAttribute("toolRef", toolId);
+    //     operationREle.addAttribute("toolRef", toolId);
+    //
+    //     return null;
+    // }
 
+
+    @Override
+    public Object geoAnalysis(String aid, ArrayList<ResourceEntity> inRes, ArrayList<String> inParams, ArrayList<ResourceEntity> outRes) {
+        return null;
+    }
+
+    @Override
+    public Object setGeoAnalysisOutPuts(String aid, String oid, ArrayList<String> output) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element operationEle = (Element) activityEle.selectSingleNode("/OperationRecords/Operation[@id = 'oid']");
+        for (String item : output) {
+            Element resRefEle = operationEle.addElement("ResRef");
+            resRefEle.addAttribute("type", "output");
+            resRefEle.addAttribute("idRef", item);
+        }
+        return null;
+    }
+
+    @Override
+    public Object geoAnalysisNoInput(String aid, String toolId, HashSet<String> onlineMemberIds, String purpose, ResourceEntity output) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+
+        //存入 output
+        Element resCollectionEle = (Element) activityEle.selectSingleNode("/ResourceCollection");
+        Element resourceEle = resCollectionEle.addElement("Resource");
+        resourceEle.addAttribute("id", output.getUid());
+        resourceEle.addAttribute("name", output.getName());
+        resourceEle.addAttribute("href", output.getAddress());
+        resourceEle.addAttribute("state", "accessible");
+
+
+        //添加  operation
+        Element operationRecordEle = (Element) activityEle.selectSingleNode("/OperationRecords");
+        Element operationEle = operationRecordEle.addElement("Operation");
+        operationEle.addAttribute("id", UUID.randomUUID().toString());
+        operationEle.addAttribute("type", "geo-analysis");
+        operationEle.addAttribute("behavior", "flow");
+        operationEle.addAttribute("toolRef", toolId);
+        operationEle.addAttribute("toolRef", purpose);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+
+        Element outputRefEle = operationEle.addElement("ResRef");
+        outputRefEle.addAttribute("type", "output");
+        outputRefEle.addAttribute("idRef", output.getUid());
+
+        for (String userId : onlineMemberIds){
+            Element personRefEle = operationEle.addElement("PersonRef");
+            personRefEle.addAttribute("type", "participant");
+            personRefEle.addAttribute("idRef", userId);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object geoAnalysis(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity input, ResourceEntity output) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element operationRecordEle = (Element) activityEle.selectSingleNode("/OperationRecords");
+
+        //存入 output
+        Element resCollectionEle = (Element) activityEle.selectSingleNode("/ResourceCollection");
+        Element resourceEle = resCollectionEle.addElement("Resource");
+        resourceEle.addAttribute("id", output.getUid());
+        resourceEle.addAttribute("name", output.getName());
+        resourceEle.addAttribute("href", output.getAddress());
+        resourceEle.addAttribute("state", "accessible");
+
+        //判断输入是否在文档中
+        String inUid = input.getUid();
+        Node node = resCollectionEle.selectSingleNode("/Resource[@id = 'inUid']");
+        if (node == null){
+            //将input 存入
+            Element inResEle = resCollectionEle.addElement("Resource");
+            resourceEle.addAttribute("id", input.getUid());
+            resourceEle.addAttribute("name", input.getName());
+            resourceEle.addAttribute("href", input.getAddress());
+            resourceEle.addAttribute("state", "accessible");
+            //可能会有多线程的问题
+            nodeService.addResToNode(aid, input.getUid());
+
+            Element operationEle = operationRecordEle.addElement("Operation");
+            operationEle.addAttribute("id", UUID.randomUUID().toString());
+            operationEle.addAttribute("type", "resource");
+            operationEle.addAttribute("behavior", "upload");
+            operationEle.addAttribute("resRef", input.getUid());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+        }
+
+        //添加  operation
+        Element operationEle = operationRecordEle.addElement("Operation");
+        operationEle.addAttribute("id", UUID.randomUUID().toString());
+        operationEle.addAttribute("type", "geo-analysis");
+        operationEle.addAttribute("behavior", "flow");
+        operationEle.addAttribute("toolRef", toolId);
+        operationEle.addAttribute("toolRef", purpose);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+
+        Element inResRefEle = operationEle.addElement("ResRef");
+        inResRefEle.addAttribute("type", "input");
+        inResRefEle.addAttribute("idRef", inUid);
+        Element outputRefEle = operationEle.addElement("ResRef");
+        outputRefEle.addAttribute("type", "output");
+        outputRefEle.addAttribute("idRef", output.getUid());
+
+        for (String userId : onlineMemberIds){
+            Element personRefEle = operationEle.addElement("PersonRef");
+            personRefEle.addAttribute("type", "participant");
+            personRefEle.addAttribute("idRef", userId);
+        }
+
+
+
+        return null;
+    }
+
+    @Override
+    public Object setGeoAnalysisOutPut(String aid, String oid, String uid) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element operationEle = (Element) activityEle.selectSingleNode("/OperationRecords/Operation[@id = 'oid']");
+        Element resRefEle = operationEle.addElement("ResRef");
+        resRefEle.addAttribute("type", "output");
+        resRefEle.addAttribute("idRef", uid);
+        return null;
+    }
+
+    //=========================================
+
+
+    @Override
+    public Object resFlow(String aid, HashMap<String, String> resInfo) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element operationRecordEle = (Element) activityEle.selectSingleNode("/OperationRecords");
+        Element operationEle = operationRecordEle.addElement("Operation");
+        operationEle.addAttribute("id", UUID.randomUUID().toString());
+        operationEle.addAttribute("type", "resource");
+        operationEle.addAttribute("behavior", "flow");
+        operationEle.addAttribute("resRef", resInfo.get("uid"));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+
+        //更新资源
+        Element resCollectionEle = (Element) activityEle.selectSingleNode("/ResourceCollection");
+        Element resourceEle = resCollectionEle.addElement("Resource");
+        resourceEle.addAttribute("id", resInfo.get("uid"));
+        resourceEle.addAttribute("name", resInfo.get("name"));
+        resourceEle.addAttribute("href", resInfo.get("address"));
+        resourceEle.addAttribute("state", "accessible");
+        return null;
+    }
+
+    public Object resFlow(String aid, ArrayList<HashMap<String, String>> resInfoList) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element operationRecordEle = (Element) activityEle.selectSingleNode("/OperationRecords");
+        Element resCollectionEle = (Element) activityEle.selectSingleNode("/ResourceCollection");
+
+        for (HashMap<String, String> resInfo : resInfoList) {
+            Element operationEle = operationRecordEle.addElement("Operation");
+            operationEle.addAttribute("id", UUID.randomUUID().toString());
+            operationEle.addAttribute("type", "resource");
+            operationEle.addAttribute("behavior", "flow");
+            operationEle.addAttribute("resRef", resInfo.get("uid"));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+
+            Element resourceEle = resCollectionEle.addElement("Resource");
+            resourceEle.addAttribute("id", resInfo.get("uid"));
+            resourceEle.addAttribute("name", resInfo.get("name"));
+            resourceEle.addAttribute("href", resInfo.get("address"));
+            resourceEle.addAttribute("state", "accessible");
+        }
+        return null;
+    }
+
+    @Override
+    public HashMap<String, String> resFlow(String formId, String endId, String uid) {
+        syncGlobalVariables(formId);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        Element resourceEle = (Element) activityEle.selectSingleNode("/ResourceCollection/Resource[@id = 'uid']");
+        if (resourceEle == null) return null;
+        HashMap<String, String> resInfo = new HashMap<>();
+        resInfo.put("uid", uid);
+        resInfo.put("type", resourceEle.attributeValue("type"));
+        if (resourceEle.attributeValue("type").equals("data")) {
+            for (Iterator<Element> it = resourceEle.elementIterator(); it.hasNext(); ) {
+                Element metaEle = it.next();
+                resInfo.put(metaEle.attributeValue("type"), metaEle.attributeValue("description"));
+            }
+        }
+
+        Optional<ActivityDoc> byId = docRepository.findById(endId);
+        if (!byId.isPresent()) return null;
+        ActivityDoc activityDoc = byId.get();
+        try {
+            Document endActivityDocXml = DocumentHelper.parseText(activityDoc.getDocument());
+            Element endActivityEle = endActivityDocXml.getRootElement();
+            endActivityEle.add(resourceEle);
+
+            //operation
+            Element operationRecordEle = (Element) activityEle.selectSingleNode("/OperationRecords");
+            Element operationEle = operationRecordEle.addElement("Operation");
+            operationEle.addAttribute("id", UUID.randomUUID().toString());
+            operationEle.addAttribute("type", "resource");
+            operationEle.addAttribute("behavior", "flow");
+            operationEle.addAttribute("resRef", uid);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+
+        return resInfo;
+    }
 }

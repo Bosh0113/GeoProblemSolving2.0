@@ -3,7 +3,9 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import org.dom4j.DocumentException;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -35,7 +37,7 @@ public interface ActivityDocParser {
      */
     //domain & organization,do not read from the node
     //the more the number of reads and writes, the easier it is to cause out of synchronization.
-    Object inActivity(String aid, HashMap<String, String> userInfo) throws DocumentException;
+    Object inActivity(String aid, HashMap<String, String> userInfo);
 
     //Generate domain and organization form user server.
     Object outActivity(String aid, String userId);
@@ -45,16 +47,25 @@ public interface ActivityDocParser {
     Object userDomainPut(String aid, String userId, HashSet<String> domains);
 
     Object userOrganizationPut(String aid, String userId, HashSet<String> organizations);
+
     /*
         2.Resources related operations
      */
-    Object uploadResource(String aid, HashMap<String, String> resInfo) throws DocumentException;
+    Object uploadResource(String aid, HashMap<String, String> resInfo);
 
-    Object uploadResource(String aid, ResourceEntity res) throws DocumentException;
+    Object resFlow(String aid, HashMap<String, String> resInfo);
+
+    Object uploadResource(String aid, ResourceEntity res);
 
     Object putRes(String aid, HashMap<String, String> putInfo);
 
     Object removeRes(String aid, String rid);
+
+    ArrayList<HashMap<String, String>> getResInfo(String aid, HashSet<String> uids);
+
+    HashMap<String, String> getResInfo(String aid, String uid);
+
+    ArrayList<HashMap<String, String>> getAllResInfo(String aid);
 
     //========================Multi activity operation===================================================
     /*
@@ -87,10 +98,21 @@ public interface ActivityDocParser {
     /*
         3.Operation records, remain geo-analysis.
      */
+    Object geoAnalysis(String aid, ArrayList<ResourceEntity> inRes, ArrayList<String> inParams, ArrayList<ResourceEntity> outRes);
+
+    Object setGeoAnalysisOutPuts(String aid, String oid, ArrayList<String> output);
+
+    Object geoAnalysisNoInput(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity output);
+
+
+    //for RL90
+    Object geoAnalysis(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity input, ResourceEntity output);
 
 
 
 
+
+        Object setGeoAnalysisOutPut(String aid, String oid, String uid);
     //service
-
+    HashMap<String, String> resFlow(String formId, String endId, String uid);
 }

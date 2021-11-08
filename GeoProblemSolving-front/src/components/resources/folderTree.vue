@@ -1420,6 +1420,18 @@ export default {
                       },
                     });
                   }
+                  if (uploadedList.length > 0){
+                    let sucFileName = uploadedList.map((item)=>{
+                      return item.name + item.suffix;
+                    });
+                    this.$Notice.success({
+                      title: "Upload result",
+                      desc: "Upload successfully",
+                      render: (h) =>{
+                        return h("span", sucFileName.join("; "));
+                      }
+                    });
+                  }
                 } else {
                   this.$Message.warning("Upload fail.");
                 }

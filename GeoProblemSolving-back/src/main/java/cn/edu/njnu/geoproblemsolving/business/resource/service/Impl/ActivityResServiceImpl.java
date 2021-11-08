@@ -148,6 +148,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             HashMap<String, String> resTagMap = new HashMap<>();
+            HashSet<String> uploadUids = new HashSet<>();
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
@@ -217,8 +218,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             uploadInfos.uploaded.add(res);
                             //======活动链接相关操作======================================
                             //资源自动更新内容, public can auto update
-                            String resTag = TagUtil.setResourceTag(res);
-                            resTagMap.put(uid, resTag);
+                            if (nodeService.nodeIsPresent(aid) != null){
+                                uploadUids.add(uid);
+                            }
                             //===================================================
                             //如果不是最后一个，则进入下一次循环
                             if (fileNum != 0) {
@@ -258,15 +260,14 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
-            //更新节点
-            nodeService.addResToNodeBatch(aid, resTagMap);
+            //更新当前节点
+            nodeService.addResToNodeBatch(aid, uploadUids);
             /*
             资源自动更新
-            todo 操作活动文档（需要的信息：aid、resourceEntity）
              */
             String graphId = req.getParameter("graphId");
             //update
-            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uploadUids);
 
             return uploadInfos;
 

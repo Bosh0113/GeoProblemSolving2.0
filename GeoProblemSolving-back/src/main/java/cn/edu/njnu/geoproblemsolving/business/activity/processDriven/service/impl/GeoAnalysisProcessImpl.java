@@ -15,6 +15,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityGraphR
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityLinkProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
@@ -22,12 +23,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import org.aspectj.lang.annotation.Aspect;
+import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.html.parser.DocumentParser;
 import java.util.*;
 
 /**
@@ -67,6 +70,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Autowired
     NodeService nodeService;
+
+    @Autowired
+    ActivityDocParser docParser;
 
     @Value("${userServerLocation}")
     String userServer;
@@ -111,7 +117,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return 参数很多 restFul 风格是 hold 不住的
      */
     @Override
-    public ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol, Integer level) {
+    public ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol, Integer level) throws DocumentException {
         String type = linkProtocol.getType();
         ArrayList<String> nodeIdList = linkProtocol.getNodes();
         LinkRestriction linkRestriction = linkProtocol.getRestriction();
@@ -151,7 +157,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param linkRestriction
      * @return
      */
-    private HashMap<String, HashMap<String, LinkRestriction>> setProtocolByRelation(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction, Integer level) {
+    private HashMap<String, HashMap<String, LinkRestriction>> setProtocolByRelation(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction, Integer level) throws DocumentException {
         //取出第一个节点（关键节点，在排序规则中第一个会汇聚点，分散点，起点）
         String keyNodeId = nodeIdList.get(0);
         //判断协议中节点是否存在，若不存在则新建
@@ -325,7 +331,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param nodeIdList 关系类型
      * @return
      */
-    private void resFlowInLowerNode(String graphId, ArrayList<String> nodeIdList) {
+    private void resFlowInLowerNode(String graphId, ArrayList<String> nodeIdList) throws DocumentException {
         for (String nodeId : nodeIdList) {
             //获取节点所有下层路径 todo 优化点：关系内存在下层关系的，会导致有很多无用路径
             Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
@@ -361,7 +367,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param resNodeId   资源流出的节点，用于获取资源字段
      * @param resFlowNode 由路径生成的每个资源可以流动到的节点
      */
-    private void resFlow(String resNodeId, HashMap<String, HashSet<String>> resFlowNode) {
+    private void resFlow(String resNodeId, HashMap<String, HashSet<String>> resFlowNode){
         for (Map.Entry<String, HashSet<String>> item : resFlowNode.entrySet()) {
             /*
             1. 拿到资源字段
@@ -378,11 +384,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             while (iterator.hasNext()) {
                 String nextNodeId = iterator.next();
                 //将资源添加到对应的活动中，并返回节点的资源标签
-                HashMap<String, String> resTagMap = addResource(resNodeId, nextNodeId, resId);
-                //将标签更新到节点中 todo 完成迁移到NodeServer 暂时还是使用老的
-                ActivityNode node = nodeRepository.findById(nextNodeId).get();
-                node.setResources(resTagMap);
-                nodeRepository.save(node);
+                addResource(resNodeId, nextNodeId, resId);
             }
         }
     }
@@ -544,7 +546,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         if (activityResource.size() == 0 || resProtocol.toString().equals("None")) return new HashSet<>();
         if (resProtocol.toString().equals("All"))
             return JSONObject.parseObject(JSONObject.toJSONString(activityResource.keySet()), HashSet.class);
-        // TODO: 2021/8/13 资源验证部分内容代码 等确定下来再增加
+        //Constrains 部分代码
         HashSet<String> types = linkRestriction.getTypes();
         HashSet<String> approvedResIdList = new HashSet<>();
         for (Map.Entry<String, String> res : activityResource.entrySet()) {
@@ -552,9 +554,32 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             String resTagStr = res.getValue();
             HashMap<String, String> resTagMap = TagUtil.recoveryResTag(resTagStr);
             String type = resTagMap.get("type");
-            if (types.contains(type)) {
-                approvedResIdList.add(resId);
+            boolean flag = false;
+            if (types != null && !type.equals("data") && types.contains(type)) flag = true;
+            //判断 data 类型数据
+            if (type.equals("data") && types.contains(type)){
+                HashSet<String> formats = linkRestriction.getFormats();
+                String format = resTagMap.get("format");
+                if (formats == null || (formats != null && formats.contains(format))) flag = true;
+                else flag = false;
+                HashSet<String> scales = linkRestriction.getScales();
+                String scale = resTagMap.get("scale");
+                if (scale == null ||(scales != null && scales.contains(scale))) flag = true;
+                else flag = false;
+                HashSet<String> references = linkRestriction.getReferences();
+                String reference = resTagMap.get("reference");
+                if (references == null || (references != null && references.contains(reference))) flag = true;
+                else flag = false;
+                HashSet<String> units = linkRestriction.getUnits();
+                String unit = resTagMap.get("unit");
+                if (units == null || (units != null && references.contains(reference))) flag = true;
+                else flag = false;
+                HashSet<String> concepts = linkRestriction.getConcepts();
+                String concept = resTagMap.get("concept");
+                if (concepts == null || (concepts != null && concepts.contains(concept))) flag = true;
+                else flag = false;
             }
+            if (flag) approvedResIdList.add(resId);
         }
         return approvedResIdList;
     }
@@ -563,45 +588,55 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         ActivityNode flowNode = nodeRepository.findById(flowNodeId).get();
         HashMap<String, String> activityResourceMap = flowNode.getResources();
 
-        HashSet<String> approvedResIdSet = new HashSet<>();
-        ResProtocol resProtocol = linkRestriction.getResProtocol();
-        if (resProtocol.toString().equals("All"))
-            return JSONObject.parseObject(JSONObject.toJSONString(activityResourceMap.keySet()), HashSet.class);
-        if (resProtocol.toString().equals("None")) return new HashSet<>();
-        //这里需要修改
-        HashSet<String> types = linkRestriction.getTypes();
-        for (Map.Entry<String, String> res : activityResourceMap.entrySet()) {
-            String resId = res.getKey();
-            String resTagStr = res.getValue();
-            HashMap<String, String> resTagMap = TagUtil.recoveryResTag(resTagStr);
-            String type = resTagMap.get("type");
-            if (types.contains(type)) {
-                approvedResIdSet.add(resId);
-            }
-        }
-        return approvedResIdSet;
+        return resFlowApprove(activityResourceMap, linkRestriction);
     }
+
 
 
     /**
      * 判断用户或资源是否符合条件(适用于Resource)
      *
-     * @param tagStr
+     * @param tagStr 资源判断字符串
      * @param linkRestriction
      * @return
      */
     private boolean resFlowApproveByTagStr(String tagStr, LinkRestriction linkRestriction) {
-        HashMap<String, String> tagMap = TagUtil.recoveryResTag(tagStr);
-        String type = tagMap.get("type");
-        String suffix = tagMap.get("suffix");
-        //
-        if (linkRestriction.getResProtocol().toString().equals("All")){
+        if (linkRestriction.getResProtocol().equals(ResProtocol.All)){
             return true;
-        }else if (linkRestriction.getResProtocol().toString().equals("None")){
+        }else if (linkRestriction.getResProtocol().equals(ResProtocol.None)){
             return false;
         }else {
+            HashMap<String, String> resTagMap = TagUtil.recoveryResTag(tagStr);
+            String type = resTagMap.get("type");
             HashSet<String> types = linkRestriction.getTypes();
-            return types.contains(type);
+            // 默认是无法流动的
+            boolean flag = false;
+            if (types != null && !type.equals("data") && types.contains(type)) flag = true;
+            //判断 data 类型数据
+            if (type.equals("data") && types.contains(type)){
+                HashSet<String> formats = linkRestriction.getFormats();
+                String format = resTagMap.get("format");
+                if (formats == null || (formats != null && formats.contains(format))) flag = true;
+                else flag = false;
+                HashSet<String> scales = linkRestriction.getScales();
+                String scale = resTagMap.get("scale");
+                if (scale == null ||(scales != null && scales.contains(scale))) flag = true;
+                else flag = false;
+                HashSet<String> references = linkRestriction.getReferences();
+                String reference = resTagMap.get("reference");
+                if (references == null || (references != null && references.contains(reference))) flag = true;
+                else flag = false;
+                HashSet<String> units = linkRestriction.getUnits();
+                String unit = resTagMap.get("unit");
+                if (units == null || (units != null && references.contains(reference))) flag = true;
+                else flag = false;
+                HashSet<String> concepts = linkRestriction.getConcepts();
+                String concept = resTagMap.get("concept");
+                if (concepts == null || (concepts != null && concepts.contains(concept))) flag = true;
+                else flag = false;
+
+            }
+            return flag;
         }
     }
 
@@ -745,12 +780,42 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         }
     }
 
+    @Override
+    public void batchResFlowAutoUpdate(String graphId, String nodeId, HashSet<String> uids) {
+        if (uids == null || uids.size() == 0) return;
+        Optional<ActivityNode> byId = nodeRepository.findById(nodeId);
+        if (!byId.isPresent()) return;
+        ActivityNode node = byId.get();
+        HashMap<String, String> resources = node.getResources();
+        HashMap<String, String> resTagMap = new HashMap<>();
+        for (String uid : uids){
+            String tagStr = resources.get(uid);
+            if (tagStr != null){
+                resTagMap.put(uid, tagStr);
+            }
+        }
+        batchResFlowAutoUpdate(graphId, nodeId, resTagMap);
+    }
+
+    @Override
+    public void batchResFlowAutoUpdate(String graphId, String nodeId, String uid) {
+        Optional<ActivityNode> byId = nodeRepository.findById(nodeId);
+        if (!byId.isPresent()) return;
+        ActivityNode node = byId.get();
+        HashMap<String, String> resources = node.getResources();
+        HashMap<String, String> tagMap = new HashMap<>();
+        String tagStr = resources.get("uid");
+        if (tagStr == null || tagStr.equals("")) return;
+        tagMap.put(uid, tagStr);
+        batchResFlowAutoUpdate(graphId, nodeId, tagMap);
+    }
+
     /*
-    基于 WFS(width first search)
-    走不过的节点就直接放弃，这样效率会更高相较于DFS而言😊
-    然后直接返回能到达的nodeId，岂不是不亦乐乎😂
-    return-> key: resId, value: 资源能到达的节点
-     */
+            基于 WFS(width first search)
+            走不过的节点就直接放弃，这样效率会更高相较于DFS而言😊
+            然后直接返回能到达的nodeId，岂不是不亦乐乎😂
+            return-> key: resId, value: 资源能到达的节点
+             */
     private HashMap<String, HashSet<String>> resAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
         Optional<ActivityGraph> byId = graphRepository.findById(graphId);
         if (!byId.isPresent()) return null;
@@ -882,7 +947,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param operationType insert, del and put
      * @return 节点的 member
      */
-    private HashMap<String, String> putActivityNodeUser(String aid, String userId, String userRole, String operationType, String oldTag, String newTag) {
+    private HashMap<String, String> putActivityNodeUser(String aid, String userId, String userRole, String operationType, String oldTag, String newTag) throws DocumentException {
         //初始化用于存储用户标签,value 存userId
         Optional<ActivityNode> nodeRepositoryById = nodeRepository.findById(aid);
         ActivityNode node = nodeRepositoryById.get();
@@ -948,7 +1013,10 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             附加在活动层面的操作放在更高层次一点的方法中
              */
             String uid = res.getUid();
-            String resTag = TagUtil.setResourceTag(res);
+            HashMap<String, String> resInfo = new HashMap<>();
+            resInfo.put("uid", uid);
+            resInfo.put("type", res.getType());
+            String resTag = TagUtil.setResTag(resInfo);
             resourceTagMap.put(uid, resTag);
         } else if (operationType.equals("del")) {
             /*
@@ -1030,8 +1098,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         flowFolderChildren.add(res);
         flowFolder.setChildren(flowFolderChildren);
         activityResDao.addResource(flowFolder);
-        //第二步：更新当前节点的资源标签
-        return putActivityNodeResource(endAid, res, "insert", null, null, null);
+        //第二步：更新流动到的节点
+        HashMap<String, String> resInfo = docParser.resFlow(startAid, endAid, uid);
+        return nodeService.addResToNodeBatch(endAid, resInfo);
     }
 
     /**
@@ -1109,11 +1178,11 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     }
 
 
-    private HashMap<String, String> delResource(String aid, String uid) {
+    private HashMap<String, String> delResource(String aid, String uid) throws DocumentException {
         return putActivityNodeResource(aid, null, "del", uid, null, null);
     }
 
-    private HashMap<String, String> putResource(String aid, JSONObject putInfo) {
+    private HashMap<String, String> putResource(String aid, JSONObject putInfo) throws DocumentException {
         //在 controller 层面使用resourceDto 进行接收，然后处理成这边需要的结构即可
         String putUid = putInfo.getString("uid");
         JSONArray oldTag = putInfo.getJSONArray("oldTag");
@@ -1142,7 +1211,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param userId
      * @return
      */
-    private HashMap<String, String> addUser(String aid, String userId) {
+    private HashMap<String, String> addUser(String aid, String userId) throws DocumentException {
         //更新活动中的 member
         Activity activity = activityRepository.findById(aid).get();
         JSONArray members = activity.getMembers();

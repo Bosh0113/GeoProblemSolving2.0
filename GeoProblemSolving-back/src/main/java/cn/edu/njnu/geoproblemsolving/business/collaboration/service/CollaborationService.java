@@ -1,7 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -66,6 +68,12 @@ public class CollaborationService {
 
     @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
+
+    @Autowired
+    NodeService nodeService;
+
+    @Autowired
+    ActivityDocParser docParser;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -363,7 +371,7 @@ public class CollaborationService {
                     RestTemplate restTemplate = new RestTemplate();
                     String graphId = messageObject.getString("graphId");
 
-                    HashMap<String, String> resTagMap = new HashMap<>();
+                    HashSet<String> outResIds = new HashSet<>();
                     if (isComputeModel) {
                     /*
                      1. 根据模型 md5 获取合适的 taskService
@@ -523,18 +531,13 @@ public class CollaborationService {
                             //已经将数据存入资源中心
                             ripDao.addResource(resourceEntity);
                             outputRes.add(resourceEntity);
+                            outResIds.add(uid);
 
-                            String resTag = TagUtil.setResourceTag(resourceEntity);
-                            resTagMap.put(uid ,resTag);
                         }
                         JSONObject output = new JSONObject();
                         output.put("outputInfo", sucOutputs);
                         output.put("outputRes", outputRes);
                         sucMessage.setOutputs(output);
-                        //资源自动更新
-                        if(graphId != null && graphId != ""){
-                            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
-                        }
 
                         HashMap<String, CollaborationUser> receivers1 = sucMessage.getReceivers();
                         HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
@@ -602,13 +605,7 @@ public class CollaborationService {
                                     outputEntity.setFolder(false);
                                     ripDao.addResource(outputEntity);
                                     outputRes.add(outputEntity);
-
-                                    String resTag = TagUtil.setResourceTag(outputEntity);
-                                    resTagMap.put(uid ,resTag);
-                                }
-                                //资源自动更新
-                                if(graphId != null && graphId != ""){
-                                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                                    outResIds.add(uid);
                                 }
                             }
                             JSONObject output = new JSONObject();
@@ -621,6 +618,15 @@ public class CollaborationService {
                         }
 
                     }
+                    //写入文档
+                    //更新当前节点
+                    nodeService.addResToNodeBatch(aid, outResIds);
+                    //资源自动更新
+                    if(graphId != null && graphId != ""){
+                        geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, outResIds);
+                    }
+                    //更新当前节点
+                    //流动
                     break;
                 }
                 case "task":{
