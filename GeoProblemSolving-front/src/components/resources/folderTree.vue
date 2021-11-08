@@ -914,6 +914,7 @@ export default {
           },
         ],
       },
+      oldMetadata: {},
       editFileValidate: {
         name: "",
         type: "",
@@ -1712,7 +1713,7 @@ export default {
       this.editFileValidate.description = fileInfo.description;
       if(this.editFileValidate.type =="data"){
         metadata = this.operationApi.getResInfo(fileInfo.uid);
-        console.log(metadata);
+        this.oldMetadata = metadata;
         this.editFileValidate.format = metadata.format;
         this.editFileValidate.scale = metadata.scale;
         this.editFileValidate.reference = metadata.reference;
@@ -1781,6 +1782,30 @@ export default {
                   this.putFileInfo,
                   metadata,
                 );
+                // 检查元数据发生修改
+                let metadataChanged = false;
+                if(
+                  this.oldMetadata.format != this.editFileValidate.format ||
+                  this.oldMetadata.scale != this.editFileValidate.scale ||
+                  this.oldMetadata.reference != this.editFileValidate.reference ||
+                  this.oldMetadata.unit != this.editFileValidate.unit ||
+                  this.oldMetadata.concept != this.editFileValidate.concept
+                ){ metadataChanged = true; }
+                if(metadataChanged){
+                  this.axios
+                    .put(
+                      "/GeoProblemSolving/activityDoc/meta/" +
+                        this.activityInfo.aid +
+                        "/" +
+                        this.selectFileInfo.uid
+                    )
+                    .then((res) => {
+                      console.log(res.data.data);
+                    })
+                    .catch((err) => {
+                      console.log(err.data);
+                    });
+                }
                 // 生成临时操作记录
                 let resOperation = {
                   id: operationId,

@@ -379,12 +379,12 @@ var taskList = [];
         for (let i = 0; i < participants.length; i++) {
             let avatar = ""
             if (participants[i].avatar == undefined || participants[i].avatar == "") {
-                avatar = "./static/collabTemplate/img/icon_avatar.png";
+                avatar = "/static/collabTemplate/img/icon_avatar.png";
             } else {
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" onerror="src='./static/collabTemplate/img/icon_avatar.png'"/>
+                                <img src="${avatar}" class="participant-avatar" />
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -1225,6 +1225,10 @@ var taskList = [];
                         break;
                     }
                     case "control-stop": {
+                        if (data.sender.userId !== userInfo.userId) {
+                            $("#operation-apply").show();
+                            $("#operation-stop").hide();
+                        }
                         setOperator(data.operator);
                         setWaitingLine(data.waiting);
                         break;
@@ -1312,7 +1316,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-
+    
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话

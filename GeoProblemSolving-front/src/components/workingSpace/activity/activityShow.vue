@@ -946,7 +946,7 @@ export default {
         let user = this.potentialMembers[index];
         inviteList.push(user.userId);
       }
-
+      
       let url = "";
       if (activity.level == 1) {
        url =
@@ -1007,7 +1007,7 @@ export default {
                     activityLevel: activity.level,
                     invitorName: this.userInfo.name,
                     invitorId: this.userInfo.userId,
-                  },
+                  }, 
                 };
                 this.sendNotice(notice);
               }
@@ -1018,7 +1018,7 @@ export default {
           .catch((err) => {
             throw err;
           });
-
+      
     },
     selectMember(member, operation) {
       if (operation == "delete") {

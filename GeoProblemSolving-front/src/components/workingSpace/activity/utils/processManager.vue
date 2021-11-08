@@ -65,10 +65,21 @@
     width: 50px;
     height: 100px;
   }
+  .popup {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 901;
+  }
 </style>
 <template>
+
   <Row>
     <Col span="24" style="margin-top: 20px">
+      <div v-show="linkBuildModal" class="popup"></div>
       <div>
         <Row type="flex" justify="space-around">
           <div
@@ -251,7 +262,8 @@
       v-model="linkBuildModal"
       title="Set link protocol"
       width="800"
-      :styles="{ top: '30px' }"
+      style="top:100px; position:fixed; z-index: 902;"
+      :mask="false"
       ok-text="Link"
       cancel-text="Cancel"
       @on-visible-change='linkModalStatus'
@@ -274,7 +286,7 @@
       <Divider orientation="left">Activity link</Divider>
       <div v-if="selectedActivities.length >= 2" style="margin: 0 20px">
         <div style="margin-bottom: 15px">
-          <label>Type of activity relations: </label>
+          <label>Type of activity relations:</label>
           <RadioGroup v-model="protocolType" @on-change="changeProtocolType">
             <Radio label="Sequence" style="margin-left: 20px"></Radio>
             <Radio label="Branch" style="margin-left: 20px"></Radio>

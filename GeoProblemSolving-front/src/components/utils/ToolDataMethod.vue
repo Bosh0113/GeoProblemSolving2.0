@@ -9,7 +9,10 @@
           :offset="1"
           v-if="dataService.hasOwnProperty('metaDetail')"
         >
-          <vue-scroll :ops="scrollOps" style="height: calc(100vh - 100px)">
+          <vue-scroll
+            :ops="scrollOps"
+            style="height: calc(100vh - 100px)"
+          >
             <el-divider
               direction="vertical"
               style="height: 1000px; float: left"

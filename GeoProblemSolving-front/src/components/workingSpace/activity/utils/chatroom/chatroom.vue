@@ -454,7 +454,7 @@ export default {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.msglist.push(chatMsg);
         } else if (chatMsg.behavior == "off") {
-          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          chatMsg["content"] = chatMsg.activeUser.name + " quit the meeting.";
           this.msglist.push(chatMsg);
         }
         this.updateParticipants(chatMsg.participants);

@@ -23,14 +23,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import org.aspectj.lang.annotation.Aspect;
-import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.swing.text.html.parser.DocumentParser;
 import java.util.*;
 
 /**
@@ -117,7 +115,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return 参数很多 restFul 风格是 hold 不住的
      */
     @Override
-    public ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol, Integer level) throws DocumentException {
+    public ActivityLinkProtocol setLinkProtocol(String rootAid, ActivityLinkProtocol linkProtocol, Integer level) {
         String type = linkProtocol.getType();
         ArrayList<String> nodeIdList = linkProtocol.getNodes();
         LinkRestriction linkRestriction = linkProtocol.getRestriction();
@@ -136,9 +134,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         获得协议的上层节点，用于协议内部的资源流动
         需要完成将协议添加到图中的操作,才能实现此步骤
          */
-        // HashMap<String, HashMap<String, LinkRestriction>> relevantUpperNode = getRelevantUpperNode(adjacencyMap, nodeIdList);
+        HashMap<String, HashMap<String, LinkRestriction>> relevantUpperNode = getRelevantUpperNode(adjacencyMap, nodeIdList);
         //完成关系内资源流动
-        resFlowInProtocol(null, type, nodeIdList, linkRestriction);
+        resFlowInProtocol(relevantUpperNode, type, nodeIdList, linkRestriction);
         //关系下层资源流动
         resFlowInLowerNode(rootAid, nodeIdList);
 
@@ -157,7 +155,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param linkRestriction
      * @return
      */
-    private HashMap<String, HashMap<String, LinkRestriction>> setProtocolByRelation(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction, Integer level) throws DocumentException {
+    private HashMap<String, HashMap<String, LinkRestriction>> setProtocolByRelation(HashMap<String, HashMap<String, LinkRestriction>> adjacencyMap, ArrayList<String> nodeIdList, String type, LinkRestriction linkRestriction, Integer level) {
         //取出第一个节点（关键节点，在排序规则中第一个会汇聚点，分散点，起点）
         String keyNodeId = nodeIdList.get(0);
         //判断协议中节点是否存在，若不存在则新建
@@ -291,7 +289,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                     ActivityNode endNode = nodeRepository.findById(endNodeId).get();
                     endNode.setResources(endNodeResourceTagMap);
                     nodeRepository.save(endNode);
-
                 }
                 break;
             case "Loop":
@@ -331,7 +328,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param nodeIdList 关系类型
      * @return
      */
-    private void resFlowInLowerNode(String graphId, ArrayList<String> nodeIdList) throws DocumentException {
+    private void resFlowInLowerNode(String graphId, ArrayList<String> nodeIdList) {
         for (String nodeId : nodeIdList) {
             //获取节点所有下层路径 todo 优化点：关系内存在下层关系的，会导致有很多无用路径
             Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
@@ -947,7 +944,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param operationType insert, del and put
      * @return 节点的 member
      */
-    private HashMap<String, String> putActivityNodeUser(String aid, String userId, String userRole, String operationType, String oldTag, String newTag) throws DocumentException {
+    private HashMap<String, String> putActivityNodeUser(String aid, String userId, String userRole, String operationType, String oldTag, String newTag) {
         //初始化用于存储用户标签,value 存userId
         Optional<ActivityNode> nodeRepositoryById = nodeRepository.findById(aid);
         ActivityNode node = nodeRepositoryById.get();
@@ -1178,11 +1175,11 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     }
 
 
-    private HashMap<String, String> delResource(String aid, String uid) throws DocumentException {
+    private HashMap<String, String> delResource(String aid, String uid) {
         return putActivityNodeResource(aid, null, "del", uid, null, null);
     }
 
-    private HashMap<String, String> putResource(String aid, JSONObject putInfo) throws DocumentException {
+    private HashMap<String, String> putResource(String aid, JSONObject putInfo) {
         //在 controller 层面使用resourceDto 进行接收，然后处理成这边需要的结构即可
         String putUid = putInfo.getString("uid");
         JSONArray oldTag = putInfo.getJSONArray("oldTag");
@@ -1211,7 +1208,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @param userId
      * @return
      */
-    private HashMap<String, String> addUser(String aid, String userId) throws DocumentException {
+    private HashMap<String, String> addUser(String aid, String userId) {
         //更新活动中的 member
         Activity activity = activityRepository.findById(aid).get();
         JSONArray members = activity.getMembers();

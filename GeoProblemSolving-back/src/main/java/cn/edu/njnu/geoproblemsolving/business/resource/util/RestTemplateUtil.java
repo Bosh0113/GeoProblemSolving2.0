@@ -24,7 +24,20 @@ public class RestTemplateUtil {
     // @Autowired
     // RestTemplate restTemplate;
 
-    RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    RestTemplate restTemplate;
+
+    @Value("${client_id}")
+    String clientId;
+
+    @Value("${client_secret}")
+    String clientSecret;
+
+    @Value("${userServerLocation}")
+    String userServerLocation;
+
+    @Autowired
+    UserDao userDao;
 
     @Value("${client_id}")
     String clientId;

@@ -286,6 +286,7 @@ public class CollaborationService {
                     }
 
                     groups.put(groupKey, collaborationConfig);
+
                     collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
 
                     break;
