@@ -187,6 +187,7 @@ var taskList = [];
             componentStatus = true;
 
             getParticipants();
+            getParentActivities();
             getResources();
 
             // socket
@@ -379,12 +380,12 @@ var taskList = [];
         for (let i = 0; i < participants.length; i++) {
             let avatar = ""
             if (participants[i].avatar == undefined || participants[i].avatar == "") {
-                avatar = "/static/collabTemplate/img/icon_avatar.png";
+                avatar = "./static/collabTemplate/img/icon_avatar.png";
             } else {
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" onerror="src='/static/collabTemplate/img/icon_avatar.png'"/>
+                                <img src="${avatar}" class="participant-avatar" onerror="src='./static/collabTemplate/img/icon_avatar.png'"/>
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -424,6 +425,7 @@ var taskList = [];
     var resources = [];
     var selectedResources = [];
     var loadResChannel = null;
+    var parentResources = [];
 
     //data
     function getResources() {
@@ -445,6 +447,7 @@ var taskList = [];
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
+                    importParentRes();
                     showResList();
 
                 }
@@ -453,6 +456,67 @@ var taskList = [];
                 throw err;
             }
         });
+    }
+
+    function getParentActivities() {
+        let parents = [];
+        if (activityInfo.level > 0 && activityInfo.aid != "" && activityInfo.aid != undefined) {
+            let url = "";
+            if (activityInfo.level == 1) {
+                url = "/GeoProblemSolving/subproject/" + activityInfo.aid + "/lineage";
+            } else if (activityInfo.level > 1) {
+                url = "/GeoProblemSolving/activity/" + activityInfo.aid + "/lineage";
+            }
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let list = result.data.ancestors;
+                        for (let i = 1; i < list.length; i++) {
+                            parents.push(list[i].aid);
+                        }
+                        getParentActivitiesFile(parents);
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+
+        }
+    }
+
+    function getParentActivitiesFile(parents) {
+        if (parents != undefined && parents.length > 0) {
+            $.ajax({
+                url: "/GeoProblemSolving/rip/file/" + parents.toString(),
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let fileList = result.data;
+                        parentResources = [];
+                        for (let i = 0; i < parents.length; i++) {
+                            parentResources.push(fileList[parents[i]]);
+                        }
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+        }
     }
 
     // page
@@ -471,7 +535,7 @@ var taskList = [];
     function addfolder(folder) {
         let resElement = `<div class="card resource" title="${folder.name}">
                             <input class="form-check-input" type="checkbox" id="${folder.uid}">
-                            <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
+                            <img src="./static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
                             <div class="folder-${folder.uid} res-name">${folder.name}</div>
                         </div>`
         $("#resource-list").append(resElement);
@@ -504,7 +568,7 @@ var taskList = [];
             case "data": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/data.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -512,7 +576,7 @@ var taskList = [];
             case "model": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/model.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -520,7 +584,7 @@ var taskList = [];
             case "paper": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/paper.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -528,7 +592,7 @@ var taskList = [];
             case "document": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/document.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -536,7 +600,7 @@ var taskList = [];
             case "image": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/image.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -544,7 +608,7 @@ var taskList = [];
             case "video": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/video.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -552,7 +616,7 @@ var taskList = [];
             case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
                     <input class="form-check-input" type="checkbox" id="${file.uid}">
-                        <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                        <img src="./static/collabTemplate/img/otherfile.png" class="res-icon" />
                         <div class="res-name">${fileName}</div>
                         </>`
                 break;
@@ -607,6 +671,7 @@ var taskList = [];
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
+                    // importParentRes();
                     showResList();
                 }
             },
@@ -631,7 +696,12 @@ var taskList = [];
         }
         return currentFolder;
     }
-
+    
+    function importParentRes() {
+        for(let i = 0; i < parentResources.length; i++){
+            resources.files.push.apply(resources.files, parentResources[i]);
+        }
+    }
 
     // resource related operations
     function selectFile(file) {
@@ -1175,7 +1245,7 @@ var taskList = [];
 
         setTimer: function () {
             this.timer = setInterval(() => {
-                var messageJson = {type: "ping"};
+                var messageJson = { type: "ping" };
                 this.websocketSend(messageJson);
             }, 20000);
         },

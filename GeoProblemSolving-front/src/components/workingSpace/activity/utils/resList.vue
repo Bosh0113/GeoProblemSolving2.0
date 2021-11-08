@@ -1869,7 +1869,6 @@ export default {
         return false;
       }
     },
-    getPersonalRes() {},
     getPreviousRes() {
       // 获取可继承的资源
       this.getPreActivities();

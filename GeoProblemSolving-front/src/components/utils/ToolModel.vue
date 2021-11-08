@@ -11,15 +11,15 @@
           :key="index"
           style="padding: 10px"
         >
-          <el-col class="leftContainer" span="5">
-            <el-col offset="1" span="22">
+          <el-col class="leftContainer" :span="5">
+            <el-col :offset="1" :span="22">
               <div class="modelState">
                 <p class="state-name">{{ state.name }}</p>
                 <p class="state-desc">{{ state.description }}</p>
               </div>
             </el-col>
           </el-col>
-          <el-col class="dataContainer" span="17" offset="1">
+          <el-col class="dataContainer" :span="17" :offset="1">
             <div class="_params-group">
               <el-row v-if="inEventList(state).length !== 0" class="stateTitle"
                 >Input

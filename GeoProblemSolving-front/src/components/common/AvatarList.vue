@@ -4,7 +4,7 @@
       <img
         v-if="item.avatar != '' && item.avatar != undefined"
         :src="avatarUrl(item.avatar)"
-        style="width: 35px; height: 35px; border-radius: 50%;"
+        style="width: 30px; height: 30px; border-radius: 50%;"
       />
       <avatar
         v-else
