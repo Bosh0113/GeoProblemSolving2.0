@@ -291,18 +291,43 @@ public class CollaborationBehavior {
                 messageObject.put("operator", config.getOperator());
                 // send message
                 for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
-                    participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                    if(participant.getValue().getUserId().equals(config.getOperator())){
+                        messageObject.put("waiting", -1);
+                        participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                    } else if (queue.contains(participant.getValue().getUserId())) {
+                        for (int i = 0; i < queue.size(); i++) {
+                            if (queue.get(i).equals(participant.getValue().getUserId())) {
+                                messageObject.put("waiting", i + 1);
+                                participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                                break;
+                            }
+                        }
+                    } else {
+                        messageObject.put("waiting", 0);
+                        participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                    }
                 }
             } else if (type.equals("control-stop")) {
                 messageObject.put("operator", config.getOperator());
                 // send message
                 for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
-                    for (int i = 0; i < queue.size(); i++) {
-                        if (queue.get(i).equals(participant.getValue().getUserId())) {
-                            messageObject.put("waiting", i);
-                            participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
-                            break;
+                    if(participant.getValue().getUserId().equals(sender.getUserId())){
+                        messageObject.put("waiting", 0);
+                        participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                    } else if(participant.getValue().getUserId().equals(config.getOperator())){
+                        messageObject.put("waiting", -1);
+                        participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                    } else if (queue.contains(participant.getValue().getUserId())) {
+                        for (int i = 0; i < queue.size(); i++) {
+                            if (queue.get(i).equals(participant.getValue().getUserId())) {
+                                messageObject.put("waiting", i + 1);
+                                participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
+                                break;
+                            }
                         }
+                    } else {
+                        messageObject.put("waiting", 0);
+                        participant.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                     }
                 }
             }

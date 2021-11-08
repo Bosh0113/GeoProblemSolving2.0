@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -65,6 +66,9 @@ public class CollaborationService {
     ActivityResDaoImpl ripDao;
 
     @Autowired
+    DocInterpret activityDocParse;
+
+    @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
 
     @Value("${managerServerIpAndPort}")
@@ -72,6 +76,7 @@ public class CollaborationService {
 
     @Value("${dataMethodProxyServerLocation}")
     String dataProxyServer;
+
 
     private CollaborationConfig collaborationConfig;
     //global static
@@ -219,6 +224,7 @@ public class CollaborationService {
                 }
             }
         } catch (Exception ex) {
+            System.out.println("Message Websocket Error_Transfer");
             ex.printStackTrace();
         }
     }
@@ -255,7 +261,7 @@ public class CollaborationService {
                     break;
                 }
                 case "mode": {
-                    String mode = messageObject.getString("mode");
+                    String mode = messageObject.getString("content");
                     collaborationConfig.setMode(CollaborationMode.valueOf(mode));
                     collaborationConfig.setOperator("");
                     collaborationConfig.setApplyQueue(new ArrayList<>());
@@ -267,14 +273,19 @@ public class CollaborationService {
                 case "control-apply": {
                     List<String> applyQueue = collaborationConfig.getApplyQueue();
                     if(applyQueue == null) applyQueue = new ArrayList<>();
-                    if(applyQueue.size() == 0) {
-                        collaborationConfig.setOperator(sender.getUserId());
-                    }
-                    applyQueue.add(sender.getUserId());
-                    collaborationConfig.setApplyQueue(applyQueue);
-                    groups.put(groupKey, collaborationConfig);
 
+                    if(collaborationConfig.getOperator().equals("")) {
+                        collaborationConfig.setOperator(sender.getUserId());
+                    } else {
+                        if(!applyQueue.contains(sender.getUserId())){
+                            applyQueue.add(sender.getUserId());
+                            collaborationConfig.setApplyQueue(applyQueue);
+                        }
+                    }
+
+                    groups.put(groupKey, collaborationConfig);
                     collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
+
                     break;
                 }
                 case "control-stop": {
@@ -290,7 +301,7 @@ public class CollaborationService {
                         }
                         groups.put(groupKey, collaborationConfig);
 
-                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, collaborationBehavior.getMemberInfo(ctrUser, null), messageType);
+                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
                     } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
                         collaborationConfig.setOperator("");
                         groups.put(groupKey, collaborationConfig);
@@ -320,9 +331,16 @@ public class CollaborationService {
                         }
                         // 判断操作权限
                         if(collaborationConfig.getOperator().equals(sender.getUserId())){
+                            collaborationConfig.resetTime();
                             collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
                         } else {
-                            collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
+                            if(collaborationConfig.resetOperator(sender.getUserId())){
+                                // reset operator successfully
+                                collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
+                            } else {
+                                // fail to reset operator
+                                collaborationBehavior.operationRefuse(collaborationConfig.getParticipants(), messageType, sender.getUserId());
+                            }
                         }
                     } else if (mode.equals(CollaborationMode.Free)) {
                         collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, behavior, object);
@@ -426,7 +444,9 @@ public class CollaborationService {
                         数据方法的话，新开线程阻塞等待计算结果即可
                          */
                         Callable<JSONObject> callable = new Callable<JSONObject>() {
-                            int index = 0;
+                            //一个线程执行完毕之后会自动结束，如果在运行过程中发生异常也会提前结束。
+                            //保证线程读取时标志位是最新数据
+                            private volatile int index = 0;
                             @Override
                             public JSONObject call() throws Exception {
                                 int refreshStatus = 0;
@@ -444,7 +464,10 @@ public class CollaborationService {
                                         resJson.put("outputs", outputs);
                                         resJson.put("tid", dataJson.getString("tid"));
                                     } else {
-                                        if (index > 60 && refreshStatus == 0) return null;
+                                        if (index > 60 && refreshStatus == 0) {
+                                            Thread.currentThread().interrupt();
+                                            return null;
+                                        }
                                         System.out.println("Waiting for computation: "+ (++index) + "+++status: " + refreshStatus);
                                     }
 
@@ -472,7 +495,11 @@ public class CollaborationService {
                          */
                         System.out.println("end: " + groupKey);
                         System.out.println(collaborationConfig);
-                        if (resJson == null) return;
+                        if (resJson == null) {
+                            computeMsg.setOutputs("Fail");
+                            collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
+                            return;
+                        }
                         String sucTaskTid = resJson.getString("tid");
                         HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
                         ComputeMsg sucMessage = computeList.get(sucTaskTid);
@@ -503,6 +530,9 @@ public class CollaborationService {
 
                             String resTag = TagUtil.setResourceTag(resourceEntity);
                             resTagMap.put(uid ,resTag);
+
+                            //Save it in the activity document todo
+                            activityDocParse.uploadResource(aid, resourceEntity);
                         }
                         //资源自动更新
                         if(graphId != null && graphId != ""){
@@ -539,9 +569,7 @@ public class CollaborationService {
                         invokeJson.put("params", paramsArray);
                         HttpEntity<JSONObject> httpEntity = new HttpEntity<>(invokeJson);
                         //新开线程处理
-                        Callable<JSONObject> dataComputeCallable = ()->{
-                           return  restTemplate.exchange(dataMethodUrl, HttpMethod.POST, httpEntity, JSONObject.class).getBody();
-                        };
+                        Callable<JSONObject> dataComputeCallable = ()-> restTemplate.exchange(dataMethodUrl, HttpMethod.POST, httpEntity, JSONObject.class).getBody();
                         FutureTask<JSONObject> futureTask = new FutureTask<>(dataComputeCallable);
                         Thread dataComputeThread = new Thread(futureTask);
                         dataComputeThread.start();
@@ -549,7 +577,9 @@ public class CollaborationService {
                         // 后续做持久化可能会有用
                         Integer code = jsonObject.getInteger("code");
                         if (code != 0){
-                            //发送错误消息
+                            //Send error info
+                            computeMsg.setOutputs("Fail");
+                            collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                         }else {
                             Map<String, String> outputs = jsonObject.getObject("urls", HashMap.class);
                             for (Map.Entry item: outputs.entrySet()){
@@ -576,6 +606,8 @@ public class CollaborationService {
 
                                     String resTag = TagUtil.setResourceTag(outputEntity);
                                     resTagMap.put(uid ,resTag);
+
+                                    //Save it in the activity document todo
                                 }
                                 //资源自动更新
                                 if(graphId != null && graphId != ""){
