@@ -53,7 +53,7 @@
       dis-hover
       class="workspaceCard"
       id="ActivityContent"
-      style="height: calc(100vh - 130px)"
+      style="height: calc(100vh - 120px)"
     >
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
@@ -105,7 +105,7 @@
           >Delete</Button
         >
         <Button
-          v-if=" slctActivity.level == 0 "
+          v-if="slctActivity.level == 0"
           type="primary"
           icon="ios-bookmark"
           size="small"
@@ -365,8 +365,7 @@ export default {
       }
     });
   },
-  created() {
-  },
+  created() {},
   mounted() {
     // load activity doc
     let urlInfo = this.getUrlInfo();
@@ -745,7 +744,7 @@ export default {
       this.nameConfirm = [];
       // child activities normalization
       let role = this.roleIdentity(ancestors[0]);
-      if (children.length > 0 && role != 'visitor' ) {
+      if (children.length > 0 && role != "visitor") {
         for (var i = 0; i < children.length; i++) {
           children[i].children = [];
           this.nameConfirm.push(children[i].name);
@@ -815,13 +814,13 @@ export default {
     },
     typeChanged(data) {
       this.slctActivity.type = data.type;
-      if(this.slctActivity.level == 0){
+      if (this.slctActivity.level == 0) {
         this.projectInfo.type = data.type;
       }
       this.updatePathway("type", data.purpose);
       this.setContent(this.slctActivity);
     },
-    activityInfo(data){
+    activityInfo(data) {
       this.activityInfo = data;
     },
     setContent(activity) {
@@ -833,7 +832,11 @@ export default {
       //   null,
       //   valiable + "?aid=" + activity.aid + "&level=" + activity.level + ""
       // );
-      this.$router.push({name: "workspaceContent", params: {projectId: this.projectInfo.aid}, query:{aid: activity.aid, level: activity.level }});
+      this.$router.push({
+        name: "workspaceContent",
+        params: { projectId: this.projectInfo.aid },
+        query: { aid: activity.aid, level: activity.level },
+      });
       this.contentId = Math.random();
       if (
         this.roleIdentity(activity) == "visitor" &&
@@ -950,7 +953,7 @@ export default {
       });
     },
     updatePathway(type, content) {
-      if(this.parentActivity){
+      if (this.parentActivity) {
         if (this.parentActivity.pathway != undefined) {
           if (type === "name") {
             let pathway = JSON.stringify(this.parentActivity.pathway);
@@ -963,7 +966,9 @@ export default {
             this.parentActivity.pathway = JSON.parse(newpathway);
           } else if (type === "type") {
             for (let i = 0; i < this.parentActivity.pathway.length; i++) {
-              if (this.parentActivity.pathway[i].aid === this.slctActivity.aid) {
+              if (
+                this.parentActivity.pathway[i].aid === this.slctActivity.aid
+              ) {
                 this.parentActivity.pathway[i].category =
                   this.getStepCategroy(content);
               }
@@ -1125,6 +1130,16 @@ export default {
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Join the activity", desc: "Success!" });
             this.enterActivity(this.slctActivity);
+
+            // // update activity doc
+            // this.operationApi.participantUpdate(
+            //   this.slctActivity.aid,
+            //   "join",
+            //   this.userInfo.userId,
+            //   this.userInfo.name,
+            //   "ordinary-member",
+            //   this.userInfo.domain
+            // );
           } else if (res.data.code == -3) {
             this.$Notice.info({
               desc: "You has already been a member of the activity.",
@@ -1157,6 +1172,7 @@ export default {
             userEmail: this.userInfo.email,
             userName: this.userInfo.name,
             userId: this.userInfo.userId,
+            userDomain: this.userInfo.domain,
             description: this.applyJoinForm.reason,
             approve: "unknow",
           },
@@ -1253,6 +1269,6 @@ export default {
 }
 
 .workspaceCard >>> .ivu-card-body {
-  padding: 0px 10px;
+  padding: 5px;
 }
 </style>

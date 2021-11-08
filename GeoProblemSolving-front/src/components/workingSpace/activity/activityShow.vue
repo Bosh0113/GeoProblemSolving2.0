@@ -879,6 +879,7 @@ export default {
             userEmail: this.userInfo.email,
             userName: this.userInfo.name,
             userId: this.userInfo.userId,
+            userDomain: this.userInfo.domain,
             description: this.applyJoinForm.reason,
             approve: "unknow",
           },
@@ -967,7 +968,7 @@ export default {
           .post(url)
           .then((res) => {
             if (res.data.code == 0) {
-              console.log(res);
+              
               //添加活动文档和发送信息
               for (var i = 0; i < this.invitingMembers.length; i++) {
                 let index = this.invitingMembers[i];
@@ -976,10 +977,10 @@ export default {
                 this.participants.push(user);
                 this.operationApi.participantUpdate(
                   this.activityInfo.aid,
-                  "invite",
+                  "join",
                   user.userId,
                   user.name,
-                  user.role,
+                  "ordinary-member",
                   user.domain
                 );
                 this.$Notice.info({ desc: "Invite member successfully" });

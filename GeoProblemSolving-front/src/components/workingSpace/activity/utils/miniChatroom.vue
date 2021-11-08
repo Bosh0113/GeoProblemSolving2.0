@@ -538,7 +538,7 @@ export default {
   word-break: break-word;
 }
 #msgPanelBtn {
-  z-index: 100;
+  z-index: 1001;
   position: fixed;
   right: 30px;
   bottom: 70px;
@@ -546,7 +546,7 @@ export default {
   background-color: #fff;
 }
 #msgPanel {
-  z-index: 99;
+  z-index: 1000;
   width: 340px;
   height: 450px;
   position: fixed;

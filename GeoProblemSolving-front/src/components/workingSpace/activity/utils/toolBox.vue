@@ -423,7 +423,6 @@ export default {
     // },
     useTool(toolInfo) {
       this.selectedTool = toolInfo;
-      console.log(this.selectedTool);
       this.openTool();
       // this.openToolModal = true;
     },

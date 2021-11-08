@@ -4,13 +4,14 @@
       <img
         v-if="item.avatar != '' && item.avatar != undefined"
         :src="avatarUrl(item.avatar)"
-        style="width: 35px; height: 35px; border-radius: 50%;"
+        style="display: inline-block; width: 35px; height: 35px; border-radius: 50%;"
       />
       <avatar
         v-else
         :username="item.name"
-        :size="30"
+        :size="37"
         :rounded="true"
+        style="display: inline-block; position: absolute; bottom: 2 px;"
       />
     </span>
   </div>
@@ -60,6 +61,7 @@
   }
   .avatar {
     margin-right: -12px;
+    position: relative;
   }
 
 </style>

@@ -551,7 +551,7 @@ export default {
     this.initSize();
     this.supportNotify();
   },
-  methods: { 
+  methods: {
     reSize() {
         if (window.innerWidth < 610) {
           this.useChatCss = false;
@@ -682,7 +682,7 @@ export default {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.msglist.push(chatMsg);
         } else if (chatMsg.behavior == "off") {
-          chatMsg["content"] = chatMsg.activeUser.name + " stop the meeting.";
+          chatMsg["content"] = chatMsg.activeUser.name + " quit the meeting.";
           this.msglist.push(chatMsg);
         }
         this.updateParticipants(chatMsg.participants);
@@ -699,12 +699,26 @@ export default {
             let time = new Date(this.msglist[i].time);
             let current = new Date();
             let threshold = 1000 * 60 * 3;
-            if (this.msglist[i].status == "sending" && this.msglist[i].time == chatMsg.time) {
+            if (
+              this.msglist[i].status == "sending" &&
+              this.msglist[i].time == chatMsg.time
+            ) {
               this.msglist[i].status = "done";
               msgCheck = true;
-            } else if (this.msglist[i].status == "sending" && (current - time > threshold)) {
+            } else if (
+              this.msglist[i].status == "sending" &&
+              current - time > threshold
+            ) {
               this.msglist[i].status = "failed";
             }
+          }
+          try {
+            if (chatMsg.type === "message_tool") {
+              let content = chatMsg.content;
+              chatMsg.content = JSON.parse(content);
+            }
+          } catch (err) {
+            console.log(err);
           }
 
           if (!msgCheck) {
@@ -746,7 +760,7 @@ export default {
       } else if (chatMsg.type == "message-cache") {
         for (let i = 0; i < chatMsg.content.length; i++) {
           if (chatMsg.content[i] != "") {
-            if(chatMsg.content[i].sender.userId == this.userInfo.userId){
+            if (chatMsg.content[i].sender.userId == this.userInfo.userId) {
               chatMsg.content[i].status = "done";
             }
             this.msglist.push(chatMsg.content[i]);
@@ -879,7 +893,7 @@ export default {
 
   beforeDestroy() {
     this.socketApi.close("MsgServer/" + this.activityInfo.aid);
-    
+
     window.removeEventListener("resize", this.reSize);
     window.removeEventListener("resize", this.initSize);
     window.removeEventListener("blur", this.winBlur, true); //监听浏览器失焦事件

@@ -569,17 +569,16 @@ export default {
                 let index = this.invitingMembers[i];
                 if (this.participants.contains(this.potentialMembers[index])) continue;
                 let user = this.potentialMembers[index];
-                user.role = "ordinary-member";
                 this.participants.push(user);
                 this.$Notice.info({ desc: "Invite member successfully" });
 
                 // update activity doc
                 this.operationApi.participantUpdate(
                   activity.aid,
-                  "invite",
+                  "join",
                   user.userId,
                   user.name,
-                  user.role,
+                  "ordinary-member",
                   user.domain
                 );
 
@@ -736,7 +735,6 @@ export default {
       this.axios
         .delete(url)
         .then((res) => {
-          console.log(res);
           if (res.data.code == 0) {
             // update activity doc
             this.operationApi.participantUpdate(

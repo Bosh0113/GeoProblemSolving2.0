@@ -129,7 +129,7 @@
                     <Col span="7" style="margin-left: 3.5%">
                       <div class="projectItem" @click="goSingleProject(mProject)">
                         <Card style="height:320px;margin-top:20px; z-index: 0;" class="projectCard">
-                          <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                          <p slot="title" class="projectsTitle" :title="mProject.name" style="width:70%;">{{mProject.name}}</p>
                           <Button
                             class="authorBtn"
                             type="default"
@@ -190,6 +190,8 @@
                           <p
                             slot="title"
                             class="projectsTitle"
+                            :title="item.name" 
+                            style="width:70%;"
                           >{{item.name}}</p>
                           <!--                        @click.stop="quitModalShow(item)"-->
                           <Button
@@ -378,7 +380,7 @@
                     <Col span="10" style="margin-left: 3.5%">
                       <div class="projectItem" @click="goSingleProject(mProject)">
                         <Card style="height:320px;margin-top:20px;" class="projectCard">
-                          <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                          <p slot="title" class="projectsTitle" :title="mProject.name" style="width:70%;">{{mProject.name}}</p>
                           <Button
                             class="authorBtn"
                             type="default"
@@ -431,6 +433,8 @@
                           <p
                             slot="title"
                             class="projectsTitle"
+                            :title="item.name" 
+                            style="width:70%;"
                           >{{item.name}}</p>
                           <!--                        @click.stop="quitModalShow(item)"-->
                           <Button
