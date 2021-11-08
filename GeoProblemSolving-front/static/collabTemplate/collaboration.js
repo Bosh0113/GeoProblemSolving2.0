@@ -122,7 +122,7 @@ var taskList = [];
                         <button class="btn btn-success btn-sm apply" style="background-color: green;" id="operation-apply">Apply</button>
                         <button class="btn btn-info btn-sm stop" style="display: none;" id="operation-stop">Stop</button>
                     </div>
-                    <div class="operator" id="operator">
+                    <div class="operator" id="apply-operator">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-joystick" viewBox="0 0 16 16" style="margin-top: -3px; margin-right:5px">
                             <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2z"/>
                             <path d="M0 9.665v1.717a1 1 0 0 0 .553.894l6.553 3.277a2 2 0 0 0 1.788 0l6.553-3.277a1 1 0 0 0 .553-.894V9.665c0-.1-.06-.19-.152-.23L9.5 6.715v.993l5.227 2.178a.125.125 0 0 1 .001.23l-5.94 2.546a2 2 0 0 1-1.576 0l-5.94-2.546a.125.125 0 0 1 .001-.23L6.5 7.708l-.013-.988L.152 9.435a.25.25 0 0 0-.152.23z"/>
@@ -131,7 +131,7 @@ var taskList = [];
                     <div class="operation-waiting" id="operation-waiting"></div>
                 </div>
                 <div class="operation-control-occupy" style="display: none;">
-                    <div class="operator" id="operator">
+                    <div class="operator" id="occupy-operator">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-joystick" viewBox="0 0 16 16" style="margin-top: -3px; margin-right:5px">
                             <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2z"/>
                             <path d="M0 9.665v1.717a1 1 0 0 0 .553.894l6.553 3.277a2 2 0 0 0 1.788 0l6.553-3.277a1 1 0 0 0 .553-.894V9.665c0-.1-.06-.19-.152-.23L9.5 6.715v.993l5.227 2.178a.125.125 0 0 1 .001.23l-5.94 2.546a2 2 0 0 1-1.576 0l-5.94-2.546a.125.125 0 0 1 .001-.23L6.5 7.708l-.013-.988L.152 9.435a.25.25 0 0 0-.152.23z"/>
@@ -337,9 +337,12 @@ var taskList = [];
 //////////
 {
     // user related
-    var participants = null;
-    var onlineMembers = null;
-    let UserServer = "http://172.21.212.103:8088/userServer";
+    var participants = [];
+    var onlineMembers = [];
+    let UserServer = "/userServer";
+    if (window.location.hostname == "localhost") {
+        UserServer = "http://172.21.212.103:8088/userServer";
+    }
 
     // data
     function getParticipants() {
@@ -381,7 +384,7 @@ var taskList = [];
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" />
+                                <img src="${avatar}" class="participant-avatar" onerror="src='/static/collabTemplate/img/icon_avatar.png'"/>
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -398,10 +401,16 @@ var taskList = [];
         for (let i = 0; i < members.length; i++) {
             $(`#${members[i].userId}`).css("background-color", "white");
         }
+        onlineMembers = members;
     }
 
     function personOffline(member) {
         $(`#${member.userId}`).css("background-color", "lightgrey");
+        for(let i = 0; i<onlineMembers.length; i++) {
+            if(onlineMembers[i].userId === member.userId){
+                onlineMembers.splice(i, 1);
+            }
+        }
     }
 }
 
@@ -727,7 +736,7 @@ var taskList = [];
                     }
                 ],
                 params: [],
-                participants: participants
+                participants: onlineMembers
             }
 
             // collaboration message
@@ -857,16 +866,19 @@ var taskList = [];
     function setCollaborationMode(mode) {
         if (mode != undefined && mode !== "") {
             if (mode === "Free") {
+                $("#collaboration-mode").val("Free");
                 $(".operation-control-apply").hide();
                 $(".operation-control-occupy").hide();
                 $(".operation-list").css("height", "calc(100vh - 200px)");
                 collabMode = "Free";
             } else if (mode === "SemiFree_Apply") {
+                $("#collaboration-mode").val("SemiFree_Apply");
                 $(".operation-control-apply").show();
                 $(".operation-control-occupy").hide();
                 $(".operation-list").css("height", "calc(100vh - 305px)");
                 collabMode = "SemiFree_Apply";
             } else if (mode === "SemiFree_Occupy") {
+                $("#collaboration-mode").val("SemiFree_Occupy");
                 $(".operation-control-apply").hide();
                 $(".operation-control-occupy").show();
                 $(".operation-list").css("height", "calc(100vh - 250px)");
@@ -876,15 +888,47 @@ var taskList = [];
     }
 
     function setOperator(operator) {
-        if (collabMode !== "Free" && operator != userInfo.userId) {
-            $("#edit-mask").show();
-        } else {
+        if (collabMode == "Free") {
             $("#edit-mask").hide();
-        }
+        } else if (collabMode == "SemiFree_Occupy") {
+            $("#edit-mask").hide();
 
-        if (operator != undefined) {
-            $("#operator-name").remove();
-            $("#operator").append(`<span class="operator-name" id="operator-name">${operator.name}</span>`);
+            if (operator != undefined && operator != {} && operator != "") {
+                $("#occupy-operator-name").remove();
+                $("#occupy-operator").append(`<span class="operator-name" id="occupy-operator-name" title="${operator.name}">${operator.name}</span>`);
+            }
+        } else if (collabMode == "SemiFree_Apply") {
+            let user = null;
+            if(Object.prototype.toString.call(operator) == "[object Object]") {
+                user = Object.assign({}, operator);
+                operator = operator.userId
+            } else {                
+                for (let i = 0; i < participants.length; i++) {
+                    if (participants[i].userId == operator) {
+                        user = participants[i];
+                    }
+                }
+            }
+            
+            if (operator != userInfo.userId) {
+                $("#operation-apply").show();
+                $("#operation-stop").hide();
+                $("#edit-mask").show();
+            } else {
+                $("#operation-apply").hide();
+                $("#operation-stop").show();
+                $("#edit-mask").hide();
+            }
+
+            if (operator != undefined && operator != "") {
+                if (user != null) {
+                    $("#apply-operator-name").remove();
+                    $("#apply-operator").append(`<span class="operator-name" id="apply-operator-name" title="${user.name}">${user.name}</span>`);
+                }
+            } else if (operator == "") {
+                $("#apply-operator-name").remove();
+                $("#apply-operator").append(`<span class="operator-name" id="apply-operator-name" title="no operator">${operator}</span>`);
+            }
         }
     }
 
@@ -895,13 +939,19 @@ var taskList = [];
                 $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
-                                            <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">${count} people are waiting</span>`);
+                                            <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Waiting for ${count} people</span>`);
             } else if (count == 0) {
                 $("#operation-waiting").empty();
                 $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
                                                 <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
                                             </svg>
                                             <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Apply to operate</span>`);
+            } else if (count < 0) {
+                $("#operation-waiting").empty();
+                $("#operation-waiting").append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lines-fill" viewBox="0 0 16 16" style="margin-top: -3px;">
+                                                <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
+                                            </svg>
+                                            <span style="margin-left: 5px; color: #007bff;" title="Waiting for operation">Current operator</span>`);
             }
         }
     }
@@ -1143,7 +1193,7 @@ var taskList = [];
                         if (data.behavior == "on") {
                             personOnline(data.participants);
                         } else if (data.behavior == "off") {
-                            personOffline(activeUser);
+                            personOffline(data.activeUser);
                         }
 
                         if (participantChannel != undefined && typeof participantChannel == "function") {
@@ -1152,21 +1202,21 @@ var taskList = [];
                         break;
                     }
                     case "collaboration-init": {
-                        setCollaborationMode(data.mode);
+                        setCollaborationMode(data.content);
                         setOperator(data.operator);
                         setWaitingLine(data.waiting);
                         break;
                     }
                     case "mode": {
                         if (data.operator !== userInfo.userId) {
-                            setCollaborationMode(data.mode);
+                            setCollaborationMode(data.content);
                         }
                         setOperator("");
                         setWaitingLine(0);
                         break;
                     }
                     case "control-apply": {
-                        if (data.operator !== userInfo.userId) {
+                        if (data.operator == userInfo.userId) {
                             $("#operation-apply").hide();
                             $("#operation-stop").show();
                         }
@@ -1175,15 +1225,16 @@ var taskList = [];
                         break;
                     }
                     case "control-stop": {
-                        if (data.sender.userId !== userInfo.userId) {
-                            $("#operation-apply").show();
-                            $("#operation-stop").hide();
-                        }
                         setOperator(data.operator);
                         setWaitingLine(data.waiting);
                         break;
                     }
                     case "operation": {
+                        setOperator(data.sender);
+                        if (data.behavior != undefined && data.behavior == "Refuse") {
+                            alert("Please wait for a while.")
+                            break;
+                        }
                         if (operationChannel != undefined && typeof operationChannel == "function") {
                             if (data.sender.userId !== userInfo.userId) {
                                 operationChannel(data);
