@@ -804,6 +804,17 @@ export function taskUpdate(aid, behavior, taskInfo) {
     if (Task !== null && Task.localName == "Task") {
       Task.setAttribute("state", "removed");
     }
+
+    // remove dependency
+    let relations = xmlDoc.getElementsByTagName("Relation");
+    for(var i = 0; i < relations.length; i++) {
+      let Relation = relations[i];
+      let relationId = Relation.getAttribute("id");
+      if(relationId.indexOf(taskInfo.taskId) == 0 || relationId.indexOf(taskInfo.taskId) == 36){
+        Relation.parentNode.removeChild(Relation);
+      }
+    }
+
     // remove operation in this task
     let operations = Task.childNodes;
     for (var i = 0; i < operations.length; i++) {

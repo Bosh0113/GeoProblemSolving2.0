@@ -188,6 +188,7 @@ var taskList = [];
             componentStatus = true;
 
             getParticipants();
+            getParentActivities();
             getResources();
 
             // socket
@@ -380,12 +381,12 @@ var taskList = [];
         for (let i = 0; i < participants.length; i++) {
             let avatar = ""
             if (participants[i].avatar == undefined || participants[i].avatar == "") {
-                avatar = "/static/collabTemplate/img/icon_avatar.png";
+                avatar = "./static/collabTemplate/img/icon_avatar.png";
             } else {
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" />
+                                <img src="${avatar}" class="participant-avatar" onerror="src='./static/collabTemplate/img/icon_avatar.png'"/>
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -407,8 +408,8 @@ var taskList = [];
 
     function personOffline(member) {
         $(`#${member.userId}`).css("background-color", "lightgrey");
-        for(let i = 0; i<onlineMembers.length; i++) {
-            if(onlineMembers[i].userId === member.userId){
+        for (let i = 0; i < onlineMembers.length; i++) {
+            if (onlineMembers[i].userId === member.userId) {
                 onlineMembers.splice(i, 1);
             }
         }
@@ -425,6 +426,7 @@ var taskList = [];
     var resources = [];
     var selectedResources = [];
     var loadResChannel = null;
+    var parentResources = [];
 
     //data
     function getResources() {
@@ -446,6 +448,7 @@ var taskList = [];
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
+                    importParentRes();
                     showResList();
 
                 }
@@ -454,6 +457,67 @@ var taskList = [];
                 throw err;
             }
         });
+    }
+
+    function getParentActivities() {
+        let parents = [];
+        if (activityInfo.level > 0 && activityInfo.aid != "" && activityInfo.aid != undefined) {
+            let url = "";
+            if (activityInfo.level == 1) {
+                url = "/GeoProblemSolving/subproject/" + activityInfo.aid + "/lineage";
+            } else if (activityInfo.level > 1) {
+                url = "/GeoProblemSolving/activity/" + activityInfo.aid + "/lineage";
+            }
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let list = result.data.ancestors;
+                        for (let i = 1; i < list.length; i++) {
+                            parents.push(list[i].aid);
+                        }
+                        getParentActivitiesFile(parents);
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+
+        }
+    }
+
+    function getParentActivitiesFile(parents) {
+        if (parents != undefined && parents.length > 0) {
+            $.ajax({
+                url: "/GeoProblemSolving/rip/file/" + parents.toString(),
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let fileList = result.data;
+                        parentResources = [];
+                        for (let i = 0; i < parents.length; i++) {
+                            parentResources.push(fileList[parents[i]]);
+                        }
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+        }
     }
 
     // page
@@ -633,6 +697,11 @@ var taskList = [];
         return currentFolder;
     }
 
+    function importParentRes() {
+        for(let i = 0; i < parentResources.length; i++){
+            resources.files.push.apply(resources.files, parentResources[i]);
+        }
+    }
 
     // resource related operations
     function selectFile(file) {
@@ -1235,10 +1304,6 @@ var taskList = [];
                         break;
                     }
                     case "control-stop": {
-                        if (data.sender.userId !== userInfo.userId) {
-                            $("#operation-apply").show();
-                            $("#operation-stop").hide();
-                        }
                         setOperator(data.operator);
                         setWaitingLine(data.waiting);
                         break;
@@ -1384,7 +1449,7 @@ var taskList = [];
                 params: params,
                 computeAbleModel: false,
                 sender: userInfo.userId,
-                graphId: activityInfo.parent,
+                graphId: activityInfo.parent
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeMsg);
