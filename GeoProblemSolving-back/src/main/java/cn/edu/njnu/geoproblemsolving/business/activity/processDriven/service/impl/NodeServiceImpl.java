@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.im
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
@@ -60,6 +61,9 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     ActivityDocParser docParser;
 
+    @Autowired
+    GeoAnalysisProcess geoAnalysisProcess;
+
     @Value("${userServerLocation}")
     String userServer;
 
@@ -69,6 +73,7 @@ public class NodeServiceImpl implements NodeService {
         ActivityNode node = new ActivityNode();
         node.setId(aid);
         HashMap<String, String> activityUserTag = getActivityUserTag(aid, level);
+        //资源得从文档中读取
         HashMap<String, String> activityResourceTag = getActivityResourceTag(aid);
         node.setMembers(activityUserTag);
         node.setResources(activityResourceTag);
@@ -207,7 +212,6 @@ public class NodeServiceImpl implements NodeService {
                 HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
                 String resourceTag = TagUtil.setResourceTag(tagMap);
                 resources.put(uid, resourceTag);
-
                 break;
         }
         nodeRepository.save(node);
@@ -221,7 +225,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public HashMap<String, String> addResToNodeBatch(String aid, HashMap<String, String> resInfo) {
-        return putNodeResource(aid, resInfo, "addBatch");
+        HashMap<String, String> resTagMap = new HashMap<>();
+        resTagMap.put(resInfo.get("uid"), TagUtil.setResTag(resInfo));
+        return putNodeResource(aid, resTagMap, "addBatch");
     }
 
     @Override
@@ -262,8 +268,11 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void putResMeta(String aid, String uid) {
+    public void putResMeta(String graphicId, String aid, String uid) {
+        //文档更新已经完成，这是第二步: 更新节点
         putNodeResource(aid, uid, "put");
+        //第三步，资源流动
+        geoAnalysisProcess.batchResFlowAutoUpdate(graphicId, aid, uid);
     }
 
     @Override

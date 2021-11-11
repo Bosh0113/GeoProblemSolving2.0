@@ -1,7 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import com.alibaba.fastjson.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,22 +18,32 @@ import java.util.Map;
  * @Date 2021/8/19
  **/
 public class TagUtil {
+    @Autowired
+    ActivityDocParser docParser;
+
     public static HashMap<String, String> recoveryResTag(String tagStr){
         HashMap<String, String> resInfo = new HashMap<>();
         String[] tagArray = tagStr.split("O517");
         String type = tagArray[0];
         resInfo.put("type", type);
         if (type.equals("data")) {
-            String format = tagArray[1];
-            if (!format.equals("")) resInfo.put("format", format);
-            String scale = tagArray[2];
-            if (!scale.equals("")) resInfo.put("scale", scale);
-            String reference = tagArray[3];
-            if (!reference.equals("")) resInfo.put("reference", reference);
-            String unit = tagArray[4];
-            if (!unit.equals("")) resInfo.put("unit", unit);
-            String concept = tagArray[5];
-            if (!concept.equals("")) resInfo.put("concept", concept);
+            try {
+                String format = tagArray[1];
+                if (!format.equals("")) resInfo.put("format", format);
+                String scale = tagArray[2];
+                if (!scale.equals("")) resInfo.put("scale", scale);
+                String reference = tagArray[3];
+                if (!reference.equals("")) resInfo.put("reference", reference);
+                String unit = tagArray[4];
+                if (!unit.equals("")) resInfo.put("unit", unit);
+                String concept = tagArray[5];
+                // 不报错就肯定是有值
+                resInfo.put("concept", concept);
+            }catch (ArrayIndexOutOfBoundsException e){
+                // 不用做处理，超出范围则说明为空，不用添加
+            }
+
+
         }
         return resInfo;
     }
@@ -105,6 +118,7 @@ public class TagUtil {
             return addFlagInTags(type, format, scale, reference, unit, concept);
         }
     }
+
 
     public static String setUserTag(String role, JSONArray domainArray, JSONArray orgArray){
         String domain = array2String(domainArray);

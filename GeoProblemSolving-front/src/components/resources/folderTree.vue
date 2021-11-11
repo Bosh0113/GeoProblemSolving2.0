@@ -1372,6 +1372,8 @@ export default {
                   var uploadedList = res.data.uploaded;
                   var failedList = res.data.failed;
                   var sizeOverList = res.data.sizeOver;
+                  let uploadedOperation = res.data.uploadedOperation;
+
                   let metadata = {};
                   for (var i = 0; i < uploadedList.length; i++) {
                     this.currentFolder.files.push(uploadedList[i]);
@@ -1382,29 +1384,21 @@ export default {
                       metadata.unit = this.uploadValidate.unit;
                       metadata.concept = this.uploadValidate.concept;
                     }
-
-                    let operationId = this.operationApi.resOperationRecord(
-                      this.activityInfo.aid,
-                      "",
-                      "",
-                      "upload",
-                      this.userInfo.userId,
-                      uploadedList[i],
-                      metadata
-                    );
-
-                    // 生成临时操作记录
-                    let resOperation = {
-                      id: operationId,
-                      type: "resource",
-                      resRef: uploadedList[i].uid,
-                      operator: this.userInfo.userId,
-                    };
-                    this.$store.commit("updateTempOperations", {
-                      behavior: "add",
-                      operation: resOperation,
-                    });
                   }
+                  // this.operationApi.getActivityDoc(this.activityInfo.aid);
+                  // for (let i = 0; i < uploadedOperation.length; i++){
+                  //   let resOperation = {
+                  //     id: uploadedOperation[i].oid,
+                  //     type: "resource",
+                  //     resRef: uploadedOperation[i].resRef,
+                  //     operator: this.userInfo.userId,
+                  //   };
+                  //
+                  //   this.$store.commit("updateTempOperations", {
+                  //     behavior: "add",
+                  //     operation: resOperation,
+                  //   });
+                  // }
                   if (sizeOverList.length > 0) {
                     this.$Notice.warning({
                       title: "Files too large.",
@@ -1435,16 +1429,6 @@ export default {
                   }
                 } else {
                   this.$Message.warning("Upload fail.");
-                }
-                //上传成功
-                if (uploadedList.length > 0){
-                  this.$Notice.success({
-                    title: "Upload result",
-                    render: (h) =>{
-                      return h("span", uploadedList.join(";"))
-                    },
-                    desc: "Upload successfully",
-                  });
                 }
                 this.progressModalShow = false;
                 this.uploadProgress = 0;

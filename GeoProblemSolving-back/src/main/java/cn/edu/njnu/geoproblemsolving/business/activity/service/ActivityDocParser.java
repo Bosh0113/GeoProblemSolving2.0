@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
+import com.alibaba.fastjson.JSONObject;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,8 @@ public interface ActivityDocParser {
      */
     Object uploadResource(String aid, HashMap<String, String> resInfo);
 
+    ArrayList<HashMap<String, String>> uploadResources(String aid, ArrayList<ResourceEntity> uploadList, HashMap<String, String> meta);
+
     Object resFlow(String aid, HashMap<String, String> resInfo);
 
     Object uploadResource(String aid, ResourceEntity res);
@@ -102,11 +105,19 @@ public interface ActivityDocParser {
 
     Object setGeoAnalysisOutPuts(String aid, String oid, ArrayList<String> output);
 
-    Object geoAnalysisNoInput(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity output);
+    //for RLS90
+    String geoAnalysisNoInput(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity output);
 
+    String geoAnalysis(String aid, String toolId,
+                       HashSet<String> inResId,
+                       ArrayList<ResourceEntity> outRes,
+                       HashSet<String> participants);
 
     //for RL90
-    Object geoAnalysis(String aid, String toolId,HashSet<String> onlineMemberIds, String purpose, ResourceEntity input, ResourceEntity output);
+    //Signal input and output
+    String geoAnalysis(String aid, String toolId,
+                       HashSet<String> onlineMemberIds, String purpose,
+                       ResourceEntity input, ResourceEntity output);
 
 
 
@@ -115,4 +126,8 @@ public interface ActivityDocParser {
         Object setGeoAnalysisOutPut(String aid, String oid, String uid);
     //service
     HashMap<String, String> resFlow(String formId, String endId, String uid);
+
+    void resFlow(String fromId, String endId, HashSet<String> uids);
+
+    Object resFlow(String aid, ArrayList<ResourceEntity> resList);
 }

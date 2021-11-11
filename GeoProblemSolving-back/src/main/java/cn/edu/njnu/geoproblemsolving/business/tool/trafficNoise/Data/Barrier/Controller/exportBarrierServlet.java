@@ -119,13 +119,14 @@ public class exportBarrierServlet extends HttpServlet {
                 outputEntity.setDescription("Barrier data for RLS-90 model.");
                 ripDao.addResource(outputEntity);
 
+
                 //文档相关操作
                 HashSet<String> userIds = new HashSet<>();
                 for (Object item : participant){
                     JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
                     userIds.add(userInfo.getString("userId"));
                 }
-                docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
+                String oid = docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
                 // 更新节点
                 nodeService.addResToNode(aid, uid);
                 //资源自动更新
@@ -136,6 +137,7 @@ public class exportBarrierServlet extends HttpServlet {
 
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
+                respJson.put("operationId", oid);
             } else {
                 respJson.put("respCode", 0);
                 respJson.put("msg", "failed.");

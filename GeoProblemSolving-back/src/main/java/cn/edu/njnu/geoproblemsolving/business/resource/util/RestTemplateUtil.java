@@ -21,12 +21,6 @@ import java.util.Date;
 
 @Service
 public class RestTemplateUtil {
-    // @Autowired
-    // RestTemplate restTemplate;
-
-    @Autowired
-    RestTemplate restTemplate;
-
     @Value("${client_id}")
     String clientId;
 
@@ -39,17 +33,8 @@ public class RestTemplateUtil {
     @Autowired
     UserDao userDao;
 
-    @Value("${client_id}")
-    String clientId;
+    RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${client_secret}")
-    String clientSecret;
-
-    @Value("${userServerLocation}")
-    String userServerLocation;
-
-    @Autowired
-    UserDao userDao;
 
     /**
      * 文件下载请求

@@ -58,8 +58,9 @@ public class ActivityDocController {
         return activityDocService.findDocuments(aids);
     }
 
-    @RequestMapping(value = "/meta/{aid}/{uid}", method = RequestMethod.PUT)
-    public void putDataMeta(@PathVariable String aid, @PathVariable String uid){
-        nodeService.putResMeta(aid, uid);
+    //资源元数据发生修改
+    @RequestMapping(value = "/meta/{graphicId}/{aid}/{uid}", method = RequestMethod.PUT)
+    public void putDataMeta(@PathVariable String graphicId, @PathVariable String aid, @PathVariable String uid){
+        nodeService.putResMeta(graphicId, aid, uid);
     }
 }

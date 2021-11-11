@@ -1357,7 +1357,7 @@ export function analysisRecordUpdate(aid, oid, outputs) {
     alert("Failed to record operation. Please try it again!");
     return;
   }
-  
+
 
   // save output data
   let ResourceCollection = xmlDoc.getElementsByTagName("ResourceCollection")[0];

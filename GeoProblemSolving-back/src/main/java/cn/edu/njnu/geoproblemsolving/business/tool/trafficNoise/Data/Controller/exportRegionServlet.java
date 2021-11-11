@@ -65,11 +65,11 @@ public class exportRegionServlet extends HttpServlet {
             JSONObject map = JSONObject.parseObject(data);
             String aid = map.getString("aid");
             String graphId = map.getString("graphId");
-//            String id = map.getString("uid");
             String top = map.getString("top");
             String bottom = map.getString("bottom");
             String right = map.getString("right");
             String left = map.getString("left");
+
             String toolId = map.getString("toolId");
             JSONArray participant = map.getJSONArray("participant");
 
@@ -127,7 +127,7 @@ public class exportRegionServlet extends HttpServlet {
                     JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
                     userIds.add(userInfo.getString("userId"));
                 }
-                docParser.geoAnalysisNoInput(aid, toolId, userIds, "Data processing", outputEntity);
+                String oid = docParser.geoAnalysisNoInput(aid, toolId, userIds, "Data processing", outputEntity);
                 //保存到节点中
                 nodeService.addResToNode(aid, uid);
 
@@ -137,6 +137,7 @@ public class exportRegionServlet extends HttpServlet {
                 }
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
+                respJson.put("operationId", oid);
             } else {
                 respJson.put("respCode", 0);
                 respJson.put("msg", "failed.");

@@ -181,6 +181,7 @@ var taskList = [];
 
             activityInfo = event.data.activity;
             userInfo = event.data.user;
+            onlineMembers = [userInfo];
             toolId = event.data.tid;
             taskList = event.data.tasks;
 
@@ -328,7 +329,7 @@ var taskList = [];
 
     // post message to parent page
     function postIframeMsg(data) {
-        window.parent.postMessage(data, '*')
+        window.parent.postMessage(data, '*');
     }
 }
 
@@ -1037,14 +1038,23 @@ var taskList = [];
 
             // save the temporary operation
             if (from === "origin") {
-                postIframeMsg({
-                    "type": "task",
-                    "behavior": "record",
-                    "operations": [operation],
-                    "task": ""
-                });
+              postIframeMsg({
+                "type": "task",
+                "behavior": "record",
+                "operations": [operation],
+                "task": ""
+              });
+            } else if (from === "transfer") {
             }
         }
+    }
+
+    function refreshOperation(oid) {
+      let message = {
+        type: "task-record-backend",
+        oid: oid
+      };
+      postIframeMsg(message)
     }
 
     // Synchronize
@@ -1265,6 +1275,13 @@ var taskList = [];
                     case "computation": {
                         if (computationChannel != undefined && typeof computationChannel == "function") {
                             computationChannel(data);
+                            if (data.computeSuc){
+                              let computationResult = {
+                                type: "task-record-backend",
+                                oid: data.operationId
+                              }
+                              postIframeMsg(computationResult);
+                            }
                         }
                         break;
                     }
@@ -1316,7 +1333,7 @@ var taskList = [];
         为此
         为了简化代码
         没必要将两类工具 Invoke 强行拧在一起
-    
+
         面向开发者定制开发工具
         若他在定制工具中使用到了通用工具
         如果要进行自定义的话
@@ -1356,27 +1373,28 @@ var taskList = [];
             }
         },
 
-        receiveDataComputation: function (aid, serviceId, serviceToken, inputs, params) {
+        receiveDataComputation: function (aid, serviceId, serviceToken, inputData, inputs, params) {
             // computationChannel = callback;
             let invokeMsg = {
                 type: "computation",
                 tid: serviceId,
                 token: serviceToken,
                 urls: inputs,
+                inputs: inputData,
                 params: params,
                 computeAbleModel: false,
                 sender: userInfo.userId,
-                graphId: activityInfo.parent
+                graphId: activityInfo.parent,
             };
             if (this.websock.readyState === this.websock.OPEN) {
                 this.websocketSend(invokeMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
                 }, 1000)
             }
         },
@@ -1430,11 +1448,11 @@ var taskList = [];
                 this.websocketSend(msg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
+                    this.receiveDataInputDataOperation(inputMdl, addOrRemove);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
+                    this.receiveDataInputDataOperation(inputMdl, addOrRemove);
                 }, 1000)
             }
         },
@@ -1584,6 +1602,12 @@ var taskList = [];
         return resaveFile(file, JSON.stringify(info));
     }
 
+
+    function loadingBackendOperation(oid) {
+      refreshOperation(oid)
+    }
+
+
     /**
      * 活动socket转态信息
      * get socket status
@@ -1650,12 +1674,13 @@ var taskList = [];
      * @param aid
      * @param serviceId
      * @param serviceToken
+     * @param inputData
      * @param inputs
      * @param params
      * @param callback
      */
-    function sendDataOperation(aid, serviceId, serviceToken, inputs, params) {
-        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+    function sendDataOperation(aid, serviceId, serviceToken, inputData, inputs, params) {
+        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
     }
 
     /**

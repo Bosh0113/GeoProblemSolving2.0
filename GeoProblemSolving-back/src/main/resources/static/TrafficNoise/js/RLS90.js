@@ -547,8 +547,8 @@ function exportData(dataType) {
             }
         }
     }
-    data["toolId"] = toolId;
-    data["participant"] = onlineMembers;
+    data["toolId"] = window.parent.toolId;
+    data["participant"] = window.parent.onlineMembers;
 
     $.ajax({
         type: "post",
@@ -559,7 +559,9 @@ function exportData(dataType) {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode === 1) {
+                window.parent.loadingBackendOperation(result.operationId);
                 alert("Export data successfully!");
+                //
             } else {
                 alert("Fail to export data!");
             }

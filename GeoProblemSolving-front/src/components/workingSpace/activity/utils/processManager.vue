@@ -267,7 +267,6 @@
       ok-text="Link"
       cancel-text="Cancel"
       @on-visible-change='linkModalStatus'
-      :mask= "false"
     >
       <div slot="footer">
         <div style="display: flex; position: absolute; left: 30px">

@@ -11,15 +11,15 @@
           :key="index"
           style="padding: 10px"
         >
-          <el-col class="leftContainer" span="5">
-            <el-col offset="1" span="22">
+          <el-col class="leftContainer" :span="5">
+            <el-col :offset="1" :span="22">
               <div class="modelState">
                 <p class="state-name">{{ state.name }}</p>
                 <p class="state-desc">{{ state.description }}</p>
               </div>
             </el-col>
           </el-col>
-          <el-col class="dataContainer" span="17" offset="1">
+          <el-col class="dataContainer" :span="17" :offset="1">
             <div class="_params-group">
               <el-row v-if="inEventList(state).length !== 0" class="stateTitle"
                 >Input
@@ -233,7 +233,7 @@
           </el-col>
         </el-row>
 
-        <el-row>
+        <el-row v-show="invokeButtonShow">
           <el-button
             type="primary"
             @click="invokeTest"
@@ -338,6 +338,7 @@ export default {
 
       inputEventList: [],
       outputEventList: [],
+      invokeButtonShow: true
     };
   },
 
@@ -394,6 +395,7 @@ export default {
           let eventIndex = content.inputs.eventIndex;
           let url = content.inputs.url;
           let urlName = content.inputs.urlName;
+          let uid = content.inputs.uid;
           this.$set(this.stateList[stateIndex].Event[eventIndex], "url", url);
           this.$set(this.stateList[stateIndex].Event[eventIndex], "uid", uid);
           this.$set(
@@ -412,6 +414,7 @@ export default {
             "urlName",
             ""
           );
+          this.$set(this.stateList[stateIndex1].Event[findIndex], "uid", "");
         }
       } else if (behavior == "params") {
         //输入参数
@@ -442,9 +445,8 @@ export default {
       if (data != undefined && data != null) {
         let computeOutputs = data.outputInfo;
         if (computeOutputs !== "Fail") {
-          this.getStateEventOut(data.computeOutputs);
-          // record
-          this.operationApi.analysisRecordUpdate(this.aid, data.operationId, data.outputRes);
+          this.getStateEventOut(computeOutputs);
+          this.invokeButtonShow = false;
         } else {
           this.fullscreenLoading.close();
           this.$Notice.error({
@@ -506,18 +508,17 @@ export default {
               userInfo.userId
           )
           .then((res) => {
-            console.log("initTaskResponse", res.data);
             if (res.data.code == 0) {
               let data2 = res.data.data;
               this.invokeInfo.serviceIp = data2.ip;
               this.invokeInfo.servicePort = data2.port;
               this.invokeInfo.serviceId = this.md5;
             } else {
-              this.$Notice.error({ title: "Tool initialization failed." });
+              this.$Notice.error({ title: "Tool initialization failed.",desc: res.data.msg});
             }
           })
           .catch((err) => {
-            this.$Notice.error({ title: "Tool initialization failed." });
+            this.$Notice.error({ title: "Tool initialization failed."});
           });
       }, 1500);
     },
@@ -581,19 +582,23 @@ export default {
       //传递开始运行信息
       runTool();
       //测试数据没有弄 直接运行 根据ip+id
-      let operationId = guid();
-      this.operationApi.analysisRecord(
-        this.aid,
-        operationId,
-        "",
-        this.userId,
-        this.toolInfo.tid,
-        "Geographical simulation",
-        this.invokeInfo.inputs,
-        [],
-        [],
-        onlineMembers
-      );
+
+      // this.operationApi.getActivityDoc(this.aid);
+      // let operationId = guid();
+      // this.operationApi.analysisRecord(
+      //   this.aid,
+      //   operationId,
+      //   "",
+      //   this.userId,
+      //   this.toolInfo.tid,
+      //   "Geographical simulation",
+      //   this.invokeInfo.inputs,
+      //   [],
+      //   [],
+      //   onlineMembers
+      // );
+
+      // console.log(this.invokeInfo.inputs)
       sendModelOperation(
         this.aid,
         this.invokeInfo.serviceId,
@@ -846,7 +851,7 @@ export default {
         eventIndex: eventIndex,
         url: val.address,
         urlName: val.name,
-        uid: uid
+        uid: val.uid
       };
 
       selectDataOperation(content, "add");

@@ -1545,20 +1545,19 @@ export default {
             if (temp.length == 0) {
               temp = ["0"];
             }
-            console.log(this.uploadDataInfo);
             formData.append("description", this.uploadDataInfo.description);
             formData.append("type", this.uploadDataInfo.type);
             formData.append("privacy", this.uploadDataInfo.privacy);
-            // if(this.uploadDataInfo.type == "data"){
-            //   formData.append("format", this.uploadDataInfo.format);
-            //   formData.append("scale", this.uploadDataInfo.scale);
-            //   formData.append("reference", this.uploadDataInfo.reference);
-            //   formData.append("unit", this.uploadDataInfo.unit);
-            //   formData.append("concept", this.uploadDataInfo.concept);
-            // }
             formData.append("aid", this.activityInfo.aid);
             formData.append("paths", temp.toString());
             formData.append("graphId", this.activityInfo.parent);
+            if(this.uploadDataInfo.type == "data"){
+              formData.append("format", this.uploadDataInfo.format);
+              formData.append("scale", this.uploadDataInfo.scale);
+              formData.append("reference", this.uploadDataInfo.reference);
+              formData.append("unit", this.uploadDataInfo.unit);
+              formData.append("concept", this.uploadDataInfo.concept);
+            }
             this.progressModalShow = true;
 
             if (
@@ -1579,6 +1578,7 @@ export default {
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
+                    let uploadedOperation = res.data.uploadedOperation;
                     let metadata = {};
 
                     for (var i = 0; i < uploadedList.length; i++) {
@@ -1594,20 +1594,35 @@ export default {
                         this.relatedResList.push(uploadedList[i]);
                       }
 
-                      let operationId = this.operationApi.resOperationRecord(
-                        this.activityInfo.aid,
-                        "",
-                        "",
-                        "upload",
-                        this.userInfo.userId,
-                        uploadedList[i],
-                        metadata
-                      );
+                      // let operationId = this.operationApi.resOperationRecord(
+                      //   this.activityInfo.aid,
+                      //   "",
+                      //   "",
+                      //   "upload",
+                      //   this.userInfo.userId,
+                      //   uploadedList[i],
+                      //   metadata
+                      // );
+
                       // 生成临时操作记录
+                      // let resOperation = {
+                      //   id: operationId,
+                      //   type: "resource",
+                      //   resRef: uploadedList[i].uid,
+                      //   operator: this.userInfo.userId,
+                      // };
+                      //
+                      // this.$store.commit("updateTempOperations", {
+                      //   behavior: "add",
+                      //   operation: resOperation,
+                      // });
+                    }
+                    this.operationApi.getActivityDoc(this.activityInfo.aid);
+                    for (let i = 0; i < uploadedOperation.length; i++){
                       let resOperation = {
-                        id: operationId,
+                        id: uploadedOperation[i].oid,
                         type: "resource",
-                        resRef: uploadedList[i].uid,
+                        resRef: uploadedOperation[i].resRef,
                         operator: this.userInfo.userId,
                       };
                       this.$store.commit("updateTempOperations", {
@@ -1615,6 +1630,7 @@ export default {
                         operation: resOperation,
                       });
                     }
+
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
                         title: "Files too large.",
@@ -1712,6 +1728,7 @@ export default {
                 resRef: this.deleteResource.uid,
                 operator: this.userInfo.userId,
               };
+
               this.$store.commit("updateTempOperations", {
                 behavior: "add",
                 operation: resOperation,
@@ -2277,7 +2294,6 @@ export default {
               formData
             )
             .then((res) => {
-              console.log(res);
               this.editFileModel = false;
               if (res.data == "Offline") {
                 this.$store.commit("userLogout");
@@ -2333,13 +2349,9 @@ export default {
                   this.oldMetadata.concept != this.editFileValidate.concept
                 ){ metadataChanged = true; }
                 if(metadataChanged){
+                  let projectId = this.$route.params.projectId;
                   this.axios
-                    .put(
-                      "/GeoProblemSolving/activityDoc/meta/" +
-                        this.activityInfo.aid +
-                        "/" +
-                        this.selectFileInfo.uid
-                    )
+                    .put(`/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
                     .then((res) => {
                       console.log(res.data.data);
                     })

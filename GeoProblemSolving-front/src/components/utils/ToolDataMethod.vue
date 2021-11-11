@@ -393,26 +393,12 @@ export default {
       }
       runTool();
 
-      let operationId = guid();
-      this.operationApi.analysisRecord(
-        this.aid,
-        operationId,
-        "",
-        this.userInfo.userId,
-        this.toolInfo.tid,
-        "Data processing",
-        this.inputData,
-        [],
-        [],
-        onlineMembers
-      );
-      sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList);
+      sendDataOperation(this.aid, this.id, this.dataToken, this.inputData, urls, paramList);
     },
     // webSocket 回调函数
     getSocketComputation: function (data) {
+      //在coll.js 层面完成可视化
       let output = data.outputInfo;
-      let outputRes = data.outputRes;
-
       if (output !== "Fail") {
         let keys = Object.keys(output);
         keys.forEach((key) => {
@@ -426,11 +412,11 @@ export default {
         this.fullscreenLoading.close();
 
         // record
-        this.operationApi.analysisRecordUpdate(
-          this.aid,
-          data.operationId,
-          data.outputRes
-        );
+        // this.operationApi.analysisRecordUpdate(
+        //   this.aid,
+        //   data.operationId,
+        //   data.outputRes
+        // );
       } else {
         this.fullscreenLoading.close();
         this.$Notice.error({
@@ -508,6 +494,7 @@ export default {
       this.dataService.metaDetail.input[index].url = val.address;
       this.dataService.metaDetail.input[index].urlName = val.name;
       this.dataService.metaDetail.input[index].uid = val.uid;
+
 
 
       this.selectDataDialogShow = false;

@@ -126,7 +126,7 @@ public class exportRoadServlet extends HttpServlet {
                     JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
                     userIds.add(userInfo.getString("userId"));
                 }
-                docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
+                String oid = docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
                 // 更新节点
                 nodeService.addResToNode(aid, uid);
                 //资源自动更新
@@ -135,6 +135,7 @@ public class exportRoadServlet extends HttpServlet {
                 }
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
+                respJson.put("operationId", oid);
             } else {
                 respJson.put("respCode", 0);
                 respJson.put("msg", "failed.");

@@ -356,7 +356,7 @@ public class CollaborationService {
                     ComputeMsg computeMsg = new ComputeMsg();
                     //读取当前 group 下的计算队列
                     HashMap<String, ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
-                    if (computeRecords == null) computeRecords = new HashMap<String, ComputeMsg>();
+                    if (computeRecords == null) computeRecords = new HashMap<>();
 
                     Boolean isComputeModel = messageObject.getBoolean("computeAbleModel");
                     // computeMsg.setOutputs(outputs);
@@ -373,6 +373,8 @@ public class CollaborationService {
                     String graphId = messageObject.getString("graphId");
 
                     HashSet<String> outResIds = new HashSet<>();
+                    HashSet<String> inResIds = new HashSet<>();
+                    ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                     if (isComputeModel) {
                     /*
                      1. 根据模型 md5 获取合适的 taskService
@@ -391,13 +393,11 @@ public class CollaborationService {
                         String servicePort = messageObject.getString("servicePort");
                         String serviceMd5 = messageObject.getString("serviceMd5");
                         JSONArray inputs = messageObject.getJSONArray("inputs");
-                        String operationId = messageObject.getString("operationId");
 
                         computeMsg.setServiceIp(serviceIp);
                         computeMsg.setServicePort(servicePort);
                         computeMsg.setServiceId(serviceMd5);
                         computeMsg.setInputs(inputs);
-                        computeMsg.setOid(operationId);
 
                         String invokeUrl = "http://" + mangeServiceLocation + "/GeoModeling/computableModel/invoke";
                         JSONObject invokeJson = new JSONObject();
@@ -504,12 +504,13 @@ public class CollaborationService {
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                             return;
                         }
-                        String sucTaskTid = resJson.getString("tid");
-                        HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
-                        ComputeMsg sucMessage = computeList.get(sucTaskTid);
+                        // String sucTaskTid = resJson.getString("tid");
+                        // HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
+                        // ComputeMsg sucMessage = computeList.get(sucTaskTid);
+                        computeMsg.setComputeSuc(true);
                         JSONArray sucOutputs = resJson.getJSONArray("outputs");
+                        computeMsg.setOutputs(sucOutputs);
                         //将所有返回内容存入项目中,不做持久化暂时没用
-                        ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                         for (int i = 0; i < sucOutputs.size(); i++) {
                             JSONObject outItem = sucOutputs.getJSONObject(i);
                             String address = outItem.getString("url").split("\\?")[0];
@@ -533,16 +534,14 @@ public class CollaborationService {
                             ripDao.addResource(resourceEntity);
                             outputRes.add(resourceEntity);
                             outResIds.add(uid);
-
                         }
-                        JSONObject output = new JSONObject();
-                        output.put("outputInfo", sucOutputs);
-                        output.put("outputRes", outputRes);
-                        sucMessage.setOutputs(output);
 
-                        HashMap<String, CollaborationUser> receivers1 = sucMessage.getReceivers();
-                        HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                        collaborationBehavior.sendComputeResult(participants, receivers1, computeMsg);
+                        //更新文档
+                        for (Object item : inputs){
+                            JSONObject input = JSONObject.parseObject(JSONObject.toJSONString(item));
+                            inResIds.add(input.getString("uid"));
+                        }
+
                     } else {
                     /*
                     从缓存中获得数据处理任务
@@ -552,8 +551,11 @@ public class CollaborationService {
                      */
                         String token = messageObject.getString("token");
                         String serviceId = messageObject.getString("tid");
+                        //前端整理好的输入格式
                         JSONObject urls = messageObject.getJSONObject("urls");
                         String params = messageObject.getString("params");
+                        //输入数据
+                        JSONArray inputs = messageObject.getJSONArray("inputs");
                         JSONArray paramsArray = new JSONArray();
                         if (!params.equals("")){
                             String[] split = params.split(",");
@@ -582,8 +584,8 @@ public class CollaborationService {
                             computeMsg.setOutputs("Fail");
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                         }else {
+                            computeMsg.setComputeSuc(true);
                             Map<String, String> outputs = jsonObject.getObject("urls", HashMap.class);
-                            ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                             for (Map.Entry item: outputs.entrySet()){
                                 String outputName = (String)item.getKey();
                                 if (!outputName.equals("undefined")){
@@ -609,25 +611,31 @@ public class CollaborationService {
                                     outResIds.add(uid);
                                 }
                             }
-                            JSONObject output = new JSONObject();
-                            output.put("outputInfo", outputs);
-                            output.put("outputRes", outputRes);
-                            computeMsg.setOutputs(output);
-                            HashMap<String, CollaborationUser> oldParticipants = computeMsg.getReceivers();
-                            HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                            collaborationBehavior.sendComputeResult(participants, oldParticipants, computeMsg);
+                            computeMsg.setOutputs(outputs);
+
+                            //输入数据
+                            for (Object item : inputs){
+                                JSONObject input = JSONObject.parseObject(JSONObject.toJSONString(item));
+                                inResIds.add(input.getString("uid"));
+                            }
                         }
 
                     }
-                    //写入文档
+
+                    //更新文档
+                    String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    computeMsg.setOid(oid);
+
                     //更新当前节点
                     nodeService.addResToNodeBatch(aid, outResIds);
                     //资源自动更新
                     if(graphId != null && graphId != ""){
                         geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, outResIds);
                     }
-                    //更新当前节点
-                    //流动
+
+                    HashMap<String, CollaborationUser> oldParticipants = computeMsg.getReceivers();
+                    HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
+                    collaborationBehavior.sendComputeResult(participants, oldParticipants, computeMsg);
                     break;
                 }
                 case "task":{

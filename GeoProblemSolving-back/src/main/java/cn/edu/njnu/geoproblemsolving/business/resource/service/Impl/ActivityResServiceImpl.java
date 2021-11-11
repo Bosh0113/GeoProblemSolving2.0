@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
@@ -57,6 +58,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Autowired
     NodeService nodeService;
+
+    @Autowired
+    ActivityDocParser docParser;
 
 
     @Value("${dataContainer}")
@@ -115,7 +119,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         //记录上传状态
         uploadInfos.failed = new ArrayList<>();
         uploadInfos.sizeOver = new ArrayList<>();
-        uploadInfos.uploaded = new ArrayList<ResourceEntity>();
+        uploadInfos.uploaded = new ArrayList<>();
         try {
             if (!ServletFileUpload.isMultipartContent(req)) {
                 System.out.println("File is not multimedia.");
@@ -125,13 +129,23 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String userId = (String) session.getAttribute("userId");
             String uploadName = userDao.findUserByIdOrEmail(userId).getName();
             String aid = req.getParameter("aid");
+            String type = req.getParameter("type");
+            //添加数据元数据相关操作
+            HashMap<String, String> meta = null;
+            if (type.equals("data")){
+                meta = new HashMap<>();
+                meta.put("format", req.getParameter("format"));
+                meta.put("scale", req.getParameter("scale"));
+                meta.put("reference", req.getParameter("reference"));
+                meta.put("unit", req.getParameter("unit"));
+                meta.put("concept", req.getParameter("concept"));
+            }
             List<ResourceEntity> resourceList = activityResDao.queryByAid(aid);
             String[] pathsArray = req.getParameter("paths").split(",");
             ArrayList<String> paths = new ArrayList<>();
             for (String path : pathsArray) {
                 paths.add(path);
             }
-
 
             Collection<Part> parts = req.getParts();
             //多个肯定是在同一个文件夹的可以直接存入
@@ -147,8 +161,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
-            HashMap<String, String> resTagMap = new HashMap<>();
             HashSet<String> uploadUids = new HashSet<>();
+            ArrayList<HashMap<String, String>> uploadSucOperation;
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
@@ -249,7 +263,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             Query query = new Query(Criteria.where("uid").is(rootResUid));
                             Update update = new Update();
                             update.set("children", putResList.get(index).getChildren());
-                            //不会出问题
+                            //将所上传的资源存入当前活动中
                             activityResDao.updateRes(query, update);
 
                         } else {
@@ -260,6 +274,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
+            //更新文档
+            uploadInfos.uploadedOperation = docParser.uploadResources(aid, uploadInfos.uploaded, meta);
             //更新当前节点
             nodeService.addResToNodeBatch(aid, uploadUids);
             /*
@@ -268,7 +284,6 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String graphId = req.getParameter("graphId");
             //update
             geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uploadUids);
-
             return uploadInfos;
 
         } catch (Exception e) {

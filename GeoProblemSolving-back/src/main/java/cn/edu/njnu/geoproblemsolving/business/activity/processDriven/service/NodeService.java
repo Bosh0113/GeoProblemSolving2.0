@@ -59,6 +59,12 @@ public interface NodeService {
     //资源相关内容，将可能异常的地方在此层完成屏蔽
     HashMap<String, String> addResToNode(String aid, ResourceEntity res);
 
+    /**
+     *
+     * @param aid
+     * @param resInfo 资源字段
+     * @return
+     */
     HashMap<String, String> addResToNodeBatch(String aid, HashMap<String, String> resInfo);
 
     void addResToNodeBatch(String aid, HashSet<String> uids);
@@ -71,7 +77,7 @@ public interface NodeService {
 
     void putResInNode(String aid, ResourceEntity res);
 
-    void putResMeta(String aid, String uid);
+    void putResMeta(String graphicId, String aid, String uid);
 
 
     //资源的更新
