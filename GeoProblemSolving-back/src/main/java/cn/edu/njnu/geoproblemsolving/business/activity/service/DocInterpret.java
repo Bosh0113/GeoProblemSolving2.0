@@ -4,6 +4,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.UserDispatch;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityDocRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
@@ -56,6 +58,9 @@ public class DocInterpret implements ActivityDocParser {
 
     @Autowired
     NodeService nodeService;
+
+    @Autowired
+    UserDispatch userDispatch;
 
     @Value("${userServerLocation}")
     String userServer;
@@ -1019,5 +1024,85 @@ public class DocInterpret implements ActivityDocParser {
             e.printStackTrace();
         }
         return;
+    }
+
+    @Override
+    public Object userJoin(String aid, String userId) {
+        try{
+            JSONObject userTag = userDispatch.getUserTag(userId);
+            if (userTag == null) return null;
+            JSONArray domains = userTag.getJSONArray("domain");
+            JSONArray organizations = userTag.getJSONArray("organization");
+            UserEntity user = userDao.findUserByIdOrEmail(userId);
+            syncGlobalVariables(aid);
+            if (operatingDoc == null) return null;
+            Element participantsEle = (Element)activityDocXml.selectSingleNode("/Activity/Participants");
+            Element personEle = participantsEle.addElement("Person");
+            personEle.addAttribute("id", userId);
+            personEle.addAttribute("email", user.getEmail());
+            personEle.addAttribute("name", user.getName());
+            personEle.addAttribute("role", "ordinary-member");
+            personEle.addAttribute("state", "in");
+            if (domains != null && !domains.isEmpty()){
+                for (Object item : domains){
+                    Element domainEle = personEle.addElement("Domain");
+                    domainEle.addAttribute("description", (String) item);
+                }
+            }
+
+            if (organizations != null && !organizations.isEmpty()){
+                for (Object item : organizations){
+                    Element OrganizationEle = personEle.addElement("Organization");
+                    OrganizationEle.addAttribute("description", (String) item);
+                }
+            }
+            saveXML();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Object userJoin(String aid, HashSet<String> userIds) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        if (userIds == null || userIds.isEmpty()) return null;
+        JSONObject usersTag = userDispatch.getUsersTag(userIds);
+        Element participantsEle = (Element)activityDocXml.selectSingleNode("/Activity/Participants");
+        for (String userId : userIds){
+            UserEntity user = userDao.findUserByIdOrEmail(userId);
+            Element personEle = participantsEle.addElement("Person");
+            personEle.addAttribute("id", userId);
+            personEle.addAttribute("email", user.getEmail());
+            personEle.addAttribute("name", user.getName());
+            personEle.addAttribute("role", "ordinary-member");
+            personEle.addAttribute("state", "in");
+
+            JSONObject userTag = usersTag.getJSONObject(userId);
+            JSONArray domains = userTag.getJSONArray("domain");
+            JSONArray organizations = userTag.getJSONArray("organization");
+
+            if (domains != null && !domains.isEmpty()){
+                for (Object item : domains){
+                    Element domainEle = personEle.addElement("Domain");
+                    domainEle.addAttribute("description", (String) item);
+                }
+            }
+
+            if (organizations != null && !organizations.isEmpty()){
+                for (Object item : organizations){
+                    Element OrganizationEle = personEle.addElement("Organization");
+                    OrganizationEle.addAttribute("description", (String) item);
+                }
+            }
+        }
+        saveXML();
+        return null;
+    }
+
+    @Override
+    public Object userJoin(String fromId, String endId, HashSet<String> userIds) {
+        return null;
     }
 }

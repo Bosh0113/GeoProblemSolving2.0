@@ -946,7 +946,7 @@ export default {
         let user = this.potentialMembers[index];
         inviteList.push(user.userId);
       }
-      
+
       let url = "";
       if (activity.level == 1) {
        url =
@@ -975,14 +975,14 @@ export default {
                 if (this.participants.contains(this.potentialMembers[index])) continue;
                 let user = this.potentialMembers[index];
                 this.participants.push(user);
-                this.operationApi.participantUpdate(
-                  this.activityInfo.aid,
-                  "join",
-                  user.userId,
-                  user.name,
-                  "ordinary-member",
-                  user.domain
-                );
+                // this.operationApi.participantUpdate(
+                //   this.activityInfo.aid,
+                //   "join",
+                //   user.userId,
+                //   user.name,
+                //   "ordinary-member",
+                //   user.domain
+                // );
                 this.$Notice.info({ desc: "Invite member successfully" });
 
                 //notice
@@ -1007,7 +1007,7 @@ export default {
                     activityLevel: activity.level,
                     invitorName: this.userInfo.name,
                     invitorId: this.userInfo.userId,
-                  }, 
+                  },
                 };
                 this.sendNotice(notice);
               }
@@ -1018,7 +1018,7 @@ export default {
           .catch((err) => {
             throw err;
           });
-      
+
     },
     selectMember(member, operation) {
       if (operation == "delete") {
@@ -1054,6 +1054,7 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.operationApi.getActivityDoc(this.activityInfo.aid);
             this.operationApi.participantUpdate(
               this.activityInfo.aid,
               "remove",

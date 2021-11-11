@@ -130,4 +130,10 @@ public interface ActivityDocParser {
     void resFlow(String fromId, String endId, HashSet<String> uids);
 
     Object resFlow(String aid, ArrayList<ResourceEntity> resList);
+
+    Object userJoin(String aid, String userId);
+
+    Object userJoin(String aid, HashSet<String> userIds);
+
+    Object userJoin(String fromId, String endId, HashSet<String> userIds);
 }

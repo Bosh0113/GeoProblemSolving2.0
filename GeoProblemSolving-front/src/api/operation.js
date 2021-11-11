@@ -288,26 +288,32 @@ export function getResMetaInfo(aids) {
           let type = metaDtaList[k].getAttribute("type");
           let description = metaDtaList[k].getAttribute("description");
           if (type === "scale") {
-            scaleTemp.push({text: description});
+            scaleTemp.push(description);
           } else if (type === "format") {
-            formatTemp.push({text: description});
+            formatTemp.push(description);
           } else if (type === "reference") {
-            referenceTemp.push({text: description});
+            referenceTemp.push(description);
           } else if (type === "unit") {
-            unitTemp.push({text: description});
+            unitTemp.push(description);
           } else if (type === "concept") {
-            conceptTemp.push({text: description});
+            conceptTemp.push(description);
           }
         }
       }
     }
+    let format = Array.from(new Set(formatTemp)).filter(item=>{return item != ""});
+    let scale = Array.from(new Set(scaleTemp)).filter(item=>{return item != ""});
+    let reference = Array.from(new Set(referenceTemp)).filter(item=>{return item != ""});
+    let unit = Array.from(new Set(unitTemp)).filter(item=>{return item != ""});
+    let concept = Array.from(new Set(conceptTemp)).filter(item=>{return item != ""});
     resMetaInfo = {
-      format: Array.from(new Set(formatTemp)),
-      scale: Array.from(new Set(scaleTemp)),
-      reference: Array.from(new Set(referenceTemp)),
-      unit: Array.from(new Set(unitTemp)),
-      concept: Array.from(new Set(conceptTemp))
+      format: format.map(item=>{return {text: item}}),
+      scale: scale.map(item=>{return {text: item}}),
+      reference: reference.map(item=>{return {text: item}}),
+      unit: unit.map(item=>{return {text: item}}),
+      concept: concept.map(item=>{return {text: item}})
     };
+
     return resMetaInfo;
   } else {
     throw new Error(result.msg)

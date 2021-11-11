@@ -2220,6 +2220,9 @@
                 },
               };
               this.sendLinkSock(content);
+              this.collLinkUser = this.participants.filter(
+                (item) => item.userId == this.userInfo.userId
+              );
               this.collaboratingInfoList.push(content.linkInfo);
             } else {
               //此几个选中的活动正在进行连接

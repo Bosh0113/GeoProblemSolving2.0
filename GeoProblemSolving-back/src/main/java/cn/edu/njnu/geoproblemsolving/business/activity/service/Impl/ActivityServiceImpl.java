@@ -2,10 +2,12 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -41,6 +43,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final ActivityDocParser docParser;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -51,7 +54,7 @@ public class ActivityServiceImpl implements ActivityService {
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
                                ToolService toolService,
-                               NodeService nodeService) {
+                               NodeService nodeService, ActivityDocParser docParser) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
@@ -61,6 +64,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectUtil = httpUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -609,6 +613,9 @@ public class ActivityServiceImpl implements ActivityService {
 
             activityRepository.save(activity);
 
+
+            //update doc
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
 
@@ -648,6 +655,8 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
             activityRepository.save(activity);
 
+            //update doc
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
             return ResultUtils.success(members);

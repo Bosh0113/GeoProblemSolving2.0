@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -40,8 +41,9 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final ActivityDocParser docParser;
 
-    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, ActivityDocParser docParser) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
@@ -50,6 +52,7 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -391,6 +394,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //更新文档
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
 
@@ -433,6 +438,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //update doc
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 

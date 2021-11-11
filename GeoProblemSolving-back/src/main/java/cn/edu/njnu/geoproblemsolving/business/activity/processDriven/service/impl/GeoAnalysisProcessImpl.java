@@ -798,6 +798,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Override
     public void batchResFlowAutoUpdate(String graphId, String nodeId, HashSet<String> uids) {
+        if (graphId == null || graphId.equals("")) return;
         if (uids == null || uids.size() == 0) return;
         Optional<ActivityNode> byId = nodeRepository.findById(nodeId);
         if (!byId.isPresent()) return;
