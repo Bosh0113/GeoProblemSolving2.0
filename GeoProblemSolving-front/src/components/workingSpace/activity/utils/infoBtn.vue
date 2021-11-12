@@ -573,14 +573,14 @@ export default {
                 this.$Notice.info({ desc: "Invite member successfully" });
 
                 // update activity doc
-                this.operationApi.participantUpdate(
-                  activity.aid,
-                  "join",
-                  user.userId,
-                  user.name,
-                  "ordinary-member",
-                  user.domain
-                );
+                // this.operationApi.participantUpdate(
+                //   activity.aid,
+                //   "join",
+                //   user.userId,
+                //   user.name,s
+                //   "ordinary-member",
+                //   user.domain
+                // );
 
                 //notice
                 let notice = {
@@ -659,6 +659,7 @@ export default {
             this.slctRoleMember = role;
             this.$Notice.info({ desc: "Change the member role successfully" });
             // update activity doc
+            this.operationApi.getActivityDoc(activity.aid);
             this.operationApi.participantUpdate(
               activity.aid,
               "role",
