@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
@@ -82,15 +83,13 @@ public class runModelService {
            @value:值
      */
     public static void genHeightUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_Height.xml";
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("data/temp/udx_xml_Height.xml");
         String allText = "";
-
-        File tempFile = new File(tempFilePath);
-        if (!tempFile.exists()) {
+        if (inputStream == null) {
             System.out.println("temp file dest not exist!");
             return;
         }
-        FileReader fileReader = new FileReader(tempFile);
+        InputStreamReader fileReader = new InputStreamReader(inputStream,"utf8");
         BufferedReader reader = new BufferedReader(fileReader);
         String tempLine;
         while ((tempLine = reader.readLine()) != null) {
@@ -135,15 +134,13 @@ public class runModelService {
     }
 
     public static void genBoundBoxUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_RegionBBox.xml";
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("data/temp/udx_xml_RegionBBox.xml");
         String allText = "";
-
-        File tempFile = new File(tempFilePath);
-        if (!tempFile.exists()) {
+        if (inputStream == null) {
             System.out.println("temp file dest not exist!");
             return;
         }
-        FileReader fileReader = new FileReader(tempFile);
+        InputStreamReader fileReader = new InputStreamReader(inputStream,"utf8");
         BufferedReader reader = new BufferedReader(fileReader);
         String tempLine;
         while ((tempLine = reader.readLine()) != null) {
@@ -188,15 +185,13 @@ public class runModelService {
     }
 
     public static void genSamplingSizeUdxData(String filePath, String value) throws IOException {
-        String tempFilePath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "data\\temp\\udx_xml_SamplingSize.xml";
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("data/temp/udx_xml_SamplingSize.xml");
         String allText = "";
-
-        File tempFile = new File(tempFilePath);
-        if (!tempFile.exists()) {
+        if (inputStream == null) {
             System.out.println("temp file dest not exist!");
             return;
         }
-        FileReader fileReader = new FileReader(tempFile);
+        InputStreamReader fileReader = new InputStreamReader(inputStream,"utf8");
         BufferedReader reader = new BufferedReader(fileReader);
         String tempLine;
         while ((tempLine = reader.readLine()) != null) {

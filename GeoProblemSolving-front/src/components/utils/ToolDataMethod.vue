@@ -3,6 +3,7 @@
     <div id="collab-tool-head"></div>
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content" class="scrollbar">
+      <div id="edit-mask" title="The other participant is operating."></div>
       <el-row>
         <el-col
           :span="22"

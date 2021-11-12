@@ -3,8 +3,13 @@
   <div class>
     <template>
       <Row>
-        <div style="float:left;">
-          <Row style="margin:8px 0 0 12px">
+        <div style="float: left">
+          <Row style="margin: 8px 12px 0 0" v-if="list.receivers != undefined && list.receivers.length > 0">
+            <div class="user_name">
+              {{ list.sender.name }} send to me
+            </div>
+          </Row>
+          <Row style="margin: 8px 0 0 12px" v-else>
             <div class="user_name">{{ list.sender.name }}</div>
           </Row>
           <Row>
@@ -88,14 +93,14 @@ import { post } from "@/axios";
 export default {
   props: {
     message: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   components: {
     simplePublicCard,
     toolModal,
     toolPreview,
-    templateGeneral
+    templateGeneral,
   },
 
   data() {
@@ -108,7 +113,7 @@ export default {
       // getGeneralInfo: {},
       currentStep: 0,
       currentToolInfo: {},
-      createToolInfo: {}
+      createToolInfo: {},
     };
   },
   watch: {
@@ -116,8 +121,8 @@ export default {
       handler(val) {
         this.list = val;
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     showPreview({ content }) {
@@ -156,8 +161,8 @@ export default {
       let data = await post("/GeoProblemSolving/tool/create", createToolForm);
       this.saveToolDialogShow = false;
       this.$Notice.info({ desc: "Save the tool successfully" });
-    }
-  }
+    },
+  },
 };
 </script>
 

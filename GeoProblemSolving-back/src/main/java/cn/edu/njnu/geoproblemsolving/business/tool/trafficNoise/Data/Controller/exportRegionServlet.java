@@ -74,7 +74,6 @@ public class exportRegionServlet extends HttpServlet {
             JSONArray participant = map.getJSONArray("participant");
 
 
-
             String resultId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             String zipUrl = "data" + File.separator + "TrafficNoise" + File.separator + resultId + File.separator;
             String resultDir = req.getServletContext().getRealPath("./") + zipUrl;

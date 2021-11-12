@@ -122,6 +122,9 @@ public class CollaborationBehavior {
                     user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else {
+                if(!receivers.contains(sender.getUserId())) {
+                    receivers.add(sender.getUserId());
+                }
                 messageObject.put("receivers", receivers);
                 // send message
                 for (String receiver : receivers) {
