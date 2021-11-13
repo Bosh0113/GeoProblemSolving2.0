@@ -443,8 +443,8 @@ export default {
 
     getSocketComputation: function (data) {
       if (data != undefined && data != null) {
-        let computeOutputs = data.outputInfo;
-        if (computeOutputs !== "Fail") {
+        if (data.computeSuc) {
+          let computeOutputs = data.outputInfo;
           this.getStateEventOut(computeOutputs);
           this.invokeButtonShow = false;
         } else {
@@ -695,8 +695,17 @@ export default {
     },
 
     download(event) {
-      let url = event.url.split("?")[0];
-      window.open(url);
+      let url = event.url;
+      let uid;
+      if (typeof(url) == "string"){
+        uid = url.slice(-36);
+      }
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = this.$store.getters.resProxy + "/data/" + uid;
+      a.target = "_self";
+      a.click();
+      a.remove();
     },
 
     urlToBlob(the_url, callback) {

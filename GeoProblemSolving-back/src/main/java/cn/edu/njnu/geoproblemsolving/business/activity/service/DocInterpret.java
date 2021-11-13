@@ -742,7 +742,7 @@ public class DocInterpret implements ActivityDocParser {
             purpose = toolEle.attributeValue("function");
         } catch (NullPointerException e) {
             e.printStackTrace();
-            System.out.println("Read XML: No such tool in the doc.");
+            System.out.println("Read XML: No such tool("+ toolId +") in the doc.");
         }
         operationEle.addAttribute("purpose", purpose);
 
@@ -1103,6 +1103,15 @@ public class DocInterpret implements ActivityDocParser {
 
     @Override
     public Object userJoin(String fromId, String endId, HashSet<String> userIds) {
+        return null;
+    }
+
+    @Override
+    public Object extractWorkFlowTemplate(String aid) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element activityEle = activityDocXml.getRootElement();
+        String activityType = activityEle.attributeValue("type");
         return null;
     }
 }

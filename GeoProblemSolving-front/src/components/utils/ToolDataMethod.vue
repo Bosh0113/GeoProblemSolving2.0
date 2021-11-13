@@ -398,8 +398,8 @@ export default {
     // webSocket 回调函数
     getSocketComputation: function (data) {
       //在coll.js 层面完成可视化
-      let output = data.outputInfo;
-      if (output !== "Fail") {
+      if (data.computeSuc) {
+        let output = data.outputInfo;
         let keys = Object.keys(output);
         keys.forEach((key) => {
           this.outputData.forEach((item, index) => {
@@ -505,7 +505,15 @@ export default {
     },
 
     download(event) {
-      window.open(event.url);
+      let url = event.url;
+      if (typeof(url) == "string"){
+        url = url.slice(-36);
+      }
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = this.$store.getters.resProxy + "/data/" + url;
+      a.click();
+      a.remove();
     },
     remove(event, index) {
       event.url = "";

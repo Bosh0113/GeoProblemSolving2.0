@@ -183,6 +183,7 @@ export default {
           { required: false, message: "Drawing tool", trigger: "blur" },
         ],
       },
+      resProxy: this.$store.getters.resProxy
     };
   },
   mounted() {
@@ -424,7 +425,7 @@ export default {
             behavior: "removeAll",
             content: JSON.stringify({}),
           };
-          
+
           sendCustomOperation(that.send_content);
         },
       });
@@ -532,7 +533,11 @@ export default {
         //从url获取GeoJSON数据
         var that = this;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", this.selectData.address, true);
+        let uid = this.requireDataId(this.selectData.address);
+        if (uid === undefined){
+          return;
+        }
+        xhr.open("GET", this.resProxy + uid, true);
         xhr.onload = function (e) {
           if (this.status == 200) {
             var file = JSON.parse(this.response);
@@ -755,7 +760,11 @@ export default {
 
             var that = this;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", dataItem.address, true);
+            let uid = this.requireDataId(dataItem.address);
+            if (uid === undefined){
+              return;
+            }
+            xhr.open("GET", this.resProxy + uid, true);
             xhr.onload = function (e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);
@@ -869,6 +878,16 @@ export default {
         this.viewData();
       }
     },
+    requireDataId(address){
+      if (address.length == 36){
+        return address;
+      }else if (address.length > 36){
+        let addressArray = address.split("data/");
+        if (addressArray instanceof  Array && addressArray.length > 1){
+          return addressArray[1];
+        }
+      }
+    }
   },
 };
 </script>

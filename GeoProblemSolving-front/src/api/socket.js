@@ -23,7 +23,6 @@ function initWebSocket(para) { //初始化websocket
   }
   websock.onclose = function (e) {
     websocketclose(e, para);
-    removeTimer();
     websockLinked[para] = false;
     connectorNum[para] = -1;
     let index = socketSites.indexOf(para);
@@ -37,7 +36,9 @@ function initWebSocket(para) { //初始化websocket
   //连接成功的回调函数
   websock.onopen = function () {
     websocketOpen();
-    setTimer();
+    if (timer === null){
+      setTimer();
+    }
     websockLinked[para] = true;
     connectorNum[para] = 1;
     socketSites.push(para);
