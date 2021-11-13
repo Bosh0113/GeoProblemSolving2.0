@@ -305,7 +305,6 @@ export default {
 
     initSize() {
       this.panelHeight = window.innerHeight;
-      console.log(this.panelHeight);
     }
   }
 };

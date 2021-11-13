@@ -698,7 +698,7 @@ var taskList = [];
     }
 
     function importParentRes() {
-        for(let i = 0; i < parentResources.length; i++){
+        for (let i = 0; i < parentResources.length; i++) {
             resources.files.push.apply(resources.files, parentResources[i]);
         }
     }
@@ -969,7 +969,7 @@ var taskList = [];
             }
         } else if (collabMode == "SemiFree_Apply") {
             let user = null;
-            if(Object.prototype.toString.call(operator) == "[object Object]") {
+            if (Object.prototype.toString.call(operator) == "[object Object]") {
                 user = Object.assign({}, operator);
                 operator = operator.userId
             } else {
@@ -1107,23 +1107,23 @@ var taskList = [];
 
             // save the temporary operation
             if (from === "origin") {
-              postIframeMsg({
-                "type": "task",
-                "behavior": "record",
-                "operations": [operation],
-                "task": ""
-              });
+                postIframeMsg({
+                    "type": "task",
+                    "behavior": "record",
+                    "operations": [operation],
+                    "task": ""
+                });
             } else if (from === "transfer") {
             }
         }
     }
 
     function refreshOperation(oid) {
-      let message = {
-        type: "task-record-backend",
-        oid: oid
-      };
-      postIframeMsg(message)
+        let message = {
+            type: "task-record-backend",
+            oid: oid
+        };
+        postIframeMsg(message)
     }
 
     // Synchronize
@@ -1340,18 +1340,26 @@ var taskList = [];
                     case "computation": {
                         if (computationChannel != undefined && typeof computationChannel == "function") {
                             computationChannel(data);
-                            if (data.computeSuc){
-                              let computationResult = {
-                                type: "task-record-backend",
-                                oid: data.operationId
-                              }
-                              postIframeMsg(computationResult);
+                            if (data.computeSuc) {
+                                let computationResult = {
+                                    type: "task-record-backend",
+                                    oid: data.operationId
+                                }
+                                postIframeMsg(computationResult);
                             }
                         }
                         break;
                     }
                     case "test": {
-
+                        try {
+                            content = JSON.parse(data.content);
+                            setCollaborationMode(content.mode);
+                            setOperator(content.operator);
+                            setWaitingLine(content.waiting);
+                        } catch (err) {
+                            console.log(err);
+                        }
+                        break;
                     }
                 }
             } catch (err) {
@@ -1669,7 +1677,7 @@ var taskList = [];
 
 
     function loadingBackendOperation(oid) {
-      refreshOperation(oid)
+        refreshOperation(oid)
     }
 
 
