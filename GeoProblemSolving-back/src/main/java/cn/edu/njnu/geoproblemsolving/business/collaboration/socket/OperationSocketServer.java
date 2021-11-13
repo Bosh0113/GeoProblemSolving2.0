@@ -58,7 +58,7 @@ public class OperationSocketServer {
 
     @OnError
     public void onError(@PathParam("roomId") Throwable error) {
-        System.out.println("Error!");
+        System.out.println("Operation Error: " + error.toString());
         error.printStackTrace();
     }
 

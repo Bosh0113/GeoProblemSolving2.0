@@ -18,12 +18,15 @@ function initWebSocket(para) { //初始化websocket
   //switch 使用时提供一个参数type
   let websock = new WebSocket(wsurl);
   websock.onmessage = function (e) {
+    let url = e.target.url;
+    let para = url.substring(url.indexOf('/GeoProblemSolving/'));
     websocketonmessage(e, para);
     websockLinked[para] = true;
   }
   websock.onclose = function (e) {
-    websocketclose(e, para);
-    removeTimer();
+    let url = e.target.url;
+    let para = url.substring(url.indexOf('/GeoProblemSolving/'));
+
     websockLinked[para] = false;
     connectorNum[para] = -1;
     let index = socketSites.indexOf(para);
@@ -33,28 +36,37 @@ function initWebSocket(para) { //初始化websocket
     if (socketSites.length == 0){
       removeTimer();
     }
+    
+    websocketclose(e, para);
   }
   //连接成功的回调函数
   websock.onopen = function () {
     websocketOpen();
-    setTimer();
+    if(timer == null){
+      setTimer();
+    }
     websockLinked[para] = true;
     connectorNum[para] = 1;
     socketSites.push(para);
   }
 
   //连接发生错误的回调方法
-  websock.onerror = function () {
+  websock.onerror = function (e) {
     console.log("WebSocket error");
-    websockLinked[para] = false;
-    connectorNum[para] = -1;
-    let index = socketSites.indexOf(para);
-    if (index > -1){
-      socketSites.splice(index, 1);
-    }
-    if (socketSites.length == 0 ){
-      removeTimer();
-    }
+    console.log(e);
+
+    // let url = e.target.url;
+    // let para = url.substring(url.indexOf('/GeoProblemSolving/'));
+
+    // websockLinked[para] = false;
+    // connectorNum[para] = -1;
+    // let index = socketSites.indexOf(para);
+    // if (index > -1){
+    //   socketSites.splice(index, 1);
+    // }
+    // if (socketSites.length == 0 ){
+    //   removeTimer();
+    // }
   }
 
   websockets[para] = websock;
@@ -111,6 +123,7 @@ function websocketonmessage(e, param) {
       return;
     }
   } catch (err) {
+    console.log(err);
   };
 }
 
@@ -121,6 +134,10 @@ function websocketsend(param, agentData) {
 
 //关闭
 function websocketclose(e, para) {
+  // error 
+  if(e.code === 1006){
+    initWebSocket(para);
+  } 
   console.log("Connection closed (" + e.code + ")");
 }
 
@@ -135,7 +152,7 @@ function setTimer() {
     for (let i = 0; i < socketSites.length; i++) {
       websocketsend(socketSites[i], messageJson);
     }
-  }, 50000);
+  }, 20000);
 }
 
 function removeTimer() {

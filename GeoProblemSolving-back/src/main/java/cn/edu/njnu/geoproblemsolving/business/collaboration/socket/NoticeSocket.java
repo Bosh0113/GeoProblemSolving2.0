@@ -36,6 +36,7 @@ public class NoticeSocket {
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message) {
+        System.out.println("---------------message-----------------");
         try {
             JSONObject messageJson = JSONObject.parseObject(message);
             if (!messageJson.getString("type").equals("ping")) {
@@ -57,6 +58,7 @@ public class NoticeSocket {
                 }
             }
         } catch (IOException e) {
+            System.out.println(e.toString());
             e.printStackTrace();
         }
     }
@@ -90,20 +92,27 @@ public class NoticeSocket {
                 break;
             }
         }
-        System.out.println("有用户失去连接：" + unConnectId);
+        System.out.println("--------Notice on error----------------");
+        System.out.println(error.toString());
     }
 
     private void broadcastMemberInfo() throws IOException {
-        ArrayList<String> participants = new ArrayList<>();
-        for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
-            String serverKey = server.getKey();
-            participants.add(serverKey);
+        try {
+            ArrayList<String> participants = new ArrayList<>();
+            for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
+                String serverKey = server.getKey();
+                participants.add(serverKey);
+            }
+            JSONObject notice = new JSONObject();
+            notice.put("type", "members");
+            notice.put("participants", participants);
+            for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
+                servers.get(server.getKey()).session.getBasicRemote().sendText(notice.toString());
+            }
+        }catch (Exception e){
+            System.out.println("------broadcastMemberInfo error ---------");
+            System.out.println(e.toString());
         }
-        JSONObject notice = new JSONObject();
-        notice.put("type", "members");
-        notice.put("participants", participants);
-        for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
-            servers.get(server.getKey()).session.getBasicRemote().sendText(notice.toString());
-        }
+
     }
 }

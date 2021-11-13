@@ -1241,13 +1241,17 @@ var taskList = [];
                 console.log("Connection closed (" + e.code + ")");
                 this.removeTimer();
                 this.websockLinked = false;
+
+                if(e.code == 1006) {
+                    this.initWebSocket(aid, toolId);
+                }
             }
 
             //连接发生错误的回调方法
             this.websock.onerror = () => {
                 console.log("WebSocket error!");
-                this.removeTimer();
-                this.websockLinked = false;
+                // this.removeTimer();
+                // this.websockLinked = false;
             }
 
         },
