@@ -854,9 +854,9 @@
       <br />
       <div>
         <a
-          :href="selectData.address"
+          :href="resProxy + '/data/' + resId"
           :download="selectData.name + selectData.suffix"
-          target="_blank"
+          target="_self"
           v-if="
             permissionIdentity(
               activityInfo.permission,
@@ -1257,7 +1257,23 @@ export default {
       },
       // panel
       panel: null,
+      resProxy: this.$store.getters.resProxy
     };
+  },
+  computed: {
+    resId: function () {
+      let address = this.selectData.address;
+      if (address != "" && typeof(address) == "string"){
+        if (address.length == 34){
+          return address;
+        }else {
+          let uidArr = address.split("data/");
+          if (uidArr instanceof Array && uidArr.length > 1){
+            return uidArr[1];
+          }
+        }
+      }
+    }
   },
   watch: {
     checkDataModal(value) {

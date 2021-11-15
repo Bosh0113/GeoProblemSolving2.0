@@ -695,7 +695,7 @@ var taskList = [];
         currentFolder.folders.push(rootRes[i]);
       } else {
         let address = rootRes[i].address;
-        if (typeof (address) == "string") {
+        if (typeof(address) == "string"){
           address = address.slice(-36);
         }
         rootRes[i].address == resProxy + "/data/" + address;
@@ -706,7 +706,7 @@ var taskList = [];
   }
 
   function importParentRes() {
-    for (let i = 0; i < parentResources.length; i++) {
+    for(let i = 0; i < parentResources.length; i++){
       resources.files.push.apply(resources.files, parentResources[i]);
     }
   }
@@ -977,7 +977,7 @@ var taskList = [];
       }
     } else if (collabMode == "SemiFree_Apply") {
       let user = null;
-      if (Object.prototype.toString.call(operator) == "[object Object]") {
+      if(Object.prototype.toString.call(operator) == "[object Object]") {
         user = Object.assign({}, operator);
         operator = operator.userId
       } else {
@@ -1250,8 +1250,8 @@ var taskList = [];
         this.removeTimer();
         this.websockLinked = false;
 
-        if (e.code == 1006) {
-          this.initWebSocket(aid, toolId);
+        if(e.code == 1006) {
+            this.initWebSocket(aid, toolId);
         }
       }
 
@@ -1352,7 +1352,7 @@ var taskList = [];
           case "computation": {
             if (computationChannel != undefined && typeof computationChannel == "function") {
               computationChannel(data);
-              if (data.computeSuc) {
+              if (data.computeSuc){
                 let computationResult = {
                   type: "task-record-backend",
                   oid: data.operationId

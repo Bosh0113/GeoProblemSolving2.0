@@ -2,9 +2,6 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
-import com.alibaba.fastjson.JSONObject;
-import org.dom4j.DocumentException;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -136,4 +133,6 @@ public interface ActivityDocParser {
     Object userJoin(String aid, HashSet<String> userIds);
 
     Object userJoin(String fromId, String endId, HashSet<String> userIds);
+
+    Object extractWorkFlowTemplate(String aid);
 }

@@ -73,13 +73,13 @@
                 <Col span="22" offset="1">
                   <Table :columns="resourceColumn" :data="showList" border no-data-text="No data">
                     <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
-                      <a
-                        :href="showList[index].address"
-                        :download="showList[index].name"
-                        title="Download"
-                      >
-                        <Icon type="md-download" :size="20" color="yellowgreen" />
-                      </a>
+<!--                      <a-->
+<!--                        :href="showList[index].address"-->
+<!--                        :download="showList[index].name"-->
+<!--                        title="Download"-->
+<!--                      >-->
+                        <Icon type="md-download" :size="20" color="yellowgreen" @click="downFile(showList[index].address)"/>
+<!--                      </a>-->
                       <a @click="show(index)" style="margin-left: 10px" title="Preview">
                         <Icon type="md-eye" :size="20" color="orange" />
                       </a>
@@ -218,7 +218,9 @@ export default {
       fileDescription: "",
       fileType: "data",
       contentHeight: "",
-      panel: null
+      panel: null,
+      resAddress: "",
+      resProxy: this.$store.getters.resProxy
     };
   },
   mounted() {
@@ -244,6 +246,7 @@ export default {
           tempResourceList.forEach(function(list) {
             var time = list.uploadTime;
             list.uploadTime = time;
+            let address = list.address;
           });
           this.$set(this, "allResourceList", tempResourceList);
           this.dataCount = tempResourceList.length;
@@ -283,6 +286,20 @@ export default {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
       this.showList = this.allSelectedList.slice(_start, _end);
+    },
+    downFile(address){
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.target = "_self";
+      if (address.indexOf("/resource/") > 0){
+        a.href = address;
+      }else{
+        if (typeof(address) == "string"){
+          a.href = this.resProxy + "/data/" + address.slice(-36);
+        }
+      }
+      a.click();
+      a.remove();
     },
     show(index) {
       var res = this.showList[index];

@@ -112,7 +112,7 @@ public class StaticPagesBuilder {
 
     private String getServicePath() {
         String servicePath = System.getProperty("user.dir") + "/src/main/resources/templates";
-//        String servicePath = System.getProperty("user.dir")+"/src/main/webapp"; //部署使用
+       // String servicePath = System.getProperty("user.dir")+"/src/main/webapp"; //部署使用
         return servicePath.replaceAll("\\\\", "/");
     }
 }

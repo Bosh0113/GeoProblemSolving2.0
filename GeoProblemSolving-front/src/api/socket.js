@@ -11,21 +11,21 @@ let timer = null;
 
 function initWebSocket(para) { //初始化websocket
   let IP_Port = window.location.host;
-  var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/GeoProblemSolving/${para}`;
+  var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/PExploration/${para}`;
   if (IP_Port == "localhost:8080") {
-    wsurl = `ws://localhost:8081/GeoProblemSolving/${para}`;
+    wsurl = `ws://localhost:8081/PExploration/${para}`;
   }
   //switch 使用时提供一个参数type
   let websock = new WebSocket(wsurl);
   websock.onmessage = function (e) {
     let url = e.target.url;
-    let para = url.substring(url.indexOf('/GeoProblemSolving/'));
+    let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
     websocketonmessage(e, para);
     websockLinked[para] = true;
   }
   websock.onclose = function (e) {
     let url = e.target.url;
-    let para = url.substring(url.indexOf('/GeoProblemSolving/'));
+    let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
 
     websockLinked[para] = false;
     connectorNum[para] = -1;
@@ -36,7 +36,7 @@ function initWebSocket(para) { //初始化websocket
     if (socketSites.length == 0){
       removeTimer();
     }
-    
+
     websocketclose(e, para);
   }
   //连接成功的回调函数
@@ -56,7 +56,7 @@ function initWebSocket(para) { //初始化websocket
     console.log(e);
 
     // let url = e.target.url;
-    // let para = url.substring(url.indexOf('/GeoProblemSolving/'));
+    // let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
 
     // websockLinked[para] = false;
     // connectorNum[para] = -1;
@@ -134,10 +134,10 @@ function websocketsend(param, agentData) {
 
 //关闭
 function websocketclose(e, para) {
-  // error 
+  // error
   if(e.code === 1006){
     initWebSocket(para);
-  } 
+  }
   console.log("Connection closed (" + e.code + ")");
 }
 
