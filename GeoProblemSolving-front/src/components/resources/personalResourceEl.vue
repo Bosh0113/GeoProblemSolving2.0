@@ -25,7 +25,7 @@
             <div slot="title" class="resourceTitle"></div>
             <div slot="extra" class="resourceBtnDiv">
                 <Tooltip content="Download all selected" placement="bottom">
-                    <Button 
+                    <Button
                     class="fileBtnHoverGray"
                     @click="downloadFiles">
                     <Icon size="20" type="md-cloud-download"></Icon>

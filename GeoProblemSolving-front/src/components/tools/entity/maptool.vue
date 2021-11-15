@@ -227,24 +227,24 @@ export default {
     },
     initMap() {
       this.tdtVectorMap =
-        "http://t0.tianditu.gov.cn/vec_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/vec_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtVectorAno =
-        // "http://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        // "https://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         // "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
-        "http://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=eva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtImgMap =
-        "http://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtImgAno =
-        "http://t0.tianditu.gov.cn/cia_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/cia_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtTerrMap =
-        "http://t0.tianditu.com/ter_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.com/ter_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtTerrAno =
-        "http://t0.tianditu.com/cta_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.com/cta_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
 
       this.map = L.map("map", {
@@ -262,7 +262,7 @@ export default {
       var vectorMap = L.tileLayer(this.tdtVectorMap, {
         maxZoom: 20,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var vectorAno = L.tileLayer(this.tdtVectorAno, { maxZoom: 18 });
       var vector = L.layerGroup([vectorMap, vectorAno]);
@@ -270,7 +270,7 @@ export default {
       var satelliteMap = L.tileLayer(this.tdtImgMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var satelliteAno = L.tileLayer(this.tdtImgAno, { maxZoom: 18 });
       var satellite = L.layerGroup([satelliteMap, satelliteAno]);
@@ -278,7 +278,7 @@ export default {
       var terrainMap = L.tileLayer(this.tdtTerrMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var terrainAno = L.tileLayer(this.tdtTerrAno, { maxZoom: 18 });
       var terrain = L.layerGroup([terrainMap, terrainAno]);

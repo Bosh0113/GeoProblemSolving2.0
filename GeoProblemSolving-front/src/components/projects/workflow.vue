@@ -79,12 +79,12 @@
 						<Label>Description:</Label>
 						<span style="margin-left: 10px">{{ projectInfo.description }}</span>
 					</div>
-					
+
 				</div>
 			</div>
 			<div v-if="introType == 'memberInfo'">
 				<h2 style="margin-top:5px; text-align:center; margin-bottom: 25px;">{{projectInfo.name}}</h2>
-				<span style="font-size: 1.17em; font-weight: bold;">Participants</span>	
+				<span style="font-size: 1.17em; font-weight: bold;">Participants</span>
 					<Icon
 						v-if="
 							permissionIdentity(
@@ -196,7 +196,7 @@
 				</div>
 				<div id="graphContainer" :style="{height:heightChange()}"></div>
 			</div>
-			
+
 		</Card>
 		<Card
 			dis-hover
@@ -528,10 +528,10 @@
 			this.getProjectInfo();
 		},
 		mounted () {
-			
+
 			this.initMxGraph();
 		    this.listenGraphEvent();
-            
+
         },
 	    beforeDestroy() {
 			window.removeEventListener("message", this.toolMsgHandle, false);
@@ -641,9 +641,9 @@
 							this.operationListToGraph();
 							layout.execute(parent);
 							graph.center(true,true,0.1,0.5);
-							
+
 							// graph.setEnabled(false);//graph只能预览
-							graph.setCellsResizable(false);//节点不可改变大小 
+							graph.setCellsResizable(false);//节点不可改变大小
 							mxGraphHandler.prototype.setMoveEnabled(false);//是否可以移动
 
 						} finally {
@@ -652,10 +652,10 @@
 						}
 						this.graph = graph;
 						// this.zoomActual();
-   						// this.restoreModel();	
-					}					
+   						// this.restoreModel();
+					}
 				},
-				
+
 				operationListToGraph(){
 					let list = this.operationList;
 					//读取input和output信息，并生成vertex
@@ -703,7 +703,7 @@
 							if(this.inputList[i].resId == this.outputList[j].resId){
 								let headVertex = this.getVertexById(this.outputList[j].vertexId);
 								let tailVertex = this.getVertexById(this.inputList[i].vertexId);
-								
+
 								//判断是否为重复边
 								let isNewEdge = true;
 								for(let k = 0 ; k < this.edgeList.length ; k++){
@@ -714,9 +714,9 @@
 								if(isNewEdge){
 									let edge = this.graph.insertEdge(
 										this.graph.getDefaultParent(),
-										null, 
-										'', 
-										headVertex, 
+										null,
+										'',
+										headVertex,
 										tailVertex
 									);
 									//绑定相关信息
@@ -929,7 +929,7 @@
 				},
 				zoomActual(){
 					this.graph.zoomActual();
-					this.graph.center(true,true,0.5,0.3);//将画布放到容器中间 
+					this.graph.center(true,true,0.5,0.3);//将画布放到容器中间
 				},
 
 				getXml(){
@@ -1127,6 +1127,6 @@
 		outline: none;
 		border: none;
 		border-radius: 15px;
-		
+
 	}
 </style>

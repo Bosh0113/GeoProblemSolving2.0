@@ -372,14 +372,14 @@ export default {
             if (res.data.code == 0) {
               this.participants.push(user);
               // update actvitiy doc
-              this.operationApi.participantUpdate(
-                this.activityInfo.aid,
-                "join",
-                user.userId,
-                user.name,
-                "ordinary-member",
-                user.domain
-              );
+              // this.operationApi.participantUpdate(
+              //   this.activityInfo.aid,
+              //   "join",
+              //   user.userId,
+              //   user.name,
+              //   "ordinary-member",
+              //   user.domain
+              // );
               //notice
               let notice = {
                 recipientId: user.userId,
@@ -531,6 +531,7 @@ export default {
         .delete(url)
         .then((res) => {
           if (res.data.code == 0) {
+            this.operationApi.getActivityDoc(this.activityInfo.aid)
             this.operationApi.participantUpdate(
               this.activityInfo.aid,
               "remove",

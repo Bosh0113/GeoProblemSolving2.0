@@ -492,6 +492,7 @@ function exportData(dataType) {
             data = {
                 aid: window.parent.activityInfo.aid,
                 uid: roadData.uid,
+                input: roadData,
                 name: roadData.name,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
@@ -506,6 +507,7 @@ function exportData(dataType) {
                 aid: window.parent.activityInfo.aid,
                 uid: buildingData.uid,
                 name: buildingData.name,
+                input: buildingData,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
             }
@@ -519,6 +521,7 @@ function exportData(dataType) {
                 aid: window.parent.activityInfo.aid,
                 uid: barrierData.uid,
                 name: barrierData.name,
+                input: buildingData,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
             }
@@ -544,6 +547,8 @@ function exportData(dataType) {
             }
         }
     }
+    data["toolId"] = window.parent.toolId;
+    data["participant"] = window.parent.onlineMembers;
 
     $.ajax({
         type: "post",
@@ -554,7 +559,9 @@ function exportData(dataType) {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode === 1) {
+                window.parent.loadingBackendOperation(result.operationId);
                 alert("Export data successfully!");
+                //
             } else {
                 alert("Fail to export data!");
             }

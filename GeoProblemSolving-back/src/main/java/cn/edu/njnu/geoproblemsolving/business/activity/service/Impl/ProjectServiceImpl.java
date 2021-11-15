@@ -9,6 +9,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -48,8 +49,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final ActivityDocParser docParser;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, ActivityDocParser docParser) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -58,6 +60,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -447,6 +450,9 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+
+            //更新文档
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
@@ -496,6 +502,9 @@ public class ProjectServiceImpl implements ProjectService {
             project.setActiveTime(dateFormat.format(new Date()));
             projectRepository.save(project);
 
+
+            //更新文档
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 

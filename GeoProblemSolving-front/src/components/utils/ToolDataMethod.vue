@@ -3,6 +3,7 @@
     <div id="collab-tool-head"></div>
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content" class="scrollbar">
+      <div id="edit-mask" title="The other participant is operating."></div>
       <el-row>
         <el-col
           :span="22"
@@ -392,12 +393,14 @@ export default {
         }
       }
       runTool();
-      sendDataOperation(this.aid, this.id, this.dataToken, urls, paramList);
+
+      sendDataOperation(this.aid, this.id, this.dataToken, this.inputData, urls, paramList);
     },
     // webSocket 回调函数
     getSocketComputation: function (data) {
-      let output = data.computeOutputs;
-      if (output !== "Fail") {
+      //在coll.js 层面完成可视化
+      if (data.computeSuc) {
+        let output = data.outputInfo;
         let keys = Object.keys(output);
         keys.forEach((key) => {
           this.outputData.forEach((item, index) => {
@@ -408,6 +411,13 @@ export default {
         });
         this.$refs.invokeButton.$el.innerHTML = null;
         this.fullscreenLoading.close();
+
+        // record
+        // this.operationApi.analysisRecordUpdate(
+        //   this.aid,
+        //   data.operationId,
+        //   data.outputRes
+        // );
       } else {
         this.fullscreenLoading.close();
         this.$Notice.error({
@@ -484,6 +494,10 @@ export default {
       let index = this.inputIndex;
       this.dataService.metaDetail.input[index].url = val.address;
       this.dataService.metaDetail.input[index].urlName = val.name;
+      this.dataService.metaDetail.input[index].uid = val.uid;
+
+
+
       this.selectDataDialogShow = false;
 
       this.inputData = this.dataService.metaDetail.input;
@@ -492,7 +506,15 @@ export default {
     },
 
     download(event) {
-      window.open(event.url);
+      let url = event.url;
+      if (typeof(url) == "string"){
+        url = url.slice(-36);
+      }
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = this.$store.getters.resProxy + "/data/" + url;
+      a.click();
+      a.remove();
     },
     remove(event, index) {
       event.url = "";

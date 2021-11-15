@@ -94,8 +94,8 @@
         v-else-if="temOperation.resource.type == 'others'"
       />
       <span class="behavior">Resource {{ temOperation.behavior }}</span>
-    </div>      
-    <div class="content" v-else-if="temOperation != undefined && temOperation.type === 'tool'">      
+    </div>
+    <div class="content" v-else-if="temOperation != undefined && temOperation.type === 'tool'">
       <img
         :src="toolUrl"
         height="24px"

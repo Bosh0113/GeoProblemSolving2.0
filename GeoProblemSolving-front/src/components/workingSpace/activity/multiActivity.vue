@@ -3,7 +3,7 @@
     <Menu
       mode="horizontal"
       :active-name="activeMenu"
-      style="height: 45px; line-height: 45px;"
+      style="height: 38px; line-height: 38px;"
       @on-select="changeMenuItem"
     >
       <MenuItem name="Introduction">
@@ -135,6 +135,7 @@
         }
         this.lastMenuName = name;
       },
+
       initTaskSocket: function (socketId, name) {
         let linkStatus = socketApi.getSocketInfo(socketId).linked;
         if (linkStatus !== undefined && linkStatus) {

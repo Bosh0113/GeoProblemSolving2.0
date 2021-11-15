@@ -2,11 +2,13 @@ package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.im
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDao;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
@@ -16,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -55,6 +58,12 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     SubprojectRepository subprojectRepository;
 
+    @Autowired
+    ActivityDocParser docParser;
+
+    @Autowired
+    GeoAnalysisProcess geoAnalysisProcess;
+
     @Value("${userServerLocation}")
     String userServer;
 
@@ -64,6 +73,7 @@ public class NodeServiceImpl implements NodeService {
         ActivityNode node = new ActivityNode();
         node.setId(aid);
         HashMap<String, String> activityUserTag = getActivityUserTag(aid, level);
+        //资源得从文档中读取
         HashMap<String, String> activityResourceTag = getActivityResourceTag(aid);
         node.setMembers(activityUserTag);
         node.setResources(activityResourceTag);
@@ -78,17 +88,16 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public HashMap<String, String> getActivityResourceTag(String aid) {
-        ArrayList<ResourceEntity> files = activityResService.getAllFileInProject(aid);
-        HashMap<String, String> fileTagMap = new HashMap<>();
-        for (ResourceEntity file : files) {
-            // 仅流动项目中的 public 资源
-            if (file.getPrivacy().equals("private")) continue;
-            String fileTagStr = TagUtil.setResourceTag(file);
-            String uid = file.getUid();
-            fileTagMap.put(uid, fileTagStr);
+    public HashMap<String, String> getActivityResourceTag(String aid){
+        HashMap<String, String> filesTagMap = new HashMap<>();
+        //All resources can flow
+        ArrayList<HashMap<String, String>> resInfoList = docParser.getAllResInfo(aid);
+        for (HashMap<String, String> item : resInfoList) {
+            String uid = item.get("uid");
+            String fileTagStr = TagUtil.setResTag(item);
+            filesTagMap.put(uid, fileTagStr);
         }
-        return fileTagMap;
+        return filesTagMap;
     }
 
     public String getUserTag(String userId, String role) {
@@ -199,18 +208,8 @@ public class NodeServiceImpl implements NodeService {
                 }
                 break;
             case "put":
-                ResourceEntity putRes = (ResourceEntity) res;
-                String uid = putRes.getUid();
-                String resTagStr = resources.get(uid);
-                HashMap<String, String> tagMap = TagUtil.recoveryResTag(resTagStr);
-                String type = putRes.getType();
-                if (type != null && !type.equals("")) {
-                    tagMap.put("type", type);
-                }
-                String suffix = putRes.getSuffix();
-                if (suffix != null && !suffix.equals("")) {
-                    tagMap.put("suffix", suffix);
-                }
+                String uid = (String) res;
+                HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
                 String resourceTag = TagUtil.setResourceTag(tagMap);
                 resources.put(uid, resourceTag);
                 break;
@@ -220,13 +219,37 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void addResToNode(String aid, ResourceEntity res) {
-        putNodeResource(aid, res, "add");
+    public HashMap<String, String> addResToNode(String aid, ResourceEntity res) {
+        return putNodeResource(aid, res, "add");
     }
 
     @Override
-    public void addResToNodeBatch(String aid, HashMap<String, String> resInfo) {
-        putNodeResource(aid, resInfo, "addBatch");
+    public HashMap<String, String> addResToNodeBatch(String aid, HashMap<String, String> resInfo) {
+        HashMap<String, String> resTagMap = new HashMap<>();
+        resTagMap.put(resInfo.get("uid"), TagUtil.setResTag(resInfo));
+        return putNodeResource(aid, resTagMap, "addBatch");
+    }
+
+    @Override
+    public void addResToNodeBatch(String aid, HashSet<String> uids) {
+        ArrayList<HashMap<String, String>> resInfoList = docParser.getResInfo(aid, uids);
+        if (resInfoList == null || resInfoList.size() == 0) return;
+        HashMap<String, String> resMap = new HashMap<>();
+        for (HashMap<String, String> item : resInfoList) {
+            String uid = item.get("uid");
+            resMap.put(uid, TagUtil.setResTag(item));
+        }
+        putNodeResource(aid, resMap, "addBatch");
+    }
+
+    @Override
+    public void addResToNode(String aid, String uid) {
+        HashMap<String, String> resInfo = docParser.getResInfo(aid, uid);
+        if (resInfo == null) return;
+        String tagStr = TagUtil.setResTag(resInfo);
+        HashMap<String, String> tagMap = new HashMap<>();
+        tagMap.put(uid, tagStr);
+        putNodeResource(aid, tagMap, "addBatch");
     }
 
     @Override
@@ -235,13 +258,21 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void delResInNodeBatch(String aid, HashSet<String> uid) {
+    public void delResInNodeBatch(String aid, HashSet<String> uid)  {
         putNodeResource(aid, uid, "delBatch");
     }
 
     @Override
     public void putResInNode(String aid, ResourceEntity res) {
         // todo 等待接入metadata，现在的无法修改
+    }
+
+    @Override
+    public void putResMeta(String graphicId, String aid, String uid) {
+        //文档更新已经完成，这是第二步: 更新节点
+        putNodeResource(aid, uid, "put");
+        //第三步，资源流动
+        geoAnalysisProcess.batchResFlowAutoUpdate(graphicId, aid, uid);
     }
 
     @Override
@@ -301,7 +332,7 @@ public class NodeServiceImpl implements NodeService {
         if (!byId.isPresent()) return;
         ActivityNode node = byId.get();
         HashMap<String, String> members = node.getMembers();
-        for (String uid: userIds){
+        for (String uid : userIds) {
             String userTag = getUserTag(uid, "ordinary-member");
             members.put(uid, userTag);
         }

@@ -634,9 +634,9 @@ export default {
       let myDate = new Date().Format("yyyy-MM-dd HH:mm:ss");
       let current_time = myDate.toLocaleString(); //获取日期与时间
       message["time"] = current_time;
-      // receiver
+      // receivers
       if (this.sendToMemberId !== "All") {
-        send_msg["receiver"] = [this.sendToMemberId];
+        message["receivers"] = [this.sendToMemberId];
       }
 
       // send

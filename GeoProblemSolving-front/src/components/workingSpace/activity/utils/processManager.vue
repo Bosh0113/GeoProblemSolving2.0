@@ -215,7 +215,7 @@
                   'manage_child_activity'
                 )"
                style="margin-top: 20px;">
-            <strong>collaborating:</strong>
+            <strong>Collaborating:</strong>
             <div
               v-for="(item, index) in collaboratingInfoList" :key="index"
               style="margin: 20px 0 10px"
@@ -269,8 +269,8 @@
       @on-visible-change='linkModalStatus'
     >
       <div slot="footer">
-        <div style="display: inline-block; position: absolute; left: 30px">
-          <span style="margin-right:10px; font-size:14px; vertical-align:top;"  v-if="collLinkUser.length > 1">online collaborating members: </span>
+        <div style="display: flex; position: absolute; left: 30px">
+          <span style="margin-right:10px; font-size:14px; vertical-align:top;"  v-if="collLinkUser.length > 1">Online collaborating members: </span>
           <avatar-list
             :list="collLinkUser"
             v-if="collLinkUser.length > 1"
@@ -2220,6 +2220,9 @@
                 },
               };
               this.sendLinkSock(content);
+              this.collLinkUser = this.participants.filter(
+                (item) => item.userId == this.userInfo.userId
+              );
               this.collaboratingInfoList.push(content.linkInfo);
             } else {
               //此几个选中的活动正在进行连接

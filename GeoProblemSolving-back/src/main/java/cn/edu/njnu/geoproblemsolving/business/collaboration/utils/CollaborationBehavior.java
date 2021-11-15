@@ -122,6 +122,9 @@ public class CollaborationBehavior {
                     user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else {
+                if(!receivers.contains(sender.getUserId())) {
+                    receivers.add(sender.getUserId());
+                }
                 messageObject.put("receivers", receivers);
                 // send message
                 for (String receiver : receivers) {
@@ -349,7 +352,13 @@ public class CollaborationBehavior {
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "computation");
-        messageObject.put("computeOutputs", computeResult.getOutputs());
+        messageObject.put("computeSuc", computeResult.isComputeSuc());
+        if (computeResult.isComputeSuc()){
+            //模型运算输出
+            messageObject.put("outputInfo", computeResult.getOutputs());
+            //生成的资源
+            messageObject.put("operationId", computeResult.getOid());
+        }
         for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
             for (int i = 0; i < oldReceiverStr.size(); i++) {
                 if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())) {

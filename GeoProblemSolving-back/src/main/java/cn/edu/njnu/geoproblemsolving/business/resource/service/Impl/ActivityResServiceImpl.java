@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
@@ -57,6 +58,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Autowired
     NodeService nodeService;
+
+    @Autowired
+    ActivityDocParser docParser;
 
 
     @Value("${dataContainer}")
@@ -115,7 +119,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         //记录上传状态
         uploadInfos.failed = new ArrayList<>();
         uploadInfos.sizeOver = new ArrayList<>();
-        uploadInfos.uploaded = new ArrayList<ResourceEntity>();
+        uploadInfos.uploaded = new ArrayList<>();
         try {
             if (!ServletFileUpload.isMultipartContent(req)) {
                 System.out.println("File is not multimedia.");
@@ -125,13 +129,23 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String userId = (String) session.getAttribute("userId");
             String uploadName = userDao.findUserByIdOrEmail(userId).getName();
             String aid = req.getParameter("aid");
+            String type = req.getParameter("type");
+            //添加数据元数据相关操作
+            HashMap<String, String> meta = null;
+            if (type.equals("data")){
+                meta = new HashMap<>();
+                meta.put("format", req.getParameter("format"));
+                meta.put("scale", req.getParameter("scale"));
+                meta.put("reference", req.getParameter("reference"));
+                meta.put("unit", req.getParameter("unit"));
+                meta.put("concept", req.getParameter("concept"));
+            }
             List<ResourceEntity> resourceList = activityResDao.queryByAid(aid);
             String[] pathsArray = req.getParameter("paths").split(",");
             ArrayList<String> paths = new ArrayList<>();
             for (String path : pathsArray) {
                 paths.add(path);
             }
-
 
             Collection<Part> parts = req.getParts();
             //多个肯定是在同一个文件夹的可以直接存入
@@ -147,7 +161,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
-            HashMap<String, String> resTagMap = new HashMap<>();
+            HashSet<String> uploadUids = new HashSet<>();
+            ArrayList<HashMap<String, String>> uploadSucOperation;
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
@@ -217,8 +232,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             uploadInfos.uploaded.add(res);
                             //======活动链接相关操作======================================
                             //资源自动更新内容, public can auto update
-                            String resTag = TagUtil.setResourceTag(res);
-                            resTagMap.put(uid, resTag);
+                            if (nodeService.nodeIsPresent(aid) != null){
+                                uploadUids.add(uid);
+                            }
                             //===================================================
                             //如果不是最后一个，则进入下一次循环
                             if (fileNum != 0) {
@@ -247,7 +263,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             Query query = new Query(Criteria.where("uid").is(rootResUid));
                             Update update = new Update();
                             update.set("children", putResList.get(index).getChildren());
-                            //不会出问题
+                            //将所上传的资源存入当前活动中
                             activityResDao.updateRes(query, update);
 
                         } else {
@@ -258,16 +274,16 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
-            //更新节点
-            nodeService.addResToNodeBatch(aid, resTagMap);
+            //更新文档
+            uploadInfos.uploadedOperation = docParser.uploadResources(aid, uploadInfos.uploaded, meta);
+            //更新当前节点
+            nodeService.addResToNodeBatch(aid, uploadUids);
             /*
             资源自动更新
-            todo 操作活动文档（需要的信息：aid、resourceEntity）
              */
             String graphId = req.getParameter("graphId");
             //update
-            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
-
+            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uploadUids);
             return uploadInfos;
 
         } catch (Exception e) {
@@ -747,7 +763,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String fullName = res.getName();
             String name = fullName.split("\\.")[0];
             String suffix = fullName.split("\\.")[1];
-            res.setSuffix(suffix);
+            res.setSuffix("." + suffix);
             res.setUserUpload(false);
             res.setName(name);
         }
