@@ -161,8 +161,8 @@ export default {
       let data = await post("/GeoProblemSolving/tool/create", createToolForm);
       this.saveToolDialogShow = false;
       this.$Notice.info({ desc: "Save the tool successfully" });
-    },
-  },
+    }
+  }
 };
 </script>
 
