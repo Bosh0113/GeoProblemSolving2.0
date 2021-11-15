@@ -18,6 +18,8 @@ function guid() {
     return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 }
 
+let resProxy = "https://geomodeling.njnu.edu.cn/dataTransferServer";
+
 // basic information
 var toolId = "";
 var activityInfo = null;
@@ -687,10 +689,16 @@ var taskList = [];
             folders: [],
             files: []
         }
+
         for (let i = 0; i < rootRes.length; i++) {
             if (rootRes[i].folder) {
                 currentFolder.folders.push(rootRes[i]);
             } else {
+                let address = rootRes[i].address;
+                if (typeof (address) == "string") {
+                    address = address.slice(-36);
+                }
+                rootRes[i].address == resProxy + "/data/" + address;
                 currentFolder.files.push(rootRes[i]);
             }
         }
@@ -1241,20 +1249,24 @@ var taskList = [];
                 console.log("Connection closed (" + e.code + ")");
                 this.removeTimer();
                 this.websockLinked = false;
+
+                if (e.code == 1006) {
+                    this.initWebSocket(aid, toolId);
+                }
             }
 
             //连接发生错误的回调方法
             this.websock.onerror = () => {
                 console.log("WebSocket error!");
-                this.removeTimer();
-                this.websockLinked = false;
+                // this.removeTimer();
+                // this.websockLinked = false;
             }
 
         },
 
         setTimer: function () {
             this.timer = setInterval(() => {
-                var messageJson = { type: "ping" };
+                var messageJson = {type: "ping"};
                 this.websocketSend(messageJson);
             }, 20000);
         },
