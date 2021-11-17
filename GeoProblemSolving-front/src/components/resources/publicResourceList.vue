@@ -27,6 +27,19 @@
 .ivu-table th {
   height: 40px !important;
 }
+.demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+}
+@keyframes ani-demo-spin {
+    from { transform: rotate(0deg);}
+    50%  { transform: rotate(180deg);}
+    to   { transform: rotate(360deg);}
+}
+.demo-spin-col{
+    height: 100px;
+    position: relative;
+    border: 1px solid #eee;
+}
 </style>
 <!--Resources中心-->
 <template>
@@ -71,15 +84,9 @@
             <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
-                  <Table :columns="resourceColumn" :data="showList" border no-data-text="No data">
-                    <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
-<!--                      <a-->
-<!--                        :href="showList[index].address"-->
-<!--                        :download="showList[index].name"-->
-<!--                        title="Download"-->
-<!--                      >-->
+                  <Table :columns="resourceColumn" :data="showList" border no-data-text="No data" v-show="showList.length>0">
+                    <template slot-scope="{ index }" slot="action">
                         <Icon type="md-download" :size="20" color="yellowgreen" @click="downFile(showList[index].address)"/>
-<!--                      </a>-->
                       <a @click="show(index)" style="margin-left: 10px" title="Preview">
                         <Icon type="md-eye" :size="20" color="orange" />
                       </a>
@@ -89,8 +96,8 @@
               </template>
               <template v-else>
                 <Col span="22" offset="1">
-                  <Table :columns="resourceColumn" :data="showList" border size="small" no-data-text="No data">
-                    <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                  <Table :columns="resourceColumn" :data="showList" border size="small" no-data-text="No data"  v-show="showList.length>0">
+                    <template slot-scope="{}" slot="action">
                       <a title="Please download after login">
                         <Icon type="md-download" :size="20" color="gray" />
                       </a>
@@ -111,12 +118,17 @@
               show-total
               @on-change="changepage"
               show-elevator
-              style="position: absolute;"
+              style="position: absolute; bottom:20px;"
             />
           </div>
         </div>
       </div>
     </Col>
+    <!-- 进度加载条 -->
+    <Spin fix v-show="showLoading">
+      <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+      <div>Loading</div>
+    </Spin>
     <Modal
       v-model="uploadModal"
       title="Upload resource"
@@ -148,6 +160,16 @@
       <br />
       <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple" />
     </Modal>
+    <Modal
+      v-model="showImagesPreview"
+      title="Preview"
+      :mask-closable="false"
+      width="600px"
+    >
+      <div style="display:flex;text-align:center;align-items:center;justify-content:center;">
+        <img :src="imagesPreviewUrl" style="max-width:550px; max-height:550px;">
+      </div>
+    </Modal>
   </Row>
 </template>
 <script>
@@ -158,7 +180,7 @@ export default {
       resourceColumn: [
         {
           type: "index",
-          maxWidth: 50,
+          maxWidth: 60,
           align: "center"
         },
         {
@@ -209,8 +231,9 @@ export default {
       allResourceList: [],
       allSelectedList: [],
       showList: [],
+      resourceData:[],
       dataCount: 0,
-      pageSize: 8,
+      pageSize: 12,
       currentPage: 1,
       // 上传文件的模态框
       uploadModal: false,
@@ -220,7 +243,11 @@ export default {
       contentHeight: "",
       panel: null,
       resAddress: "",
-      resProxy: this.$store.getters.resProxy
+      resProxy: this.$store.getters.resProxy,
+      showImagesPreview:false,
+      imagesPreviewUrl:"",
+      //进度条
+      showLoading: false,
     };
   },
   mounted() {
@@ -242,12 +269,16 @@ export default {
       this.axios.get("/GeoProblemSolving/rip/file/allPublic").then(res => {
         if (res.data.code == 0){
           let tempResourceList = res.data.data;
+          console.log(tempResourceList);
           tempResourceList.reverse();
+          let that = this;
           tempResourceList.forEach(function(list) {
-            var time = list.uploadTime;
-            list.uploadTime = time;
-            let address = list.address;
+            let time = list.uploadTime;
+            let size = list.fileSize;
+            list.fileSize = that.filterSizeType(size);
+            list.uploadTime = that.filterTimeStyle(time);
           });
+          console.log(tempResourceList);
           this.$set(this, "allResourceList", tempResourceList);
           this.dataCount = tempResourceList.length;
           this.allSelectedList = tempResourceList;
@@ -303,58 +334,45 @@ export default {
     },
     show(index) {
       var res = this.showList[index];
-      let name = this.showList[index].name;
-      if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
-        this.$Modal.confirm({
-          title: "Note",
-          content:
-            "<p>You selected file will be previewed through</p><p style='font-size:16px;font-weight:bold'>Microsoft office online service</p>",
-          onOk: () => {
-            if (this.panel != null) {
-              this.panel.close();
-            }
-            var url =
-              "http://view.officeapps.live.com/op/view.aspx?src=" +
-              "http://" +
-              this.$store.state.DataServer +
-              res.address;
-            var toolURL =
-              "<iframe src=" +
-              url +
-              ' style="width: 100%;height:100%" frameborder="0"></iframe>';
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove"
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:5px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              closeOnEscape: true,
-              // callback: function() {
-              //   var that = this;
-              //   demoPanelTimer = window.setInterval(function() {
-              //     that.style.zIndex = "9999";
-              //   }, 1);
-              // }
-            });
-            $(".jsPanel-content").css("font-size", "0");
+      let name = this.showList[index].suffix;
+      if (/\.(doc|docx|xls|xlsx|ppt|pptx|xml|json|md)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url = "";
+        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + this.showList[index].address;
+        }
+        console.log(url);
+        let finalUrl = "http://view.xdocin.com/xdoc?_xdoc=" + url;
+        var toolURL =
+          "<iframe src=" +
+          finalUrl +
+          ' style="width: 100%;height:100%" frameborder="0"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
           },
-          onCancel: () => {
-            return;
-          }
+          theme: "primary",
+          footerToolbar: '<p style="height:5px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
         });
+        $(".jsPanel-content").css("font-size", "0");
+        
       } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
-        var url =
-          "http://" + this.$store.state.DataServer + this.showList[index].address;
+        var url = this.showList[index].address;
         var toolURL =
           "<video src=" +
           url +
@@ -375,32 +393,95 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+      } else if (/\.(pdf)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
-        var url =
-          "http://" + this.$store.state.IP_Port + this.showList[index].pathURL;
-        var toolURL =
-          "<iframe src=" +
-          url +
-          ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
+        let url = "";
+        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + this.showList[index].address;
+        }
+        console.log(url);
+
+        let that = this;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader(
+          'Content-Type',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        xhr.responseType = 'blob';
+        this.showLoading = true;
+        xhr.onload = function (e) {
+          if (this.status == 200) {
+            let changeUrl = ''
+            let file = new Blob([this.response], { type: 'application/pdf' })
+            if (window.createObjectURL !== undefined) { // basic
+              changeUrl = window.createObjectURL(file)
+            } else if (window.webkitURL !== undefined) { // webkit or chrome
+              try {
+                changeUrl = window.webkitURL.createObjectURL(file)
+              } catch (error) {
+  
+              }
+            } else if (window.URL !== undefined) { // Mozilla (firefox)
+              try {
+                changeUrl = window.URL.createObjectURL(file)
+              } catch (error) {
+                console.log(error)
+              }
+            }
+            console.log(file);
+            console.log(changeUrl);
+            var toolURL =
+              "<iframe src=" +
+              changeUrl +
+              ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
+            this.panel = jsPanel.create({
+              headerControls: {
+                smallify: "remove"
+              },
+              theme: "primary",
+              footerToolbar: '<p style="height:10px"></p>',
+              headerTitle: "Preview",
+              contentSize: "800 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              closeOnEscape: true
+            });
+            $(".jsPanel-content").css("font-size", "0");
+          }
+        };
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                that.showLoading = false;
+            } else {
+                //请求失败
+            }
+          }
+        }
+        xhr.send();
+        
+      } else if (/\.(gif|jpg|png|jpeg)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url = "";
+        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + this.showList[index].address;
+        }
+        
+        this.imagesPreviewUrl = url;
+        this.showImagesPreview = true;
+        
       } else {
         this.$Notice.error({
           title: "Open failed",
@@ -408,7 +489,22 @@ export default {
         });
         return false;
       }
+    },
+    filterSizeType(value) {
+      if(/(KB|MB|GB|B)$/.test(value)){
+        return value;
+      } else {
+        if (value === 0) return "0 B";
+        let k = 1024;
+        let sizes = ["B", "KB", "MB", "GB"];
+        let i = Math.floor(Math.log(value) / Math.log(k));
+        return (value / Math.pow(k, i)).toPrecision(3) + " " + sizes[i];
+      }
+    },
+    filterTimeStyle(str) {
+      let result = str.split('.')[0];
+      return result.replace('T', " ");
     }
-  }
+  },
 };
 </script>
