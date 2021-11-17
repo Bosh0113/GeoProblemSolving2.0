@@ -1505,7 +1505,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.resProtocol = tempProtocol;
+                  ].linkRestriction.resProtocol.resProtocol = tempProtocol;
                 break;
               case "resType":
                 let tempTypes = content.resType;
@@ -1518,7 +1518,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.types = tempTypes;
+                  ].linkRestriction.resProtocol.types = tempTypes;
                 break;
               case "resFormat":
                 let tempFormat = content.resFormat;
@@ -1531,7 +1531,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.formats = tempFormat;
+                  ].linkRestriction.resProtocol.formats = tempFormat;
                 break;
               case "resScale":
                 let tempScale = content.resScale;
@@ -1544,7 +1544,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.scales = tempScale;
+                  ].linkRestriction.resProtocol.scales = tempScale;
                 break;
               case "resReference":
                 let tempReference = content.resReference;
@@ -1557,7 +1557,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.references = tempReference;
+                  ].linkRestriction.resProtocol.references = tempReference;
                 break;
               case "resUnit":
                 let tempUnit = content.resUnit;
@@ -1570,7 +1570,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.units = tempUnit;
+                  ].linkRestriction.resProtocol.units = tempUnit;
                 break;
               case "resConcept":
                 let tempConcept = content.resConcept;
@@ -1583,7 +1583,7 @@
                 }
                 this.collaboratingInfoList[
                   this.collaIndex
-                  ].resProtocolForm.concepts = tempConcept;
+                  ].linkRestriction.resProtocol.concepts = tempConcept;
                 break;
             }
           }

@@ -690,7 +690,11 @@ public class CollaborationService {
                 // 持久化存储
                 if (communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0) {
                     MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
-                    collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), msgRecords);
+                    //聊天记录存入文档
+                    String oid = docParser.storeMessageRecord(null, msgRecords);
+
+                    //将 oid 发送给前端
+                    collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), oid);
                 }
                 // 通知成员退出，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");

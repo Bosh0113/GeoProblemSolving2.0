@@ -10,8 +10,10 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityDocRep
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -388,6 +390,7 @@ public class DocInterpret implements ActivityDocParser {
             operationEle.addAttribute("behavior", "upload");
             operationEle.addAttribute("resRef", item.getUid());
             operationEle.addAttribute("operator", item.getUploaderId());
+            operationEle.addAttribute("task","");
             operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
             uploadOperation.put("oid", oid);
@@ -532,6 +535,29 @@ public class DocInterpret implements ActivityDocParser {
     /*
         1.Tool related operation, include toolbox
      */
+
+    @Override
+    public Object addTools(String aid, List<Tool> tools) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        if (tools == null || tools.isEmpty()) return null;
+        Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
+        for (Tool item : tools){
+            Element toolEle = toolBoxEle.addElement("Tool");
+            toolEle.addAttribute("id", item.getTid());
+            toolEle.addAttribute("name", item.getToolName());
+            toolEle.addAttribute("function", item.getDescription());
+            toolEle.addAttribute("toolSet", "false");
+            toolEle.addAttribute("provider", item.getProvider());
+            toolEle.addAttribute("state", "accessible");
+
+            if (item.getBackendType().equals("webTool")){
+                toolEle.addAttribute("href", item.getToolUrl());
+            }
+        }
+        saveXML();
+        return null;
+    }
 
     /*
         2.Task related operation, include task list and task dependency.
@@ -774,6 +800,31 @@ public class DocInterpret implements ActivityDocParser {
             Element outResRefEle = operationEle.addElement("ResRef");
             outResRefEle.addAttribute("type", "output");
             outResRefEle.addAttribute("idRef", res.getUid());
+        }
+        saveXML();
+        return oid;
+    }
+
+
+    @Override
+    public String storeMessageRecord(String toolId, MsgRecords msgRecords) {
+        syncGlobalVariables(msgRecords.getAid());
+        if (operatingDoc == null) return null;
+        Element oRecordEle =  (Element)activityDocXml.selectSingleNode("/Activity/OperationRecords");
+        Element operationEle = oRecordEle.addElement("Operation");
+        String oid = UUID.randomUUID().toString();
+        operationEle.addAttribute("id", oid);
+        operationEle.addAttribute("type", "communication");
+        operationEle.addAttribute("toolRef", "");
+        operationEle.addAttribute("task", "");
+        operationEle.addAttribute("resRef", msgRecords.getRecordId());
+        operationEle.addAttribute("time", simpleDateFormat.format(msgRecords.getCreatedTime()));
+
+        //参与者
+        ArrayList<String> uids = msgRecords.getParticipants();
+        for (String uid : uids){
+            Element personRefEle = operationEle.addElement("PersonRef");
+            personRefEle.addAttribute("idRef", uid);
         }
         saveXML();
         return oid;

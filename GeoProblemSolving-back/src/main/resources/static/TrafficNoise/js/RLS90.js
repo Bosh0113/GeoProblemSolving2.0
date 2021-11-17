@@ -12,6 +12,7 @@ var roadDataId, buildingDataId, barrierDataId, runningId;
 var roadData, buildingData, barrierData;
 var resultIdList = [];
 var userId;
+var resProxy = "https://geomodeling.njnu.edu.cn/dataTransferServer";
 
 proj4.defs("EPSG:2437", "+proj=tmerc +lat_0=0 +lon_0=120 +k=1 +x_0=500000 +y_0=0 +ellps=krass +towgs84=15.8,-154.4,-82.3,0,0,0,0 +units=m +no_defs");
 
@@ -2082,8 +2083,13 @@ async function loadShapefile(layer, shapefilePath) {
 }
 
 function loadResultTiff(resulUrl) {
+    let uid;
+    if (typeof(resulUrl) == "string"){
+        uid = resulUrl.slice(-36);
+    }
+    let resUrl = resProxy + "/data/" + uid;
     L.leafletGeotiff(
-        url = resulUrl,
+        url = resUrl,
         options = {
             band: 0,
             displayMin: 0,

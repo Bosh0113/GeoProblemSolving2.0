@@ -173,6 +173,9 @@ public class ActivityServiceImpl implements ActivityService {
                     toolSet.add(tool.getTid());
                 }
                 activity.setToolList(toolSet);
+
+                //更新文档
+                docParser.addTools(aid, relevantPurposeTool);
             }
 
             // tools and toolsets
