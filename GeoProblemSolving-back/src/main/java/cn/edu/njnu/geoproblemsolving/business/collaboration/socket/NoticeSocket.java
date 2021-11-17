@@ -36,7 +36,6 @@ public class NoticeSocket {
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message) {
-        System.out.println("---------------message-----------------");
         try {
             JSONObject messageJson = JSONObject.parseObject(message);
             if (!messageJson.getString("type").equals("ping")) {

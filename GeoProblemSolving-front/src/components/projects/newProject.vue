@@ -326,10 +326,10 @@ export default {
                 this.$Message.error(res.data.msg);
               } else {
                 this.createProjectInfo = res.data.data;
-                this.operationApi.activityDocInit(
-                  res.data.data,
-                  {userId: this.$store.getters.userId, name: this.$store.getters.userName}
-                );
+                // this.operationApi.activityDocInit(
+                //   res.data.data,
+                //   {userId: this.$store.getters.userId, name: this.$store.getters.userName}
+                // );
                 this.addHistoryEvent(this.createProjectInfo.aid);
                 this.$router.go(-1);
               }

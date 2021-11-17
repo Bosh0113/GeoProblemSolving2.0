@@ -101,6 +101,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // set type
             subproject.setType(subproject.getType());
+            // 初始化文档
+            docParser.initActivityDoc(subproject);
             if (subproject.getType().equals(ActivityType.Activity_Group)) {
                 subproject.setChildren(new ArrayList<>());
             }else if (subproject.getType().equals(ActivityType.Activity_Unit)){
@@ -108,12 +110,14 @@ public class SubprojectServiceImpl implements SubprojectService {
                 String purpose = subproject.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool){
-                    toolSet.add(tool.getTid());
+                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool){
+                        toolSet.add(tool.getTid());
+                    }
+                    subproject.setToolList(toolSet);
                 }
-                subproject.setToolList(toolSet);
 
-                //更新文档
+                //若是 Activity_Unit, 则绑定工具
                 docParser.addTools(subprojectId, relevantPurposeTool);
             }
 
@@ -136,6 +140,16 @@ public class SubprojectServiceImpl implements SubprojectService {
             // Save
             subprojectRepository.save(subproject);
             projectRepository.save(project);
+
+            /*
+            activity doc operation
+            1. init subproject document
+            2. append child activity
+            3. add tool, if need
+             */
+            //添加依赖
+            docParser.appendChildActivity(projectId, subprojectId, subproject.getName(), creatorId);
+
 
             return ResultUtils.success(subproject);
         } catch (Exception ex) {
@@ -170,21 +184,35 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = (Subproject) result.get();
 
             String purpose = update.getPurpose();
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit) &&
                     !subproject.getType().equals(ActivityType.Activity_Unit) ||
                     !subproject.getPurpose().equals(purpose)
             )){
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool){
-                    toolSet.add(tool.getTid());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool){
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                subproject.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = subproject.getType();
             update.updateTo(subproject);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, subproject);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -26,6 +26,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -236,22 +237,38 @@ public class ProjectServiceImpl implements ProjectService {
                 updateProjectListPage = isUpdateProjectListStaticPage(aid, !project.getPrivacy().equals("Private"));
             }
 
+
             //补充绑定对于 purpose 的工具
+            //mongoTemplate 底层实现为 arrayList
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit)
                     && !project.getType().equals(ActivityType.Activity_Unit)
                     || !project.getPurpose().equals(update.getPurpose()))) {
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool) {
-                    toolSet.add(tool.getTid());
+                relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                project.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = project.getType();
             update.updateTo(project);
             projectRepository.save(project);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, project);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             if (updateProjectListPage) {

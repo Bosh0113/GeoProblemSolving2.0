@@ -2770,7 +2770,7 @@
       },
       formatChange(newTag) {
         this.resProtocolForm.formats = newTag;
-        // console.log(newTag);
+        console.log(newTag);
         let content = {
           behavior: "setLink",
           param: "resFormat",
