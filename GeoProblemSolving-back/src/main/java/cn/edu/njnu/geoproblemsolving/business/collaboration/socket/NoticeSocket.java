@@ -67,6 +67,8 @@ public class NoticeSocket {
     public void onClose() throws IOException {
         String unConnectId = "";
         for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
+            System.out.println(server.getValue().toString());
+            System.out.println(this.toString());
             if (server.getValue().equals(this)) {
                 unConnectId = server.getKey();
                 servers.remove(server.getKey());

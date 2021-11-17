@@ -387,7 +387,7 @@ export default {
                 record.createdTime = date.Format("yyyy-MM-dd HH:mm:ss");
                 this.msgRecords.push(record);
               }
-              console.log(this.msgRecords);
+              // console.log(this.msgRecords);
               this.getRecordsFinish = true;
             } else {
               console.log(res.data.msg);
