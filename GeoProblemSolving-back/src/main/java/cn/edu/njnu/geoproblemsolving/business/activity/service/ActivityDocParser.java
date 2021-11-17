@@ -1,11 +1,15 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public interface ActivityDocParser {
     //
@@ -82,7 +86,7 @@ public interface ActivityDocParser {
     /*
         1.Tool related operation, include toolbox
      */
-
+    Object addTools(String aid, List<Tool> tools);
     /*
         2.Task list
      */
@@ -115,6 +119,8 @@ public interface ActivityDocParser {
     String geoAnalysis(String aid, String toolId,
                        HashSet<String> onlineMemberIds, String purpose,
                        ResourceEntity input, ResourceEntity output);
+
+    String storeMessageRecord(String toolId, MsgRecords msgRecords);
 
 
 

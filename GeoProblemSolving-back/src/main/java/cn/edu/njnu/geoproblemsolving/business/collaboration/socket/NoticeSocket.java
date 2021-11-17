@@ -84,10 +84,8 @@ public class NoticeSocket {
 
     @OnError
     public void onError(Throwable error) {
-        String unConnectId = "";
         for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
             if (server.getValue().equals(this)) {
-                unConnectId = server.getKey();
                 servers.remove(server.getKey());
                 break;
             }

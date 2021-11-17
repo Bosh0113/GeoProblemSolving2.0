@@ -15,6 +15,7 @@ public class MsgRecords {
     @Id
     private String recordId;
 
+
     private String aid; //查询条件Id
 
     private ArrayList<String> records;

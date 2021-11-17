@@ -145,9 +145,9 @@ export default {
       if (operation.type === "communication") {
         // participants
         let participants = [];
-        for (var j = 0; j < operation.operators.length; j++) {
+        for (var j = 0; j < operation.personRef.length; j++) {
           let personInfo = this.operationApi.getMemberInfo(
-            operation.operators[j]
+            operation.personRef[j]
           );
           if (personInfo == null) return;
           participants.push(personInfo);

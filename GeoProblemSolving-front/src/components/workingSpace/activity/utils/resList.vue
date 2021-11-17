@@ -1264,7 +1264,7 @@ export default {
     resId: function () {
       let address = this.selectData.address;
       if (address != "" && typeof(address) == "string"){
-        if (address.length == 34){
+        if (address.length == 36){
           return address;
         }else {
           let uidArr = address.split("data/");

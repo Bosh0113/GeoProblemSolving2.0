@@ -477,18 +477,18 @@ export default {
           }
         }
       } else if (chatMsg.type == "message-store") {
-        this.operationApi.communicationRecord(
-          this.activityInfo.aid,
-          "",
-          "",
-          "",
-          chatMsg.recordId,
-          chatMsg.time,
-          chatMsg.participants
-        );
-        chatMsg["type"] = "members";
-        chatMsg["content"] = "You have the only person in the meeting.";
-        this.receivedChatMsgs.push(chatMsg);
+        // this.operationApi.communicationRecord(
+        //   this.activityInfo.aid,
+        //   "",
+        //   "",
+        //   "",
+        //   chatMsg.recordId,
+        //   chatMsg.time,
+        //   chatMsg.participants
+        // );
+        // chatMsg["type"] = "members";
+        // chatMsg["content"] = "You have the only person in the meeting.";
+        // this.receivedChatMsgs.push(chatMsg);
       } else if (chatMsg.type == "test") {
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have joined the meeting.";

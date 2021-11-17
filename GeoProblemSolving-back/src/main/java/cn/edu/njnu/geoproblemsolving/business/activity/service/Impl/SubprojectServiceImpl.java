@@ -112,6 +112,9 @@ public class SubprojectServiceImpl implements SubprojectService {
                     toolSet.add(tool.getTid());
                 }
                 subproject.setToolList(toolSet);
+
+                //更新文档
+                docParser.addTools(subprojectId, relevantPurposeTool);
             }
 
             // folder
