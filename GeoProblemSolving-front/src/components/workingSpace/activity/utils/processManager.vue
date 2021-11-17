@@ -35,11 +35,19 @@
   .domain >>> input {
     opacity: 0.5;
   }
-
+  .res-protocol-type >>> .ivu-select-selection {
+    height: 37px;
+  }
+  .res-protocol-type >>> .ivu-select-placeholder{
+    height: 35px;
+  }
+  .res-protocol >>> .ti-input::-webkit-scrollbar {
+    display: none;
+  }
   .res-protocol >>> .ti-input {
     display: inline-block;
     width: 267px;
-    height: 32px;
+    height: 39px;
     line-height: 1.5;
     padding: 4px 7px;
     font-size: 12px;
@@ -50,8 +58,11 @@
     background-image: none;
     position: relative;
     cursor: text;
+    overflow-x: scroll;
   }
-
+  .res-protocol >>> .ti-tags {
+    height: 30px;
+  }
   .res-protocol >>> input {
     opacity: 0.5;
   }
@@ -671,10 +682,11 @@
             <div style="margin-top: 5px; width: 72px">Types:</div>
             <Select
               v-model="resProtocolForm.types"
+              class="res-protocol-type"
               multiple
               :max-tag-count="2"
               placeholder="Type of resources"
-              style="width: 267px"
+              style="width: 267px; height: 39px;"
               @on-change="resTypeChange"
             >
               <Option value="data">Data</Option>
@@ -686,7 +698,7 @@
               <Option value="variable">Variables</Option>
               <Option value="others">Others</Option>
             </Select>
-            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px; height: 39px;">
               Formats:
             </div>
             <vue-tags-input
@@ -698,7 +710,7 @@
             />
           </div>
           <div style="display: flex; margin-bottom: 15px">
-            <div style="margin-top: 5px; width: 72px">Scales:</div>
+            <div style="margin-top: 5px; width: 72px; height: 39px;">Scales:</div>
             <vue-tags-input
               class="res-protocol"
               v-model="scales_tag"
@@ -706,7 +718,7 @@
               :autocomplete-items="scaleFilteredItems"
               @tags-changed="scaleChange"
             />
-            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px; height: 39px;">
               References:
             </div>
             <vue-tags-input
@@ -718,7 +730,7 @@
             />
           </div>
           <div style="display: flex; margin-bottom: 15px">
-            <div style="margin-top: 5px; width: 72px">Units:</div>
+            <div style="margin-top: 5px; width: 72px; height: 39px;">Units:</div>
             <vue-tags-input
               class="res-protocol"
               v-model="units_tag"
@@ -726,7 +738,7 @@
               :autocomplete-items="unitFilteredItems"
               @tags-changed="unitChange"
             />
-            <div style="margin-top: 5px; margin-left: 50px; width: 72px">
+            <div style="margin-top: 5px; margin-left: 50px; width: 72px; height: 39px;">
               Concepts:
             </div>
             <vue-tags-input
@@ -983,6 +995,11 @@
     props: ["activityInfo", "childActivities", "userInfo", "projectInfo"],
     data() {
       return {
+        ops: {
+          bar: {
+            background: "#808695"
+          }
+        },
         userRole: "visitor",
         //button
         linkBtn: false,

@@ -15,10 +15,10 @@ img {
 .bg{
   background-image: url("../../assets/images/helpTitle.png");
   position: absolute;
-  width: 110%;
+  width: 101%;
   height: 120%;
   top: -10px;
-  left: -10px;
+  left: -18px;
 }
 .content{
   top:50%; 

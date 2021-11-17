@@ -22,11 +22,11 @@
         type="flex"
         justify="space-around"
         class="code-row-bg"
-        style="margin-top: 20px"
+        style="margin-top: 40px"
       >
         <Col span="10">
-          <Card style="min-height: 350px">
-            <div style="text-align: center; margin-top:10px">
+          <Card class="cardContiner" style="min-height: 350px;">
+            <div class="cardPicture" style="text-align: center; margin-top:10px">
               <img
                 src="../../../assets/images/startWork.png"
                 style="height: 150px"
@@ -42,7 +42,7 @@
                 <li>Accessible participatory tools and resources</li>
               </ul>
             </div>
-            <div style="text-align: center; margin-top: 2%">
+            <div style="text-align: center; margin-top: 2%; margin-bottom:5%;">
               <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Unit')">Go</a>
@@ -51,8 +51,8 @@
           </Card>
         </Col>
         <Col span="10">
-          <Card style="min-height: 350px">
-            <div style="text-align: center; margin-top:10px;">
+          <Card class="cardContiner" style="min-height: 350px;">
+            <div class="cardPicture" style="text-align: center; margin-top:10px;">
               <img
                 src="../../../assets/images/designWorkflow.png"
                 style="height: 150px"
@@ -68,7 +68,7 @@
                 <li>Task coordination and participant management</li>
               </ul>
             </div>
-            <div style="text-align:center;margin-top:2%">
+            <div style="text-align:center;margin-top:2%; margin-bottom:5%;">
               <h3 v-if="operationPermissionIdentity(this.activityInfo.permission, this.userRole, 'manage_workspace_type')">
                 Select this type ->
                 <a @click="selectTypeModalShow('Activity_Group')">Go</a>
@@ -77,7 +77,7 @@
           </Card>
         </Col>
       </Row>
-       <div style="text-align: center; margin-top: 10px; color: grey">
+       <div style="text-align: center; margin-top: 250px; color: grey">
         Activity contains workspaces to support collaborative geo-problem
         solving. Here provides two activity types for different solutions of
         geo-problems.
@@ -219,3 +219,6 @@ export default {
   },
 };
 </script>
+<style scoped>
+
+</style>
