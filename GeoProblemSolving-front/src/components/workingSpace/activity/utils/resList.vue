@@ -374,6 +374,11 @@
         </div>
       </div>
     </Card>
+    <!-- 进度加载条 -->
+    <Spin fix v-show="showLoading">
+      <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+      <div>Loading</div>
+    </Spin>
     <Modal
       v-model="shareModal"
       title="Share file from personal center"
@@ -716,6 +721,12 @@
         :label-width="100"
         inline
       >
+        <FormItem label="Privacy" prop="privacy">
+          <RadioGroup v-model="editFileValidate.privacy">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
         <FormItem label="Type" prop="type">
           <RadioGroup v-model="editFileValidate.type">
             <Radio label="data"></Radio>
@@ -873,6 +884,14 @@
             style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
           ></Button>
         </a>
+        <Button
+          type="success"
+          size="small"
+          title="Preview"
+          icon="md-eye"
+          style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
+          @click="preview(selectData)"
+        ></Button>
         <Button
           v-if="
             selectData.fromParents == undefined &&
@@ -1047,6 +1066,16 @@
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this resource?</h3>
+    </Modal>
+    <Modal
+      v-model="showImagesPreview"
+      title="Preview"
+      :mask-closable="false"
+      width="600px"
+    >
+      <div style="display:flex;text-align:center;align-items:center;justify-content:center;">
+        <img :src="imagesPreviewUrl" style="max-width:550px; max-height:550px;">
+      </div>
     </Modal>
     <login-modal
       :tempLoginModal="tempLoginModal"
@@ -1257,7 +1286,11 @@ export default {
       },
       // panel
       panel: null,
-      resProxy: this.$store.getters.resProxy
+      resProxy: this.$store.getters.resProxy,
+      showImagesPreview:false,
+      imagesPreviewUrl:"",
+      //进度条
+      showLoading: false,
     };
   },
   computed: {
@@ -1700,6 +1733,166 @@ export default {
           }
         }
       });
+    },
+    preview(data){
+      console.log(data);
+      this.checkDataModal = false;
+      var res = data;
+      let name = data.suffix;
+      if (/\.(doc|docx|xls|xlsx|ppt|pptx|xml|json|md)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url = "";
+        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + res.address;
+        }
+        console.log(url);
+        let finalUrl = "http://view.xdocin.com/xdoc?_xdoc=" + url;
+        var toolURL =
+          "<iframe src=" +
+          finalUrl +
+          ' style="width: 100%;height:100%" frameborder="0"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:5px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true,
+        });
+        $(".jsPanel-content").css("font-size", "0");
+        
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        var url = res.address;
+        var toolURL =
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      } else if (/\.(pdf)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url = "";
+        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + res.address;
+        }
+        console.log(url);
+
+        let that = this;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader(
+          'Content-Type',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        xhr.responseType = 'blob';
+        this.showLoading = true;
+        xhr.onload = function (e) {
+          if (this.status == 200) {
+            let changeUrl = ''
+            let file = new Blob([this.response], { type: 'application/pdf' })
+            if (window.createObjectURL !== undefined) { // basic
+              changeUrl = window.createObjectURL(file)
+            } else if (window.webkitURL !== undefined) { // webkit or chrome
+              try {
+                changeUrl = window.webkitURL.createObjectURL(file)
+              } catch (error) {
+  
+              }
+            } else if (window.URL !== undefined) { // Mozilla (firefox)
+              try {
+                changeUrl = window.URL.createObjectURL(file)
+              } catch (error) {
+                console.log(error)
+              }
+            }
+            console.log(file);
+            console.log(changeUrl);
+            var toolURL =
+              "<iframe src=" +
+              changeUrl +
+              ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
+            this.panel = jsPanel.create({
+              headerControls: {
+                smallify: "remove"
+              },
+              theme: "primary",
+              footerToolbar: '<p style="height:10px"></p>',
+              headerTitle: "Preview",
+              contentSize: "800 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              closeOnEscape: true
+            });
+            $(".jsPanel-content").css("font-size", "0");
+          }
+        };
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                that.showLoading = false;
+            } else {
+                //请求失败
+            }
+          }
+        }
+        xhr.send();
+        
+      } else if (/\.(gif|jpg|png|jpeg)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url = "";
+        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
+          url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else {
+          url = this.$store.getters.resProxy + res.address;
+        }
+        
+        this.imagesPreviewUrl = url;
+        this.showImagesPreview = true;
+        
+      } else {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Not supported file format."
+        });
+        return false;
+      }
     },
     deleteResourceModalShow(resource) {
       this.deleteResourceModal = true;
@@ -2271,6 +2464,7 @@ export default {
     fileEditModelShow(fileInfo) {
       let metadata = {};
       this.selectFileInfo = fileInfo;
+      this.editFileValidate.privacy = fileInfo.privacy;
       this.editFileValidate.name = fileInfo.name;
       this.editFileValidate.type = fileInfo.type;
       this.editFileValidate.description = fileInfo.description;
@@ -2291,6 +2485,7 @@ export default {
           let formData = new FormData();
           let putResInfo = {
             uid: this.selectFileInfo.uid,
+            privacy: this.editFileValidate.privacy,
             name: this.editFileValidate.name,
             type: this.editFileValidate.type,
             description: this.editFileValidate.description,
@@ -2354,25 +2549,27 @@ export default {
                   this.selectFileInfo,
                   metadata,
                 );
-                // 检查元数据发生修改
-                let metadataChanged = false;
-                if(
-                  this.oldMetadata.format != this.editFileValidate.format ||
-                  this.oldMetadata.scale != this.editFileValidate.scale ||
-                  this.oldMetadata.reference != this.editFileValidate.reference ||
-                  this.oldMetadata.unit != this.editFileValidate.unit ||
-                  this.oldMetadata.concept != this.editFileValidate.concept
-                ){ metadataChanged = true; }
-                if(metadataChanged){
-                  let projectId = this.$route.params.projectId;
-                  this.axios
-                    .put(`/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
-                    .then((res) => {
-                      console.log(res.data.data);
-                    })
-                    .catch((err) => {
-                      console.log(err.data);
-                    });
+                if(this.editFileValidate.type == "data"){
+                  // 检查元数据发生修改
+                  let metadataChanged = false;
+                  if(
+                    this.oldMetadata.format != this.editFileValidate.format ||
+                    this.oldMetadata.scale != this.editFileValidate.scale ||
+                    this.oldMetadata.reference != this.editFileValidate.reference ||
+                    this.oldMetadata.unit != this.editFileValidate.unit ||
+                    this.oldMetadata.concept != this.editFileValidate.concept
+                  ){ metadataChanged = true; }
+                  if(metadataChanged){
+                    let projectId = this.$route.params.projectId;
+                    this.axios
+                      .put(`/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
+                      .then((res) => {
+                        console.log(res.data.data);
+                      })
+                      .catch((err) => {
+                        console.log(err.data);
+                      });
+                }
                 }
                 // 生成临时操作记录
                 let resOperation = {

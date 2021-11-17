@@ -781,6 +781,12 @@
         :label-width="100"
         inline
       >
+        <FormItem label="Privacy" prop="privacy">
+          <RadioGroup v-model="editFileValidate.privacy">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
         <FormItem label="Type" prop="type">
           <RadioGroup v-model="editFileValidate.type">
             <Radio label="data"></Radio>
@@ -1706,6 +1712,7 @@
       fileEditModelShow(fileInfo) {
         let metadata = {};
         this.putFileInfo = fileInfo;
+        this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileValidate.name = fileInfo.name;
         this.editFileValidate.type = fileInfo.type;
         this.editFileValidate.description = fileInfo.description;
@@ -1726,6 +1733,7 @@
             let formData = new FormData();
             let putResInfo = {
               uid: this.putFileInfo.uid,
+              privacy: this.editFileValidate.privacy,
               name: this.editFileValidate.name,
               type: this.editFileValidate.type,
               description: this.editFileValidate.description,
@@ -1750,10 +1758,10 @@
                   this.$store.commit("userLogout");
                   this.tempLoginModal = true;
                 } else if (res.data.code == 0) {
+                  this.putFileInfo.privacy = this.editFileValidate.privacy;
                   this.putFileInfo.name = this.editFileValidate.name;
                   this.putFileInfo.type = this.editFileValidate.type;
-                  this.putFileInfo.description =
-                    this.editFileValidate.description;
+                  this.putFileInfo.description =this.editFileValidate.description;
                   for (var i = 0; i < this.currentFolder.files.length; i++) {
                     if (
                       this.currentFolder.files[i].resourceId ==
@@ -1780,31 +1788,33 @@
                     this.putFileInfo,
                     metadata,
                   );
-                  // 检查元数据发生修改
-                  let metadataChanged = false;
-                  if (
-                    this.oldMetadata.format != this.editFileValidate.format ||
-                    this.oldMetadata.scale != this.editFileValidate.scale ||
-                    this.oldMetadata.reference != this.editFileValidate.reference ||
-                    this.oldMetadata.unit != this.editFileValidate.unit ||
-                    this.oldMetadata.concept != this.editFileValidate.concept
-                  ) {
-                    metadataChanged = true;
-                  }
-                  if (metadataChanged) {
-                    this.axios
-                      .put(
-                        "/GeoProblemSolving/activityDoc/meta/" +
-                        this.activityInfo.aid +
-                        "/" +
-                        this.selectFileInfo.uid
-                      )
-                      .then((res) => {
-                        console.log(res.data.data);
-                      })
-                      .catch((err) => {
-                        console.log(err.data);
-                      });
+                  if (this.editFileValidate.type == "data") {
+                    // 检查元数据发生修改
+                    let metadataChanged = false;
+                    if (
+                      this.oldMetadata.format != this.editFileValidate.format ||
+                      this.oldMetadata.scale != this.editFileValidate.scale ||
+                      this.oldMetadata.reference != this.editFileValidate.reference ||
+                      this.oldMetadata.unit != this.editFileValidate.unit ||
+                      this.oldMetadata.concept != this.editFileValidate.concept
+                    ) {
+                      metadataChanged = true;
+                    }
+                    if (metadataChanged) {
+                      this.axios
+                        .put(
+                          "/GeoProblemSolving/activityDoc/meta/" +
+                          this.activityInfo.aid +
+                          "/" +
+                          this.selectFileInfo.uid
+                        )
+                        .then((res) => {
+                          console.log(res.data.data);
+                        })
+                        .catch((err) => {
+                          console.log(err.data);
+                        });
+                    }
                   }
                   // 生成临时操作记录
                   let resOperation = {
@@ -1817,6 +1827,7 @@
                     behavior: "add",
                     operation: resOperation,
                   });
+                  this.$Message.success("Edit resource success!");
                 } else {
                   this.$Message.warning("Update fail.");
                 }
