@@ -175,7 +175,6 @@
                   icon="md-link"
                   title="Start to link"
                   style="float: right; margin-left: 10px"
-                  id="linkBegin"
                   >Start to link
                 </Button>
                 <Button
@@ -187,7 +186,6 @@
                   icon="md-link"
                   title="Complete linking"
                   style="float: right; margin-left: 10px"
-                  id="linkEnd"
                   >Complete linking
                 </Button>
                 <Button
@@ -198,7 +196,6 @@
                   icon="md-link"
                   title="Complete linking"
                   style="float: right; margin-left: 10px; cursor: default"
-                  id="linkEnd"
                   >Complete linking
                 </Button>
               </template>

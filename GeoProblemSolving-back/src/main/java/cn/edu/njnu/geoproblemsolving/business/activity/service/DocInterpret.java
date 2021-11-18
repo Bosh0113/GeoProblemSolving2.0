@@ -136,6 +136,7 @@ public class DocInterpret implements ActivityDocParser {
         activityEle.addAttribute("name", activity.getName());
         activityEle.addAttribute("type", activityType);
         activityEle.addAttribute("description", activity.getDescription());
+
         initActivityContent(activityEle, activity);
 
         //文档入库
@@ -337,6 +338,10 @@ public class DocInterpret implements ActivityDocParser {
         ArrayList<HashMap<String, String>> uploadOperationList = new ArrayList<>();
         Element resCollectionEle = (Element) activityDocXml.selectSingleNode("/Activity/ResourceCollection");
         Element operationRecordEle = (Element) activityDocXml.selectSingleNode("/Activity/OperationRecords");
+        boolean operationFlag = false;
+        String activityType = activityDocXml.getRootElement().attributeValue("type");
+        if (activityType.equals(ActivityType.Activity_Unit.toString())) operationFlag = true;
+        //添加 operation，单活动才需要有操作
         for (ResourceEntity item : uploadList) {
             HashMap<String, String> uploadOperation = new HashMap<>();
             Element resEle = resCollectionEle.addElement("Resource");
@@ -356,20 +361,21 @@ public class DocInterpret implements ActivityDocParser {
                     }
                 }
             }
-            //添加 operation
-            Element operationEle = operationRecordEle.addElement("Operation");
-            String oid = UUID.randomUUID().toString();
-            operationEle.addAttribute("id", oid);
-            operationEle.addAttribute("type", "resource");
-            operationEle.addAttribute("behavior", "upload");
-            operationEle.addAttribute("resRef", item.getUid());
-            operationEle.addAttribute("operator", item.getUploaderId());
-            operationEle.addAttribute("task","");
-            operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+            if (operationFlag){
+                Element operationEle = operationRecordEle.addElement("Operation");
+                String oid = UUID.randomUUID().toString();
+                operationEle.addAttribute("id", oid);
+                operationEle.addAttribute("type", "resource");
+                operationEle.addAttribute("behavior", "upload");
+                operationEle.addAttribute("resRef", item.getUid());
+                operationEle.addAttribute("operator", item.getUploaderId());
+                operationEle.addAttribute("task","");
+                operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
-            uploadOperation.put("oid", oid);
-            uploadOperation.put("resRef", item.getUid());
-            uploadOperationList.add(uploadOperation);
+                uploadOperation.put("oid", oid);
+                uploadOperation.put("resRef", item.getUid());
+                uploadOperationList.add(uploadOperation);
+            }
         }
         saveXML();
         return uploadOperationList;
