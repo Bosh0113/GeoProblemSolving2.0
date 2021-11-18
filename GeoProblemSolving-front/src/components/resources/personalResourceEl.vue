@@ -38,7 +38,7 @@
                     <template slot-scope="{ row }" slot="name">
                     <strong>{{ row.name }}</strong>
                     </template>
-                    <template slot-scope="{ row, index }" slot="action">
+                    <template slot-scope="{  index }" slot="action">
                     <Button
                         class="fileBtnHoverGreen"
                         size="small"

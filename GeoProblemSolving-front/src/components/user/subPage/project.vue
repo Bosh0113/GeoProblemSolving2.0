@@ -147,25 +147,39 @@
                             icon="md-close"
                             title="remove"
                           ></Button>
-
-                          <!-- project显示图片 -->
-                          <!-- <Poptip trigger="hover" title="Description" :content="mProject.description" style="position:absolute;  top:50px; left:1%;">
-                            <img
-                              :src="mProject.picture"
-                              style="width:287%; height:230px; opacity: 1;"
-                            >
-                          </Poptip> -->
-
-
                           <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                           <!-- 表头结束 -->
                           <!--              200px  -->
-                          <div style="height:200px; z-index: 2;">
-                            <span style="font-weight: bold;">Description：</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{mProject.description}}
-                            </vue-scroll>
-                          </div>
+                          <Row>
+                            <Col span="7" >
+                              <div style="margin-top: 5px; margin-left:5px;">
+                                  <img
+                                    :src="mProject.picture"
+                                    v-if="mProject.picture != '' && mProject.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="mProject.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
+                          
                           <br/>
                           <div>
                             <span style="float:left">Created time:</span>
@@ -201,12 +215,35 @@
                           >Quit
                           </Button>
                           <!-- <img :src="item.picture" style="position:absolute; width:98%; height:230px; top:50px; left:1%; opacity: 0.5;z-index: -1;"> -->
-                          <div style="height:200px;  z-index: 2;">
-                            <span style="font-weight: bold">Description：</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{item.description}}
-                            </vue-scroll>
-                          </div>
+                          <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="item.picture"
+                                    v-if="item.picture != '' && item.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="item.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{item.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div style="height:40px">
                             <span style="float:left">CreateTime:</span>
@@ -402,12 +439,35 @@
                           <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                           <!-- 表头结束 -->
                           <!--              200px  -->
-                          <p style="height:200px;">
-                            <span style="font-weight: bold;">Description</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{mProject.description}}
-                            </vue-scroll>
-                          </p>
+                         <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="mProject.picture"
+                                    v-if="mProject.picture != '' && mProject.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="mProject.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div>
                             <span style="float:left">CreateTime:</span>
@@ -443,14 +503,35 @@
                             @click.stop="quitModalShow(item)"
                           >Quit
                           </Button>
-                          <p
-                            style="height:200px;"
-                          >
-                            <span style="font-weight: bold">Description</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{item.description}}
-                            </vue-scroll>
-                          </p>
+                          <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="item.picture"
+                                    v-if="item.picture != '' && item.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="item.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{item.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div style="height:40px">
                             <span style="float:left">CreateTime:</span>
@@ -548,9 +629,11 @@
 </template>
 
 <script>
+import Avatar from "vue-avatar";
+
   export default {
     name: "project",
-    components: {},
+    components: {Avatar,},
     data() {
       return {
         joinedProjectsList: [],
@@ -640,6 +723,7 @@
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
               if(res.data.code == 0){
+                console.log(res.data.data);
                 this.$set(this, "createdProjectList", res.data.data)
               }
             })
