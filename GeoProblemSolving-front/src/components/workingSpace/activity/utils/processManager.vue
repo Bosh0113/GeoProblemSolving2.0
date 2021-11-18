@@ -1750,6 +1750,8 @@
             };
             this.activityInfo.pathway.push(newStepNode);
           }
+          this.processStructure = this.activityInfo.pathway;
+          this.updatePathway();
         } else if (
           this.activityInfo.pathway.length < this.childActivities.length
         ) {
@@ -1775,8 +1777,9 @@
               status: true,
             };
             this.activityInfo.pathway.push(newStepNode);
-            this.updatePathway();
           }
+          this.processStructure = this.activityInfo.pathway;
+          this.updatePathway();
         } else if (
           this.activityInfo.pathway.length > this.childActivities.length
         ) {
@@ -1793,9 +1796,11 @@
               this.removePathwayNode(this.activityInfo.pathway[i].aid);
             }
           }
+          this.processStructure = this.activityInfo.pathway;
           this.updatePathway();
+        } else {
+          this.processStructure = this.activityInfo.pathway;
         }
-        this.processStructure = this.activityInfo.pathway;
       },
       getProtocolInfo(last, next){
         this.axios.get(`/GeoProblemSolving/activityDriven/${this.activityInfo.aid}/${last}/${next}`)

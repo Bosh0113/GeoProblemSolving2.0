@@ -435,7 +435,7 @@ export default {
         }
       });
 
-      this.operations.push(operation);
+      // this.operations.push(operation);
     },
     removeOperationNode(operation) {
       let nodeId = this.editor.getNodesFromName(operation.id)[0];

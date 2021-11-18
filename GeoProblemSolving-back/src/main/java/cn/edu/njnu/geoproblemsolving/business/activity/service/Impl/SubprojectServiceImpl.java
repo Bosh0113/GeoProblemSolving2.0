@@ -123,7 +123,6 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
-
             // update project info
             String projectId = subproject.getParent();
             Project project = projectRepository.findById(projectId).get();
@@ -140,7 +139,6 @@ public class SubprojectServiceImpl implements SubprojectService {
             // Save
             subprojectRepository.save(subproject);
             projectRepository.save(project);
-
             /*
             activity doc operation
             1. init subproject document

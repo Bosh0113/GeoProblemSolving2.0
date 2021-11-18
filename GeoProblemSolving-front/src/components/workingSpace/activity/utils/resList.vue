@@ -1771,7 +1771,7 @@ export default {
           closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
-        
+
       } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -1828,7 +1828,7 @@ export default {
               try {
                 changeUrl = window.webkitURL.createObjectURL(file)
               } catch (error) {
-  
+
               }
             } else if (window.URL !== undefined) { // Mozilla (firefox)
               try {
@@ -1871,7 +1871,7 @@ export default {
           }
         }
         xhr.send();
-        
+
       } else if (/\.(gif|jpg|png|jpeg)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -1882,10 +1882,10 @@ export default {
         } else {
           url = this.$store.getters.resProxy + res.address;
         }
-        
+
         this.imagesPreviewUrl = url;
         this.showImagesPreview = true;
-        
+
       } else {
         this.$Notice.error({
           title: "Open failed",

@@ -510,9 +510,15 @@ public class DocInterpret implements ActivityDocParser {
         syncGlobalVariables(aid);
         if (operatingDoc == null) return null;
         Element childActivitiesEle =  (Element)activityDocXml.selectSingleNode("/Activity/ChildActivities");
+        System.out.println("childActivitiesEle" + childActivitiesEle);
         Element oldChildEle = (Element)childActivitiesEle.selectSingleNode("//Child[@id = '"+ childId +"']");
         if (oldChildEle != null){
             childActivitiesEle.remove(oldChildEle);
+        }
+        Element activityEle = activityDocXml.getRootElement();
+        String activityType = activityEle.attributeValue("type");
+        if (childActivitiesEle == null && activityType.equals(ActivityType.Activity_Group)){
+            childActivitiesEle = activityDocXml.getRootElement().addElement("ChildActivities");
         }
         Element childEle = childActivitiesEle.addElement("Child");
         childEle.addAttribute("id", childId);
@@ -545,13 +551,13 @@ public class DocInterpret implements ActivityDocParser {
         if (operatingDoc == null) return null;
         Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
         if (toolBoxEle == null) return null;
-        List<Node> oldTools = activityDocXml.selectNodes("/Activity/ToolBox/Tool");
-        if (oldTools != null && !oldTools.isEmpty()){
-            for (Node item : oldTools){
-                Element oldToolEle = (Element) item;
-                oldToolEle.attribute("state").setValue("removed");
-            }
-        }
+        toolBoxEle.clearContent();
+        // if (oldTools != null && !oldTools.isEmpty()){
+        //     for (Node item : oldTools){
+        //         Element oldToolEle = (Element) item;
+        //         oldToolEle.attribute("state").setValue("removed");
+        //     }
+        // }
         //将新工具添加到ToolBox 中
         appendTools(toolBoxEle, tools);
         saveXML();
