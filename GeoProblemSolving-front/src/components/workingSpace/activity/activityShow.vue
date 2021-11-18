@@ -779,16 +779,18 @@ export default {
                 this.$store.commit("userLogout");
                 this.tempLoginModal = true;
               } else if (res.data.code == 0) {
-                this.operationApi.activityRecord(
-                  "",
-                  "create",
-                  this.userInfo.userId,
-                  res.data.data
-                );
-                this.operationApi.activityDocInit(
-                  res.data.data,
-                  this.userInfo
-                );
+                //多活动依赖
+                // this.operationApi.activityRecord(
+                //   "",
+                //   "create",
+                //   this.userInfo.userId,
+                //   res.data.data
+                // );
+                //初始化文档
+                // this.operationApi.activityDocInit(
+                //   res.data.data,
+                //   this.userInfo
+                // );
 
                 this.$emit('enterActivity', res.data.data);
               } else {

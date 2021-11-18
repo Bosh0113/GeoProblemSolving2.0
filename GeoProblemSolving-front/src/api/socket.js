@@ -56,7 +56,7 @@ function initWebSocket(para) { //初始化websocket
     console.log(e);
 
     // let url = e.target.url;
-    // let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
+    // let para = url.substring(url.indexOf('/GeoProblemSolving/')+"/GeoProblemSolving/".length);
 
     // websockLinked[para] = false;
     // connectorNum[para] = -1;

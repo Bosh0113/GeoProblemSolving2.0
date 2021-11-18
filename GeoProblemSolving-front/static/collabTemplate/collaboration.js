@@ -698,7 +698,7 @@ var taskList = [];
         if (typeof(address) == "string"){
           address = address.slice(-36);
         }
-        rootRes[i].address = resProxy + "/data/" + address;
+        rootRes[i].address == resProxy + "/data/" + address;
         currentFolder.files.push(rootRes[i]);
       }
     }

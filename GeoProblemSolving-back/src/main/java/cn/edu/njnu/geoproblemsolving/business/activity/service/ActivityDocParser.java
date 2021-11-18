@@ -1,11 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ public interface ActivityDocParser {
 
     void initActivityDoc(String aid, String level);
 
-    void changeActivityType(String aid, String type);
+    void changeActivityType(String aid, Activity activity);
 
 
     //=================Generic operation==============================================================
@@ -82,11 +82,15 @@ public interface ActivityDocParser {
         2. ChildActivities and activity dependencies
      */
 
+    Object appendChildActivity(String aid, String childId, String name, String creatorId);
+
     //=======================Signal activity operation===================================================
     /*
         1.Tool related operation, include toolbox
      */
     Object addTools(String aid, List<Tool> tools);
+
+    Object putTools(String aid, List<Tool> tools);
     /*
         2.Task list
      */

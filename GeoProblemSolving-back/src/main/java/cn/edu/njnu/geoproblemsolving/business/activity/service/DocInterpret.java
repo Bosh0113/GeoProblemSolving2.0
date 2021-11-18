@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Folder.IFolderDao;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -33,6 +34,9 @@ import java.util.*;
 /**
  * @ClassName DocInterpret
  * @Description 活动文档解析
+ * 整体设计思路应该是外部来调用这里面
+ * 而不是来修改内容代码，外部逻辑未知
+ * 内部提供丰富的基础接口，服务层来拼装这些接口，来完成业务逻辑
  * 1. 活动文档解析
  * 2. 地理问题求解模板文档
  * 3. 文档间的映射方法
@@ -125,55 +129,16 @@ public class DocInterpret implements ActivityDocParser {
     public void initActivityDoc(Activity activity) {
         Document document = DocumentHelper.createDocument();
         String activityType = activity.getType().toString();
+
+        //add rootElement
         Element activityEle = document.addElement("Activity");
         activityEle.addAttribute("id", activity.getAid());
         activityEle.addAttribute("name", activity.getName());
         activityEle.addAttribute("type", activityType);
         activityEle.addAttribute("description", activity.getDescription());
+        initActivityContent(activityEle, activity);
 
-        //participants
-        Element participantsEle = activityEle.addElement("Participants");
-        JSONObject memberJson = JSONObject.parseObject(JSONObject.toJSONString(activity.getMembers().get(0)));
-        Element personEle = participantsEle.addElement("person");
-        String userId = memberJson.getString("userId");
-        personEle.addAttribute("id", userId);
-        personEle.addAttribute("role", memberJson.getString("role"));
-        personEle.addAttribute("state", "in");
-        UserEntity user = userDao.findUserByIdOrEmail(userId);
-        if (user != null) {
-            personEle.addAttribute("email", user.getEmail());
-            personEle.addAttribute("name", user.getName());
-            ArrayList<String> domains = user.getDomain();
-            if (domains != null && domains.size() != 0) {
-                for (String domain : domains) {
-                    Element domainEle = personEle.addElement("Domain");
-                    domainEle.addAttribute("description", domain);
-                }
-
-            }
-            ArrayList<String> organizations = user.getOrganizations();
-            if (organizations != null && organizations.size() != 0) {
-                for (String organization : organizations) {
-                    Element domainEle = personEle.addElement("Organization");
-                    domainEle.addAttribute("description", organization);
-                }
-            }
-        }
-
-        Element resCollectionEle = activityEle.addElement("ResourceCollection");
-        Element operationsEle = activityEle.addElement("OperationRecords");
-
-        if (activityType.equals("Activity_Unit")) {
-            Element toolBoxEle = activityEle.addElement("ToolBox");
-            Element taskListEle = activityEle.addElement("TaskList");
-            Element taskDependencies = activityEle.addElement("TaskDependency");
-
-        } else if (activityType.equals("Activity_Group")) {
-            Element childEle = activityEle.addElement("ChildActivities");
-            Element acDependenciesEle = activityEle.addElement("ActivityDependencies");
-        }
-
-        //
+        //文档入库
         String xmlStr = document.asXML();
         ActivityDoc activityDoc = new ActivityDoc();
         activityDoc.setAid(activity.getAid());
@@ -182,8 +147,16 @@ public class DocInterpret implements ActivityDocParser {
     }
 
     @Override
-    public void changeActivityType(String aid, String type) {
+    public void changeActivityType(String aid, Activity activity) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return;
+        Element activityEle = activityDocXml.getRootElement();
+        activityEle.clearContent();
+        String type = activity.getType().toString();
+        activityEle.attribute("type").setValue(type);
 
+        initActivityContent(activityEle, activity);
+        saveXML();
     }
 
     //Change the document type.
@@ -215,6 +188,7 @@ public class DocInterpret implements ActivityDocParser {
             String level = params[2];
         }
     }
+
 
 
     //=================Generic operation==============================================================
@@ -531,6 +505,30 @@ public class DocInterpret implements ActivityDocParser {
         2. ChildActivities and activity dependencies
      */
 
+    @Override
+    public Object appendChildActivity(String aid, String childId, String name, String creatorId) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element childActivitiesEle =  (Element)activityDocXml.selectSingleNode("/Activity/ChildActivities");
+        System.out.println("childActivitiesEle" + childActivitiesEle);
+        Element oldChildEle = (Element)childActivitiesEle.selectSingleNode("//Child[@id = '"+ childId +"']");
+        if (oldChildEle != null){
+            childActivitiesEle.remove(oldChildEle);
+        }
+        Element activityEle = activityDocXml.getRootElement();
+        String activityType = activityEle.attributeValue("type");
+        if (childActivitiesEle == null && activityType.equals(ActivityType.Activity_Group)){
+            childActivitiesEle = activityDocXml.getRootElement().addElement("ChildActivities");
+        }
+        Element childEle = childActivitiesEle.addElement("Child");
+        childEle.addAttribute("id", childId);
+        childEle.addAttribute("name", name);
+        childEle.addAttribute("creator", creatorId);
+        childEle.addAttribute("state", "accessible");
+        saveXML();
+        return null;
+    }
+
     //=======================Signal activity operation===================================================
     /*
         1.Tool related operation, include toolbox
@@ -542,7 +540,37 @@ public class DocInterpret implements ActivityDocParser {
         if (operatingDoc == null) return null;
         if (tools == null || tools.isEmpty()) return null;
         Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
+        appendTools(toolBoxEle, tools);
+        saveXML();
+        return null;
+    }
+
+    @Override
+    public Object putTools(String aid, List<Tool> tools) {
+        syncGlobalVariables(aid);
+        if (operatingDoc == null) return null;
+        Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
+        if (toolBoxEle == null) return null;
+        toolBoxEle.clearContent();
+        // if (oldTools != null && !oldTools.isEmpty()){
+        //     for (Node item : oldTools){
+        //         Element oldToolEle = (Element) item;
+        //         oldToolEle.attribute("state").setValue("removed");
+        //     }
+        // }
+        //将新工具添加到ToolBox 中
+        appendTools(toolBoxEle, tools);
+        saveXML();
+        return null;
+    }
+
+    private Element appendTools(Element toolBoxEle, List<Tool> tools){
         for (Tool item : tools){
+            //判断是否有此工具先
+            Element oldToolEle = (Element)toolBoxEle.selectSingleNode("//Tool[@id = '"+ item.getTid() +"']");
+            if (oldToolEle != null){
+                oldToolEle.getParent().remove(oldToolEle);
+            }
             Element toolEle = toolBoxEle.addElement("Tool");
             toolEle.addAttribute("id", item.getTid());
             toolEle.addAttribute("name", item.getToolName());
@@ -551,14 +579,12 @@ public class DocInterpret implements ActivityDocParser {
             toolEle.addAttribute("provider", item.getProvider());
             toolEle.addAttribute("state", "accessible");
 
-            if (item.getBackendType().equals("webTool")){
+            if (item.getBackendType() != null && item.getBackendType().equals("webTool")){
                 toolEle.addAttribute("href", item.getToolUrl());
             }
         }
-        saveXML();
-        return null;
+        return toolBoxEle;
     }
-
     /*
         2.Task related operation, include task list and task dependency.
      */
@@ -1164,5 +1190,53 @@ public class DocInterpret implements ActivityDocParser {
         Element activityEle = activityDocXml.getRootElement();
         String activityType = activityEle.attributeValue("type");
         return null;
+    }
+
+
+    private Element initActivityContent(Element activityEle, Activity activity){
+        Element participantsEle = activityEle.addElement("Participants");
+        JSONObject memberJson = JSONObject.parseObject(JSONObject.toJSONString(activity.getMembers().get(0)));
+        Element personEle = participantsEle.addElement("Person");
+        String userId = memberJson.getString("userId");
+        personEle.addAttribute("id", userId);
+        personEle.addAttribute("role", memberJson.getString("role"));
+        personEle.addAttribute("state", "in");
+        //增加用户领域等信息
+        UserEntity user = userDao.findUserByIdOrEmail(userId);
+        if (user != null) {
+            personEle.addAttribute("email", user.getEmail());
+            personEle.addAttribute("name", user.getName());
+            ArrayList<String> domains = user.getDomain();
+            if (domains != null && domains.size() != 0) {
+                for (String domain : domains) {
+                    Element domainEle = personEle.addElement("Domain");
+                    domainEle.addAttribute("description", domain);
+                }
+            }
+            ArrayList<String> organizations = user.getOrganizations();
+            if (organizations != null && organizations.size() != 0) {
+                for (String organization : organizations) {
+                    Element domainEle = personEle.addElement("Organization");
+                    domainEle.addAttribute("description", organization);
+                }
+            }
+        }
+
+        activityEle.addElement("ResourceCollection");
+        activityEle.addElement("OperationRecords");
+
+
+        String activityType = activity.getType().toString();
+        if (activityType.equals("Activity_Unit")) {
+            activityEle.addElement("ToolBox");
+            activityEle.addElement("TaskList");
+            activityEle.addElement("TaskDependency");
+
+        } else if (activityType.equals("Activity_Group")) {
+            activityEle.addElement("ChildActivities");
+            activityEle.addElement("ActivityDependencies");
+        }
+
+        return activityEle;
     }
 }
