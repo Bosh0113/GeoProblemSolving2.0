@@ -342,8 +342,8 @@
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
-                  :title="file.name"
-                >{{ file.name }}</span
+                  :title="file.name + file.suffix"
+                >{{ file.name + file.suffix }}</span
                 >
                 <span class="fileItemSize">{{
                   file.fileSize | filterSizeType
