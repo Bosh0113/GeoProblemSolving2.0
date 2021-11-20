@@ -152,7 +152,7 @@ function setTimer() {
     for (let i = 0; i < socketSites.length; i++) {
       websocketsend(socketSites[i], messageJson);
     }
-  }, 50000);
+  }, 15000);
 }
 
 function removeTimer() {

@@ -1725,7 +1725,7 @@ export default {
           closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
-        
+
       } else if (/(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();

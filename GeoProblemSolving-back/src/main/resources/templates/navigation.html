@@ -317,10 +317,15 @@
                 },
                 onClose(e) {
                     this.removeTimer();
+                    if(e.code === 1006){
+                        this.initWebSocket();
+                    }
+                    console.log("Connection closed (" + e.code + ")");
                     // console.log("NoticeSocket连接断开！");
                 },
                 onError(e) {
                     this.removeTimer();
+
                     // console.log("NoticeSocket连接错误！");
                 },
                 sendMessage(data) {
@@ -332,7 +337,7 @@
                         if (that.noticeSocket != null && that.noticeSocket != undefined) {
                             that.noticeSocket.send(JSON.stringify({"type": "ping"}));
                         }
-                    }, 20000);
+                    }, 15000);
                 },
                 removeTimer() {
                     clearInterval(this.timer);

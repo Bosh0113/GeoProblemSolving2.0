@@ -1748,7 +1748,6 @@
                 formData
               )
               .then((res) => {
-                console.log(res);
                 this.editFileModel = false;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
@@ -1802,7 +1801,7 @@
                           "/GeoProblemSolving/activityDoc/meta/" +
                           this.activityInfo.aid +
                           "/" +
-                          this.selectFileInfo.uid
+                          this.putFileInfo.uid
                         )
                         .then((res) => {
                           console.log(res.data.data);

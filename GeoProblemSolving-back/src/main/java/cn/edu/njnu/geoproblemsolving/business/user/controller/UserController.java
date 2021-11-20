@@ -121,6 +121,7 @@ public class UserController {
         session.setAttribute("email", localUser.getEmail());
         session.setMaxInactiveInterval(60 * 60 * 2);
         System.out.println("User login. User name: " + localUser.getName());
+        System.out.println("User session id is : " + session.getId());
         return loginResult;
     }
 
