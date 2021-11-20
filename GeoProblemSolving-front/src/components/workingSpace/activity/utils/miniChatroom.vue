@@ -438,7 +438,8 @@ export default {
     getSocketConnect(data) {
       this.receivedChatMsgs = [];
       let chatMsg = data;
-      if (chatMsg.type === "members") {
+      if (chatMsg.type === "members") {        
+        this.memberNoticeClear();
         if (chatMsg.behavior == "on") {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.receivedChatMsgs.push(chatMsg);
@@ -459,7 +460,7 @@ export default {
               this.allChatMsgs[i].status = "done";
               msgCheck = true;
             } else if (
-              (this.allChatMsgs[i].status =
+              (this.allChatMsgs[i].status ==
                 "sending" && current - time > threshold)
             ) {
               this.allChatMsgs[i].status = "failed";
@@ -488,10 +489,12 @@ export default {
         // );
         // chatMsg["type"] = "members";
         // chatMsg["content"] = "You have the only person in the meeting.";
+        // this.memberNoticeClear();
         // this.receivedChatMsgs.push(chatMsg);
       } else if (chatMsg.type == "test") {
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have joined the meeting.";
+        this.memberNoticeClear();
         this.receivedChatMsgs.push(chatMsg);
       }
     },
@@ -523,10 +526,18 @@ export default {
             type: "members",
             content: "Lost the connection with others.",
           };
+          this.memberNoticeClear();
           this.allChatMsgs.push(chatMsg);
         }
       }
       this.typingMsg = "";
+    },
+    memberNoticeClear(){
+      for(let i = this.allChatMsgs.length - 1; i >= 0; i--) {
+        if(this.allChatMsgs[i].type == "members"){
+          this.allChatMsgs.splice(i, 1);
+        }
+      }
     },
   },
   beforeDestroy() {

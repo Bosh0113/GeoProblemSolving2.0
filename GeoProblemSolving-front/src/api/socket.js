@@ -157,6 +157,7 @@ function setTimer() {
 
 function removeTimer() {
   clearInterval(timer);
+  timer = null;
 }
 
 
