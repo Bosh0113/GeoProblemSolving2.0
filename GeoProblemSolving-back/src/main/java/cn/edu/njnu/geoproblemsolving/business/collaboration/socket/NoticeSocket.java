@@ -38,7 +38,7 @@ public class NoticeSocket {
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message) {
-        System.out.println("Notice on message");
+        // System.out.println("Notice on message");
         try {
             JSONObject messageJson = JSONObject.parseObject(message);
             // System.out.println("-----Notice onmessage: --------:" + messageJson);

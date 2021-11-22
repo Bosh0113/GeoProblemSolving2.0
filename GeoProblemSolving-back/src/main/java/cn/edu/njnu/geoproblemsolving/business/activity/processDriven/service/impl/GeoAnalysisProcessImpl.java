@@ -1308,7 +1308,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         //起点不用管,有肯定就不为空
         HashMap<String, LinkRestriction> endNode = adjacencyMap.get(startId);
         visitedNode.add(startId);
-        if (endNode != null) {
+        if (endNode != null && !endNode.isEmpty()) {
             //节点遍历完，都没下一步则走完了，退回上一层
             int size = endNode.size();
             for (Map.Entry<String, LinkRestriction> item : endNode.entrySet()) {

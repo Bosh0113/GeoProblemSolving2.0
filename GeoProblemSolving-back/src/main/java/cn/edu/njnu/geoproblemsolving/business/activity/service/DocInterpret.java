@@ -1085,15 +1085,15 @@ public class DocInterpret implements ActivityDocParser {
                 endResCollectionEle.add(endRes);
 
                 //operation
-                Element operationRecordEle = (Element) endActivityDocXml.selectSingleNode("/Activity/OperationRecords");
-                Element operationEle = operationRecordEle.addElement("Operation");
-                operationEle.addAttribute("id", UUID.randomUUID().toString());
-                operationEle.addAttribute("type", "resource");
-                operationEle.addAttribute("behavior", "flow");
-                operationEle.addAttribute("resRef", uid);
-                operationEle.addAttribute("operator", "");
-                operationEle.addAttribute("task", "");
-                operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+                // Element operationRecordEle = (Element) endActivityDocXml.selectSingleNode("/Activity/OperationRecords");
+                // Element operationEle = operationRecordEle.addElement("Operation");
+                // operationEle.addAttribute("id", UUID.randomUUID().toString());
+                // operationEle.addAttribute("type", "resource");
+                // operationEle.addAttribute("behavior", "flow");
+                // operationEle.addAttribute("resRef", uid);
+                // operationEle.addAttribute("operator", "");
+                // operationEle.addAttribute("task", "");
+                // operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
             }
             activityDoc.setDocument(endActivityDocXml.asXML());
             docRepository.save(activityDoc);
