@@ -1268,7 +1268,7 @@ var taskList = [];
       this.timer = setInterval(() => {
         var messageJson = { type: "ping" };
         this.websocketSend(messageJson);
-      }, 50000);
+      }, 20000);
     },
 
     removeTimer: function () {

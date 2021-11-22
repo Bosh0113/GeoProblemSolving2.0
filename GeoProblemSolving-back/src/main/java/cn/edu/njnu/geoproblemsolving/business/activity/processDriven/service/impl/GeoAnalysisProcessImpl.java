@@ -1310,9 +1310,24 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         visitedNode.add(startId);
         if (endNode != null) {
             //节点遍历完，都没下一步则走完了，退回上一层
+            int size = endNode.size();
             for (Map.Entry<String, LinkRestriction> item : endNode.entrySet()) {
                 String nextStartId = item.getKey();
-                if (visitedNode.contains(nextStartId)) continue;
+                if (visitedNode.contains(nextStartId)) {
+                    /*
+                    fix bug
+                    添加环路径的入栈机制
+                    1. 该节点仅有一个后继节点
+                    2. 该后继节点为已访问过的节点
+                     */
+                    if (size == 1){
+                        if (pathStackTemp.size() == 0) return path;
+                        Stack<HashMap<String, LinkRestriction>> pathStack = new Stack<>();
+                        pathStack.addAll(pathStackTemp);
+                        path.push(pathStack);
+                    }
+                    continue;
+                }
                 LinkRestriction linkRestriction = item.getValue();
                 //到这一层了，入栈
                 HashMap<String, LinkRestriction> endNodeAndRestriction = new HashMap<>();
@@ -1404,9 +1419,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     /**
      * 获得可以流动的节点
      * <p>
-     * 可优化
-     * todo 需要理一下,最后的问题
-     *
      * @param paths
      * @param resApproveMap
      * @return

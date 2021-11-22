@@ -298,13 +298,6 @@ export default {
   },
   watch: {},
   updated: function () {
-    // this.$refs["vs"].scrollTo(
-    //   {
-    //     y: "100%"
-    //   },
-    //   0,
-    //   "easeInQuad"
-    // );
     if (this.openPanel) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {
         this.allChatMsgs.push(this.receivedChatMsgs.shift());
@@ -438,7 +431,7 @@ export default {
     getSocketConnect(data) {
       this.receivedChatMsgs = [];
       let chatMsg = data;
-      if (chatMsg.type === "members") {        
+      if (chatMsg.type === "members") {
         this.memberNoticeClear();
         if (chatMsg.behavior == "on") {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";

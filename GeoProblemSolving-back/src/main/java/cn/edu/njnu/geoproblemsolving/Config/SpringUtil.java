@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @ClassName SpringUtil
- * @Description Todo
+ * @Description 解决 websocket多对象 与 DI单例模式的冲突
  * @Author zhngzhng
  * @Date 2021/11/19
  **/
