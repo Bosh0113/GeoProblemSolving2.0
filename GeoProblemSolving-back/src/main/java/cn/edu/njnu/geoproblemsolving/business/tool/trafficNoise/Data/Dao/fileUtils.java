@@ -35,8 +35,8 @@ public class fileUtils {
                 InputStream inputStream = conn.getInputStream();
                 FileOutputStream fileOutputStream = new FileOutputStream(dirLocation + fileName);
 
-                byte[] bytes = new byte[1204];
-                while ((byteread = inputStream.read(bytes)) != 1) {
+                byte[] bytes = new byte[1024];
+                while ((byteread = inputStream.read(bytes)) != -1) {
                     bytesum += byteread;
                     fileOutputStream.write(bytes, 0, byteread);
                 }
