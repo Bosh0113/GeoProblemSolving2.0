@@ -113,7 +113,9 @@
                 cursor: pointer;
               "
             >
-              <p slot="title" :title="item.name" class="activityTitle">{{ item.name }}</p>
+              <p slot="title" :title="item.name" class="activityTitle">
+                {{ item.name }}
+              </p>
               <div slot="extra" style="margin-top: -10px; margin-right: -5px">
                 <Tooltip
                   trigger="hover"
@@ -299,7 +301,11 @@
         >
           <div style="display: flex; align-items: center">
             <div
-              v-if="delUserBtn && member.userId != userInfo.userId"
+              v-if="
+                delUserBtn &&
+                member.userId != userInfo.userId &&
+                roleCompare(userRole, member.role) == 1
+              "
               style="cursor: pointer; margin-right: 10px"
               @click="selectMember(member, 'delete')"
             >
@@ -309,7 +315,7 @@
               v-if="
                 userRoleBtn &&
                 member.userId != userInfo.userId &&
-                roleCompare(userRole, member.role) != -1
+                roleCompare(userRole, member.role) == 1
               "
               title="Set user role"
               style="cursor: pointer; margin-right: 10px"
@@ -321,7 +327,7 @@
               v-if="
                 userRoleBtn &&
                 (member.userId == userInfo.userId ||
-                  roleCompare(userRole, member.role) == -1)
+                  roleCompare(userRole, member.role) != 1)
               "
               :title="
                 member.role.charAt(0).toUpperCase() + member.role.slice(1)
@@ -562,12 +568,7 @@ export default {
     Avatar,
     loginModal,
   },
-  props: [
-    "activityInfo",
-    "nameConfirm",
-    "userInfo",
-    "projectInfo"
-   ],
+  props: ["activityInfo", "nameConfirm", "userInfo", "projectInfo"],
   data() {
     return {
       scrollOps: {
@@ -792,7 +793,7 @@ export default {
                 //   this.userInfo
                 // );
 
-                this.$emit('enterActivity', res.data.data);
+                this.$emit("enterActivity", res.data.data);
               } else {
                 console.log(res.data.msg);
               }
@@ -805,10 +806,10 @@ export default {
       });
     },
     enterActivity(activity) {
-      if (this.roleIdentity(activity) == "visitor"){
-         this.$Message.info("Please join this activity.");
+      if (this.roleIdentity(activity) == "visitor") {
+        this.$Message.info("Please join this activity.");
       }
-      this.$emit('enterActivity', activity);
+      this.$emit("enterActivity", activity);
     },
     preApplication(activity) {
       this.appliedActivity = activity;
@@ -951,7 +952,7 @@ export default {
 
       let url = "";
       if (activity.level == 1) {
-       url =
+        url =
           "/GeoProblemSolving/subproject/" +
           activity.aid +
           "/userBatch?userIds=" +
@@ -966,61 +967,60 @@ export default {
         return;
       }
 
-        this.axios
-          .post(url)
-          .then((res) => {
-            if (res.data.code == 0) {
+      this.axios
+        .post(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            //添加活动文档和发送信息
+            for (var i = 0; i < this.invitingMembers.length; i++) {
+              let index = this.invitingMembers[i];
+              if (this.participants.contains(this.potentialMembers[index]))
+                continue;
+              let user = this.potentialMembers[index];
+              this.participants.push(user);
+              // this.operationApi.participantUpdate(
+              //   this.activityInfo.aid,
+              //   "join",
+              //   user.userId,
+              //   user.name,
+              //   "ordinary-member",
+              //   user.domain
+              // );
+              this.$Notice.info({ desc: "Invite member successfully" });
 
-              //添加活动文档和发送信息
-              for (var i = 0; i < this.invitingMembers.length; i++) {
-                let index = this.invitingMembers[i];
-                if (this.participants.contains(this.potentialMembers[index])) continue;
-                let user = this.potentialMembers[index];
-                this.participants.push(user);
-                // this.operationApi.participantUpdate(
-                //   this.activityInfo.aid,
-                //   "join",
-                //   user.userId,
-                //   user.name,
-                //   "ordinary-member",
-                //   user.domain
-                // );
-                this.$Notice.info({ desc: "Invite member successfully" });
-
-                //notice
-                let notice = {
-                  recipientId: user.userId,
-                  type: "notice",
-                  content: {
-                    title: "Join activity",
-                    description:
-                      "You have been invited by " +
-                      this.userInfo.name +
-                      " to join the activity: " +
-                      activity.name +
-                      " in project: " +
-                      this.projectInfo.name +
-                      " , and now you are a member in this activity!",
-                    approve: "unknow",
-                    projectId: this.projectInfo.aid,
-                    projectName: this.projectInfo.name,
-                    activityId: activity.aid,
-                    activityName: activity.name,
-                    activityLevel: activity.level,
-                    invitorName: this.userInfo.name,
-                    invitorId: this.userInfo.userId,
-                  },
-                };
-                this.sendNotice(notice);
-              }
-            } else {
-              console.log(res.data.msg);
+              //notice
+              let notice = {
+                recipientId: user.userId,
+                type: "notice",
+                content: {
+                  title: "Join activity",
+                  description:
+                    "You have been invited by " +
+                    this.userInfo.name +
+                    " to join the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    " , and now you are a member in this activity!",
+                  approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
+                },
+              };
+              this.sendNotice(notice);
             }
-          })
-          .catch((err) => {
-            throw err;
-          });
-
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     selectMember(member, operation) {
       if (operation == "delete") {
@@ -1219,8 +1219,11 @@ export default {
               []
             );
             //
-            this.$Notice.info({ title: "Leave the activity", desc: "Success!" });
-            this.$emit('enterRootActivity');
+            this.$Notice.info({
+              title: "Leave the activity",
+              desc: "Success!",
+            });
+            this.$emit("enterRootActivity");
             //notice
             let managers = this.userRoleApi.getMemberByRole(
               activity,
@@ -1331,7 +1334,7 @@ export default {
   -webkit-line-clamp: 5;
   overflow: hidden;
 }
-  .activityTitle >>> .ivu-card-head p{
-    width: 90%;
-  }
+.activityTitle >>> .ivu-card-head p {
+  width: 90%;
+}
 </style>
