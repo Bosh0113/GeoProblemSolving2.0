@@ -177,7 +177,11 @@
             >
               <div style="display: flex; align-items: center">
                 <div
-                  v-if="delUserBtn && member.userId != userInfo.userId"
+                  v-if="
+                    delUserBtn &&
+                    member.userId != userInfo.userId &&
+                    roleCompare(userRole, member.role) == 1
+                  "
                   style="cursor: pointer; margin-right: 10px"
                   @click="selectMember(member, 'delete')"
                 >
@@ -187,7 +191,7 @@
                   v-if="
                     userRoleBtn &&
                     member.userId != userInfo.userId &&
-                    roleCompare(userRole, member.role) != -1
+                    roleCompare(userRole, member.role) == 1
                   "
                   title="Set user role"
                   style="cursor: pointer; margin-right: 10px"
@@ -199,7 +203,7 @@
                   v-if="
                     userRoleBtn &&
                     (member.userId == userInfo.userId ||
-                      roleCompare(userRole, member.role) == -1)
+                      roleCompare(userRole, member.role) != 1)
                   "
                   :title="
                     member.role.charAt(0).toUpperCase() + member.role.slice(1)
@@ -342,7 +346,7 @@
 import { get, del, post, put } from "@/axios";
 import Avatar from "vue-avatar";
 export default {
-  props: ["activityInfo","projectInfo"],
+  props: ["activityInfo", "projectInfo"],
   components: {
     Avatar,
   },
@@ -379,8 +383,7 @@ export default {
       listStyle: { width: "280px", height: "360px" },
     };
   },
-  computed: {
-  },
+  computed: {},
   created() {
     this.userRole = this.roleIdentity(this.activityInfo);
     // this.getProjectInfo(); //通过传值代替
@@ -546,7 +549,7 @@ export default {
 
       let url = "";
       if (activity.level == 1) {
-       url =
+        url =
           "/GeoProblemSolving/subproject/" +
           activity.aid +
           "/userBatch?userIds=" +
@@ -561,61 +564,61 @@ export default {
         return;
       }
 
-        this.axios
-          .post(url)
-          .then((res) => {
-            if (res.data.code == 0) {
-              for (var i = 0; i < this.invitingMembers.length; i++) {
-                let index = this.invitingMembers[i];
-                if (this.participants.contains(this.potentialMembers[index])) continue;
-                let user = this.potentialMembers[index];
-                this.participants.push(user);
-                this.$Notice.info({ desc: "Invite member successfully" });
+      this.axios
+        .post(url)
+        .then((res) => {
+          if (res.data.code == 0) {
+            for (var i = 0; i < this.invitingMembers.length; i++) {
+              let index = this.invitingMembers[i];
+              if (this.participants.contains(this.potentialMembers[index]))
+                continue;
+              let user = this.potentialMembers[index];
+              this.participants.push(user);
+              this.$Notice.info({ desc: "Invite member successfully" });
 
-                // update activity doc
-                // this.operationApi.participantUpdate(
-                //   activity.aid,
-                //   "join",
-                //   user.userId,
-                //   user.name,s
-                //   "ordinary-member",
-                //   user.domain
-                // );
+              // update activity doc
+              // this.operationApi.participantUpdate(
+              //   activity.aid,
+              //   "join",
+              //   user.userId,
+              //   user.name,s
+              //   "ordinary-member",
+              //   user.domain
+              // );
 
-                //notice
-                let notice = {
-                  recipientId: user.userId,
-                  type: "notice",
-                  content: {
-                    title: "Join activity",
-                    description:
-                      "You have been invited by " +
-                      this.userInfo.name +
-                      " to join the activity: " +
-                      activity.name +
-                      " in project: " +
-                      this.projectInfo.name +
-                      " , and now you are a member in this activity!",
-                    approve: "unknow",
-                    projectId: this.projectInfo.aid,
-                    projectName: this.projectInfo.name,
-                    activityId: activity.aid,
-                    activityName: activity.name,
-                    activityLevel: activity.level,
-                    invitorName: this.userInfo.name,
-                    invitorId: this.userInfo.userId,
-                  },
-                };
-                this.sendNotice(notice);
-              }
-            } else {
-              console.log(res.data.msg);
+              //notice
+              let notice = {
+                recipientId: user.userId,
+                type: "notice",
+                content: {
+                  title: "Join activity",
+                  description:
+                    "You have been invited by " +
+                    this.userInfo.name +
+                    " to join the activity: " +
+                    activity.name +
+                    " in project: " +
+                    this.projectInfo.name +
+                    " , and now you are a member in this activity!",
+                  approve: "unknow",
+                  projectId: this.projectInfo.aid,
+                  projectName: this.projectInfo.name,
+                  activityId: activity.aid,
+                  activityName: activity.name,
+                  activityLevel: activity.level,
+                  invitorName: this.userInfo.name,
+                  invitorId: this.userInfo.userId,
+                },
+              };
+              this.sendNotice(notice);
             }
-          })
-          .catch((err) => {
-            throw err;
-          });
-
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          throw err;
+        });
     },
     updateUserRole() {
       let member = this.slctRoleMember;
