@@ -1,21 +1,21 @@
 Array.prototype.contains = function (obj) {
-    var i = this.length;
-    while (i--) {
-        if (this[i] != undefined && this[i] === obj ||
-            this[i].userId != undefined && this[i].userId === obj) {
-            return true;
-        }
+  var i = this.length;
+  while (i--) {
+    if (this[i] != undefined && this[i] === obj ||
+        this[i].userId != undefined && this[i].userId === obj) {
+      return true;
     }
-    return false;
+  }
+  return false;
 };
 
 //guid
 function guid() {
-    function S4() {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    }
+  function S4() {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  }
 
-    return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+  return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 }
 
 let resProxy = "https://geomodeling.njnu.edu.cn/dataTransferServer";
@@ -38,7 +38,7 @@ var taskList = [];
   function initComponent() {
     $("#collab-tool-head").append(`<li><span class="head-logo" id="tool-logo" style="cursor: pointer; width: 120px; display: inline-block;"></span></li>`);
     $("#collab-tool-sidebar").append(
-      `<ul class="nav flex-column" style="width: 46px">
+        `<ul class="nav flex-column" style="width: 46px">
             <li class="nav-item">
                 <button type="button" class="btn btn-dark active" id="people-btn" title="People">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -663,9 +663,9 @@ var taskList = [];
     }
     $.ajax({
       url: "/GeoProblemSolving/rip/" +
-        activityInfo.aid +
-        "/" +
-        temp.toString(),
+          activityInfo.aid +
+          "/" +
+          temp.toString(),
       type: "GET",
       async: false,
       success: function (result) {
@@ -1214,9 +1214,9 @@ var taskList = [];
     timer: null,
     websockLinked: false,
 
-    initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
+    initSocketChannel: function (opeChannel, resChannel, compChannel, peopleChannel) {
       operationChannel = opeChannel;
-      dataChannel = dataChannel;
+      dataChannel = resChannel;
       computationChannel = compChannel;
       participantChannel = peopleChannel;
     },
@@ -1251,7 +1251,7 @@ var taskList = [];
         this.websockLinked = false;
 
         if(e.code == 1006) {
-            this.initWebSocket(aid, toolId);
+          this.initWebSocket(aid, toolId);
         }
       }
 
@@ -1341,13 +1341,13 @@ var taskList = [];
                 }
                 dataChannel(data);
                 // record
-                addOperations(message.sender, message, "transfer");
+                // addOperations(message.sender, message, "transfer");
               }
             }
             break;
           }
           case "geo-analysis": {
-            addOperations(message.sender, message, "transfer");
+            // addOperations(message.sender, message, "transfer");
           }
           case "computation": {
             if (computationChannel != undefined && typeof computationChannel == "function") {
@@ -1772,8 +1772,8 @@ var taskList = [];
    * 建立协同数据通道
    * build call back channel
    */
-  function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
-    CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
+  function buildSocketChannel(opeChannel, resChannel, compChannel, peopleChannel) {
+    CollabSocket.initSocketChannel(opeChannel, resChannel, compChannel, peopleChannel);
   }
 
   //
