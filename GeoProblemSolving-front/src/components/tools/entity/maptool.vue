@@ -183,6 +183,7 @@ export default {
           { required: false, message: "Drawing tool", trigger: "blur" },
         ],
       },
+      resProxy: this.$store.getters.resProxy
     };
   },
   mounted() {
@@ -424,7 +425,7 @@ export default {
             behavior: "removeAll",
             content: JSON.stringify({}),
           };
-          
+
           sendCustomOperation(that.send_content);
         },
       });
@@ -478,7 +479,6 @@ export default {
             }
 
             var fileOfBlob = new File([this.geojsonBlob], filename);
-
             // upload
             let file = saveResources(
               [fileOfBlob],
@@ -528,11 +528,16 @@ export default {
       return false;
     },
     viewData() {
+      let address = this.selectData.address;
+      if (typeof address == "string"){
+        address = address.slice(-36);
+      }
+      let fileUrl = this.resProxy + "/data/" + uid;
       if (/\.(json)$/.test(this.selectData.suffix.toLowerCase())) {
         //从url获取GeoJSON数据
         var that = this;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", this.selectData.address, true);
+        xhr.open("GET", fileUrl, true);
         xhr.onload = function (e) {
           if (this.status == 200) {
             var file = JSON.parse(this.response);
@@ -553,7 +558,7 @@ export default {
       } else if (/\.(zip)$/.test(this.selectData.suffix.toLowerCase())) {
         try {
           var that = this;
-          shp(this.selectData.address).then(function (file) {
+          shp(fileUrl).then(function (file) {
             let geoJsonLayer = L.geoJSON(file, {
               style: function (feature) {
                 return { color: "orange" };
@@ -755,7 +760,12 @@ export default {
 
             var that = this;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", dataItem.address, true);
+            let address = dataItem.address;
+            let uid;
+            if (typeof address == "string"){
+              uid = address.slice(-36);
+            }
+            xhr.open("GET", this.resProxy + "/data/" + uid, true);
             xhr.onload = function (e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);

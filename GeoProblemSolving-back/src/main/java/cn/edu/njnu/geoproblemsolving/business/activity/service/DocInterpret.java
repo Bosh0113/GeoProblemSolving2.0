@@ -895,6 +895,7 @@ public class DocInterpret implements ActivityDocParser {
             operationEle.addAttribute("type", "resource");
             operationEle.addAttribute("behavior", "upload");
             operationEle.addAttribute("resRef", input.getUid());
+            operationEle.addAttribute("task", "");
             operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
             saveXML();
         }
@@ -906,6 +907,7 @@ public class DocInterpret implements ActivityDocParser {
         operationEle.addAttribute("type", "geo-analysis");
         operationEle.addAttribute("toolRef", toolId);
         operationEle.addAttribute("purpose", purpose);
+        operationEle.addAttribute("task", "");
         operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
         Element inResRefEle = operationEle.addElement("ResRef");
@@ -956,6 +958,7 @@ public class DocInterpret implements ActivityDocParser {
         operationEle.addAttribute("type", "resource");
         operationEle.addAttribute("behavior", "flow");
         operationEle.addAttribute("resRef", resInfo.get("uid"));
+        operationEle.addAttribute("task", "");
         operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
         //更新资源
