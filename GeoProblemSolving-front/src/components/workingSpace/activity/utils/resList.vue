@@ -1486,6 +1486,8 @@ export default {
       }
     },
     refreshResource(){
+      this.folderStack = [{ uid: 0, name: "Home" }], //folder level
+      this.folderIdStack = [], // folder level
       this.getResList();
       this.getParentActivities();
     },
@@ -1724,6 +1726,8 @@ export default {
         let url = "";
         if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else if(res.address.indexOf("/PExploration/resource") != -1){
+          url = "https://geomodeling.njnu.edu.cn" + res.address;
         } else {
           url = this.$store.getters.resProxy + res.address;
         }

@@ -1718,12 +1718,21 @@
         this.editFileValidate.description = fileInfo.description;
         if (this.editFileValidate.type == "data") {
           metadata = this.operationApi.getResInfo(fileInfo.uid);
-          this.oldMetadata = metadata;
-          this.editFileValidate.format = metadata.format;
-          this.editFileValidate.scale = metadata.scale;
-          this.editFileValidate.reference = metadata.reference;
-          this.editFileValidate.unit = metadata.unit;
-          this.editFileValidate.concept = metadata.concept;
+          if(metadata == undefined || metadata == null || metadata == ""){
+            this.oldMetadata = {};
+            this.editFileValidate.format = "";
+            this.editFileValidate.scale = "";
+            this.editFileValidate.reference = "";
+            this.editFileValidate.unit = "";
+            this.editFileValidate.concept = "";
+          } else {
+            this.oldMetadata = metadata;
+            this.editFileValidate.format = metadata.format;
+            this.editFileValidate.scale = metadata.scale;
+            this.editFileValidate.reference = metadata.reference;
+            this.editFileValidate.unit = metadata.unit;
+            this.editFileValidate.concept = metadata.concept;
+          }
         }
         this.editFileModel = true;
       },

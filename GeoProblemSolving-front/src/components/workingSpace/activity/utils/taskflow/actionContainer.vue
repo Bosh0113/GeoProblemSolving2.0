@@ -271,6 +271,7 @@ export default {
         let props = {
           taskId: nodeId,
           name: nodeName,
+          activityInfo: this.activityInfo,
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
