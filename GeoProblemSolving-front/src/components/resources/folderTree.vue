@@ -1707,6 +1707,7 @@
       },
       fileEditModelShow(fileInfo) {
         let metadata = {};
+        console.log(fileInfo);
         this.putFileInfo = fileInfo;
         this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileValidate.name = fileInfo.name;
@@ -1714,6 +1715,7 @@
         this.editFileValidate.description = fileInfo.description;
         if (this.editFileValidate.type == "data") {
           metadata = this.operationApi.getResInfo(fileInfo.uid);
+          console.log(metadata);
           if(metadata == undefined || metadata == null || metadata == ""){
             this.oldMetadata = {};
             this.editFileValidate.format = "";
@@ -1807,10 +1809,7 @@
                     if (metadataChanged) {
                       this.axios
                         .put(
-                          "/GeoProblemSolving/activityDoc/meta/" +
-                          this.activityInfo.aid +
-                          "/" +
-                          this.putFileInfo.uid
+                          "/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}"
                         )
                         .then((res) => {
                           console.log(res.data.data);

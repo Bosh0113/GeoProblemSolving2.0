@@ -1696,7 +1696,7 @@ export default {
       this.checkDataModal = false;
       var res = data;
       let name = data.suffix;
-      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf)$/.test(name.toLowerCase())) {
+      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf|txt)$/.test(name.toLowerCase())) {
         // if (this.panel != null) {
         //   this.panel.close();
         // }
@@ -1708,7 +1708,7 @@ export default {
         } else {
           url = this.$store.getters.resProxy + res.address;
         }
-        let finalUrl = "https://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "http://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +
@@ -2431,7 +2431,6 @@ export default {
     shareToParentModalShow(){
       this.shareToParentModal = true;
       this.fileListChoosed = [];
-      console.log(this.activityInfo.parent);
       for(let i = 0 ; i < this.fileList.length ; i++){
         if(!this.fileList[i].fromParents){
           this.fileListChoosed.push(this.fileList[i]);
@@ -2459,11 +2458,11 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              for( let j = 0 ; j < this.fileList.length ; j++){
-                if(addFileList[i].uid == this.fileList[j].uid){
-                  this.fileList.splice(j,1);
-                }
-              }
+              // for( let j = 0 ; j < this.fileList.length ; j++){
+              //   if(addFileList[i].uid == this.fileList[j].uid){
+              //     this.fileList.splice(j,1);
+              //   }
+              // }
             } else {
               suc = false;
             }
