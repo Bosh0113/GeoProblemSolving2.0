@@ -1798,11 +1798,11 @@
                     // 检查元数据发生修改
                     let metadataChanged = false;
                     if (
-                      this.oldMetadata.format != this.editFileValidate.format ||
-                      this.oldMetadata.scale != this.editFileValidate.scale ||
-                      this.oldMetadata.reference != this.editFileValidate.reference ||
-                      this.oldMetadata.unit != this.editFileValidate.unit ||
-                      this.oldMetadata.concept != this.editFileValidate.concept
+                      this.oldMetadata.format != metadata.format ||
+                      this.oldMetadata.scale != metadata.scale ||
+                      this.oldMetadata.reference != metadata.reference ||
+                      this.oldMetadata.unit != metadata.unit ||
+                      this.oldMetadata.concept != metadata.concept
                     ) {
                       metadataChanged = true;
                     }

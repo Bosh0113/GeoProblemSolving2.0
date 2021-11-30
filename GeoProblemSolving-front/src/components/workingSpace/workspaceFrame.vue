@@ -402,7 +402,6 @@ export default {
         .get("/GeoProblemSolving/project/" + urlInfo.aid)
         .then((res) => {
           //offline model
-
           if (res.data.code == 0) {
             // this.$set(this, "projectInfo", res.data.data[0])
             this.projectInfo = res.data.data;
