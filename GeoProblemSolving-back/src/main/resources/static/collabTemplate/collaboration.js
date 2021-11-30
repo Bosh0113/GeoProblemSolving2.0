@@ -1215,9 +1215,9 @@ var taskList = [];
     timer: null,
     websockLinked: false,
 
-    initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
+    initSocketChannel: function (opeChannel, resChannel, compChannel, peopleChannel) {
       operationChannel = opeChannel;
-      dataChannel = dataChannel;
+      dataChannel = resChannel;
       computationChannel = compChannel;
       participantChannel = peopleChannel;
     },
@@ -1342,13 +1342,13 @@ var taskList = [];
                 }
                 dataChannel(data);
                 // record
-                addOperations(message.sender, message, "transfer");
+                // addOperations(message.sender, message, "transfer");
               }
             }
             break;
           }
           case "geo-analysis": {
-            addOperations(message.sender, message, "transfer");
+            // addOperations(message.sender, message, "transfer");
           }
           case "computation": {
             if (computationChannel != undefined && typeof computationChannel == "function") {
@@ -1773,8 +1773,8 @@ var taskList = [];
    * 建立协同数据通道
    * build call back channel
    */
-  function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
-    CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
+  function buildSocketChannel(opeChannel, resChannel, compChannel, peopleChannel) {
+    CollabSocket.initSocketChannel(opeChannel, resChannel, compChannel, peopleChannel);
   }
 
   //

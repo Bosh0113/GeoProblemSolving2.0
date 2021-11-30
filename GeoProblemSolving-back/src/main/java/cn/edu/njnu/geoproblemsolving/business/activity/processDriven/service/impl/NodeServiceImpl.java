@@ -210,7 +210,7 @@ public class NodeServiceImpl implements NodeService {
             case "put":
                 String uid = (String) res;
                 HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
-                String resourceTag = TagUtil.setResourceTag(tagMap);
+                String resourceTag = TagUtil.setResTag(tagMap);
                 resources.put(uid, resourceTag);
                 break;
         }

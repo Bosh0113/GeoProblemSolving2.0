@@ -183,7 +183,7 @@ export default {
           { required: false, message: "Drawing tool", trigger: "blur" },
         ],
       },
-      resProxy: this.$store.getters.resProxy
+      resProxy: this.$store.getters.resProxy,
     };
   },
   mounted() {
@@ -528,9 +528,9 @@ export default {
       return false;
     },
     viewData() {
-      let address = this.selectData.address;
-      if (typeof address == "string"){
-        address = address.slice(-36);
+      let uid;
+      if (typeof this.selectData.address == "string") {
+        uid = this.selectData.address.slice(-36);
       }
       let fileUrl = this.resProxy + "/data/" + uid;
       if (/\.(json)$/.test(this.selectData.suffix.toLowerCase())) {
@@ -552,6 +552,8 @@ export default {
             that.loadFeatures(geoJsonLayer);
             //平移至数据位置
             that.map.fitBounds(geoJsonLayer.getBounds());
+          } else {
+            this.$Message.error("Loading failed");
           }
         };
         xhr.send();
@@ -753,16 +755,16 @@ export default {
     getSocketData(data) {
       let socketMsg = data;
       if (socketMsg.type === "resource") {
+        let dataItem = JSON.parse(socketMsg.content);
         switch (socketMsg.behavior) {
           case "update": {
-            let dataItem = JSON.parse(socketMsg.content);
             this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
             let address = dataItem.address;
             let uid;
-            if (typeof address == "string"){
+            if (typeof address == "string") {
               uid = address.slice(-36);
             }
             xhr.open("GET", this.resProxy + "/data/" + uid, true);
@@ -784,11 +786,8 @@ export default {
             break;
           }
           case "select": {
-            for (let i = 0; i < selectedResources.length; i++) {
-              this.selectData = selectedResources[i];
-              this.viewData();
-            }
-            break;
+            this.selectData = dataItem;
+            this.viewData();
           }
         }
       }
@@ -877,6 +876,14 @@ export default {
       for (let i = 0; i < resList.length; i++) {
         this.selectData = resList[i];
         this.viewData();
+
+        let send_content = {
+          type: "resource",
+          sender: this.userInfo.userId,
+          behavior: "select",
+          content: this.selectData,
+        };
+        sendCustomOperation(send_content);
       }
     },
   },

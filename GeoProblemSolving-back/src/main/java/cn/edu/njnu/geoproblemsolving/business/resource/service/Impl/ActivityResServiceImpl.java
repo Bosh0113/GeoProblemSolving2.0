@@ -162,7 +162,6 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             HashSet<String> uploadUids = new HashSet<>();
-            ArrayList<HashMap<String, String>> uploadSucOperation;
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
