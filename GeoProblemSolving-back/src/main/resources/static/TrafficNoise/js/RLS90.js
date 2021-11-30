@@ -522,7 +522,7 @@ function exportData(dataType) {
                 aid: window.parent.activityInfo.aid,
                 uid: barrierData.uid,
                 name: barrierData.name,
-                input: buildingData,
+                input: barrierData,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
             }

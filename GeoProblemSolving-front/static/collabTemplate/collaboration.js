@@ -788,6 +788,7 @@ var taskList = [];
     formData.append("aid", activityInfo.aid);
     formData.append("paths", paths);
     formData.append("editToolInfo", toolId);
+    formData.append("graphId", activityInfo.parent);
 
     let uploadedList = fileUpload(formData);
 

@@ -136,6 +136,7 @@ public class DocInterpret implements ActivityDocParser {
         activityEle.addAttribute("name", activity.getName());
         activityEle.addAttribute("type", activityType);
         activityEle.addAttribute("description", activity.getDescription());
+
         initActivityContent(activityEle, activity);
 
         //文档入库
@@ -188,7 +189,6 @@ public class DocInterpret implements ActivityDocParser {
             String level = params[2];
         }
     }
-
 
 
     //=================Generic operation==============================================================
@@ -337,6 +337,7 @@ public class DocInterpret implements ActivityDocParser {
         ArrayList<HashMap<String, String>> uploadOperationList = new ArrayList<>();
         Element resCollectionEle = (Element) activityDocXml.selectSingleNode("/Activity/ResourceCollection");
         Element operationRecordEle = (Element) activityDocXml.selectSingleNode("/Activity/OperationRecords");
+        //添加 operation，单活动才需要有操作
         for (ResourceEntity item : uploadList) {
             HashMap<String, String> uploadOperation = new HashMap<>();
             Element resEle = resCollectionEle.addElement("Resource");
@@ -356,7 +357,6 @@ public class DocInterpret implements ActivityDocParser {
                     }
                 }
             }
-            //添加 operation
             Element operationEle = operationRecordEle.addElement("Operation");
             String oid = UUID.randomUUID().toString();
             operationEle.addAttribute("id", oid);
@@ -364,7 +364,7 @@ public class DocInterpret implements ActivityDocParser {
             operationEle.addAttribute("behavior", "upload");
             operationEle.addAttribute("resRef", item.getUid());
             operationEle.addAttribute("operator", item.getUploaderId());
-            operationEle.addAttribute("task","");
+            operationEle.addAttribute("task", "");
             operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
             uploadOperation.put("oid", oid);
@@ -456,7 +456,7 @@ public class DocInterpret implements ActivityDocParser {
     public HashMap<String, String> getResInfo(String aid, String uid) {
         syncGlobalVariables(aid);
         Element activityEle = activityDocXml.getRootElement();
-        Element resourceEle = (Element) activityEle.selectSingleNode("//ResourceCollection/Resource[@id = '"+ uid +"']");
+        Element resourceEle = (Element) activityEle.selectSingleNode("//ResourceCollection/Resource[@id = '" + uid + "']");
         if (resourceEle == null) return null;
         HashMap<String, String> resInfoMap = new HashMap<>();
         String type = resourceEle.attributeValue("type");
@@ -477,13 +477,13 @@ public class DocInterpret implements ActivityDocParser {
         ArrayList<HashMap<String, String>> resInfoList = new ArrayList<>();
         List<Node> resNodes = activityDocXml.selectNodes("/Activity/ResourceCollection/Resource[@state = 'accessible']");
         for (int i = 0; i < resNodes.size(); i++) {
-            Element resEle = (Element)resNodes.get(i);
+            Element resEle = (Element) resNodes.get(i);
             HashMap<String, String> resInfo = new HashMap<>();
             String uid = resEle.attributeValue("id");
             String type = resEle.attributeValue("type");
             resInfo.put("uid", uid);
             resInfo.put("type", type);
-            if (type.equals("data")){
+            if (type.equals("data")) {
                 for (Iterator<Element> mIt = resEle.elementIterator("Metadata"); mIt.hasNext(); ) {
                     Element metaEle = mIt.next();
                     resInfo.put(metaEle.attributeValue("type"), metaEle.attributeValue("description"));
@@ -509,15 +509,15 @@ public class DocInterpret implements ActivityDocParser {
     public Object appendChildActivity(String aid, String childId, String name, String creatorId) {
         syncGlobalVariables(aid);
         if (operatingDoc == null) return null;
-        Element childActivitiesEle =  (Element)activityDocXml.selectSingleNode("/Activity/ChildActivities");
+        Element childActivitiesEle = (Element) activityDocXml.selectSingleNode("/Activity/ChildActivities");
         System.out.println("childActivitiesEle" + childActivitiesEle);
-        Element oldChildEle = (Element)childActivitiesEle.selectSingleNode("//Child[@id = '"+ childId +"']");
-        if (oldChildEle != null){
+        Element oldChildEle = (Element) childActivitiesEle.selectSingleNode("//Child[@id = '" + childId + "']");
+        if (oldChildEle != null) {
             childActivitiesEle.remove(oldChildEle);
         }
         Element activityEle = activityDocXml.getRootElement();
         String activityType = activityEle.attributeValue("type");
-        if (childActivitiesEle == null && activityType.equals(ActivityType.Activity_Group)){
+        if (childActivitiesEle == null && activityType.equals(ActivityType.Activity_Group)) {
             childActivitiesEle = activityDocXml.getRootElement().addElement("ChildActivities");
         }
         Element childEle = childActivitiesEle.addElement("Child");
@@ -539,7 +539,7 @@ public class DocInterpret implements ActivityDocParser {
         syncGlobalVariables(aid);
         if (operatingDoc == null) return null;
         if (tools == null || tools.isEmpty()) return null;
-        Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
+        Element toolBoxEle = (Element) activityDocXml.selectSingleNode("/Activity/ToolBox");
         appendTools(toolBoxEle, tools);
         saveXML();
         return null;
@@ -549,7 +549,7 @@ public class DocInterpret implements ActivityDocParser {
     public Object putTools(String aid, List<Tool> tools) {
         syncGlobalVariables(aid);
         if (operatingDoc == null) return null;
-        Element toolBoxEle = (Element)activityDocXml.selectSingleNode("/Activity/ToolBox");
+        Element toolBoxEle = (Element) activityDocXml.selectSingleNode("/Activity/ToolBox");
         if (toolBoxEle == null) return null;
         toolBoxEle.clearContent();
         // if (oldTools != null && !oldTools.isEmpty()){
@@ -564,11 +564,11 @@ public class DocInterpret implements ActivityDocParser {
         return null;
     }
 
-    private Element appendTools(Element toolBoxEle, List<Tool> tools){
-        for (Tool item : tools){
+    private Element appendTools(Element toolBoxEle, List<Tool> tools) {
+        for (Tool item : tools) {
             //判断是否有此工具先
-            Element oldToolEle = (Element)toolBoxEle.selectSingleNode("//Tool[@id = '"+ item.getTid() +"']");
-            if (oldToolEle != null){
+            Element oldToolEle = (Element) toolBoxEle.selectSingleNode("//Tool[@id = '" + item.getTid() + "']");
+            if (oldToolEle != null) {
                 oldToolEle.getParent().remove(oldToolEle);
             }
             Element toolEle = toolBoxEle.addElement("Tool");
@@ -579,7 +579,7 @@ public class DocInterpret implements ActivityDocParser {
             toolEle.addAttribute("provider", item.getProvider());
             toolEle.addAttribute("state", "accessible");
 
-            if (item.getBackendType() != null && item.getBackendType().equals("webTool")){
+            if (item.getBackendType() != null && item.getBackendType().equals("webTool")) {
                 toolEle.addAttribute("href", item.getToolUrl());
             }
         }
@@ -794,7 +794,7 @@ public class DocInterpret implements ActivityDocParser {
             purpose = toolEle.attributeValue("function");
         } catch (NullPointerException e) {
             e.printStackTrace();
-            System.out.println("Read XML: No such tool("+ toolId +") in the doc.");
+            System.out.println("Read XML: No such tool(" + toolId + ") in the doc.");
         }
         operationEle.addAttribute("purpose", purpose);
 
@@ -836,7 +836,7 @@ public class DocInterpret implements ActivityDocParser {
     public String storeMessageRecord(String toolId, MsgRecords msgRecords) {
         syncGlobalVariables(msgRecords.getAid());
         if (operatingDoc == null) return null;
-        Element oRecordEle =  (Element)activityDocXml.selectSingleNode("/Activity/OperationRecords");
+        Element oRecordEle = (Element) activityDocXml.selectSingleNode("/Activity/OperationRecords");
         Element operationEle = oRecordEle.addElement("Operation");
         String oid = UUID.randomUUID().toString();
         operationEle.addAttribute("id", oid);
@@ -848,7 +848,7 @@ public class DocInterpret implements ActivityDocParser {
 
         //参与者
         ArrayList<String> uids = msgRecords.getParticipants();
-        for (String uid : uids){
+        for (String uid : uids) {
             Element personRefEle = operationEle.addElement("PersonRef");
             personRefEle.addAttribute("idRef", uid);
         }
@@ -895,6 +895,7 @@ public class DocInterpret implements ActivityDocParser {
             operationEle.addAttribute("type", "resource");
             operationEle.addAttribute("behavior", "upload");
             operationEle.addAttribute("resRef", input.getUid());
+            operationEle.addAttribute("task", "");
             operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
             saveXML();
         }
@@ -906,6 +907,7 @@ public class DocInterpret implements ActivityDocParser {
         operationEle.addAttribute("type", "geo-analysis");
         operationEle.addAttribute("toolRef", toolId);
         operationEle.addAttribute("purpose", purpose);
+        operationEle.addAttribute("task", "");
         operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
         Element inResRefEle = operationEle.addElement("ResRef");
@@ -956,6 +958,7 @@ public class DocInterpret implements ActivityDocParser {
         operationEle.addAttribute("type", "resource");
         operationEle.addAttribute("behavior", "flow");
         operationEle.addAttribute("resRef", resInfo.get("uid"));
+        operationEle.addAttribute("task", "");
         operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
 
         //更新资源
@@ -995,6 +998,7 @@ public class DocInterpret implements ActivityDocParser {
     /**
      * 资源流动更新文档，流动不算做操作
      * 记录为临时操作，好像也无相关任务用于
+     *
      * @param formId
      * @param endId
      * @param uid
@@ -1021,7 +1025,7 @@ public class DocInterpret implements ActivityDocParser {
         ActivityDoc activityDoc = byId.get();
         try {
             Document endActivityDocXml = DocumentHelper.parseText(activityDoc.getDocument());
-            Element endResCollectionEle = (Element)endActivityDocXml.selectSingleNode("/Activity/ResourceCollection");
+            Element endResCollectionEle = (Element) endActivityDocXml.selectSingleNode("/Activity/ResourceCollection");
             Element endRes = resourceEle.createCopy();
             endResCollectionEle.add(endRes);
 
@@ -1079,20 +1083,20 @@ public class DocInterpret implements ActivityDocParser {
                 if (resourceEle == null) return;
                 Node endResEle = endActivityDocXml.selectSingleNode("/Activity/ResourceCollection/Resource[@id = '" + uid + "']");
                 if (endResEle != null) continue;
-                Element endResCollectionEle = (Element)endActivityDocXml.selectSingleNode("/Activity/ResourceCollection");
+                Element endResCollectionEle = (Element) endActivityDocXml.selectSingleNode("/Activity/ResourceCollection");
                 Element endRes = resourceEle.createCopy();
                 endResCollectionEle.add(endRes);
 
                 //operation
-                Element operationRecordEle = (Element) endActivityDocXml.selectSingleNode("/Activity/OperationRecords");
-                Element operationEle = operationRecordEle.addElement("Operation");
-                operationEle.addAttribute("id", UUID.randomUUID().toString());
-                operationEle.addAttribute("type", "resource");
-                operationEle.addAttribute("behavior", "flow");
-                operationEle.addAttribute("resRef", uid);
-                operationEle.addAttribute("operator", "");
-                operationEle.addAttribute("task", "");
-                operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
+                // Element operationRecordEle = (Element) endActivityDocXml.selectSingleNode("/Activity/OperationRecords");
+                // Element operationEle = operationRecordEle.addElement("Operation");
+                // operationEle.addAttribute("id", UUID.randomUUID().toString());
+                // operationEle.addAttribute("type", "resource");
+                // operationEle.addAttribute("behavior", "flow");
+                // operationEle.addAttribute("resRef", uid);
+                // operationEle.addAttribute("operator", "");
+                // operationEle.addAttribute("task", "");
+                // operationEle.addAttribute("time", simpleDateFormat.format(new Date()));
             }
             activityDoc.setDocument(endActivityDocXml.asXML());
             docRepository.save(activityDoc);
@@ -1105,7 +1109,7 @@ public class DocInterpret implements ActivityDocParser {
 
     @Override
     public Object userJoin(String aid, String userId) {
-        try{
+        try {
             JSONObject userTag = userDispatch.getUserTag(userId);
             if (userTag == null) return null;
             JSONArray domains = userTag.getJSONArray("domain");
@@ -1113,28 +1117,28 @@ public class DocInterpret implements ActivityDocParser {
             UserEntity user = userDao.findUserByIdOrEmail(userId);
             syncGlobalVariables(aid);
             if (operatingDoc == null) return null;
-            Element participantsEle = (Element)activityDocXml.selectSingleNode("/Activity/Participants");
+            Element participantsEle = (Element) activityDocXml.selectSingleNode("/Activity/Participants");
             Element personEle = participantsEle.addElement("Person");
             personEle.addAttribute("id", userId);
             personEle.addAttribute("email", user.getEmail());
             personEle.addAttribute("name", user.getName());
             personEle.addAttribute("role", "ordinary-member");
             personEle.addAttribute("state", "in");
-            if (domains != null && !domains.isEmpty()){
-                for (Object item : domains){
+            if (domains != null && !domains.isEmpty()) {
+                for (Object item : domains) {
                     Element domainEle = personEle.addElement("Domain");
                     domainEle.addAttribute("description", (String) item);
                 }
             }
 
-            if (organizations != null && !organizations.isEmpty()){
-                for (Object item : organizations){
+            if (organizations != null && !organizations.isEmpty()) {
+                for (Object item : organizations) {
                     Element OrganizationEle = personEle.addElement("Organization");
                     OrganizationEle.addAttribute("description", (String) item);
                 }
             }
             saveXML();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -1146,8 +1150,8 @@ public class DocInterpret implements ActivityDocParser {
         if (operatingDoc == null) return null;
         if (userIds == null || userIds.isEmpty()) return null;
         JSONObject usersTag = userDispatch.getUsersTag(userIds);
-        Element participantsEle = (Element)activityDocXml.selectSingleNode("/Activity/Participants");
-        for (String userId : userIds){
+        Element participantsEle = (Element) activityDocXml.selectSingleNode("/Activity/Participants");
+        for (String userId : userIds) {
             UserEntity user = userDao.findUserByIdOrEmail(userId);
             Element personEle = participantsEle.addElement("Person");
             personEle.addAttribute("id", userId);
@@ -1160,15 +1164,15 @@ public class DocInterpret implements ActivityDocParser {
             JSONArray domains = userTag.getJSONArray("domain");
             JSONArray organizations = userTag.getJSONArray("organization");
 
-            if (domains != null && !domains.isEmpty()){
-                for (Object item : domains){
+            if (domains != null && !domains.isEmpty()) {
+                for (Object item : domains) {
                     Element domainEle = personEle.addElement("Domain");
                     domainEle.addAttribute("description", (String) item);
                 }
             }
 
-            if (organizations != null && !organizations.isEmpty()){
-                for (Object item : organizations){
+            if (organizations != null && !organizations.isEmpty()) {
+                for (Object item : organizations) {
                     Element OrganizationEle = personEle.addElement("Organization");
                     OrganizationEle.addAttribute("description", (String) item);
                 }
@@ -1193,7 +1197,7 @@ public class DocInterpret implements ActivityDocParser {
     }
 
 
-    private Element initActivityContent(Element activityEle, Activity activity){
+    private Element initActivityContent(Element activityEle, Activity activity) {
         Element participantsEle = activityEle.addElement("Participants");
         JSONObject memberJson = JSONObject.parseObject(JSONObject.toJSONString(activity.getMembers().get(0)));
         Element personEle = participantsEle.addElement("Person");

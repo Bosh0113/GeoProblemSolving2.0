@@ -663,6 +663,7 @@ export default {
           type: "members",
           content: "You are disconnecting with others.",
         };
+        this.memberNoticeClear();
         this.msglist.push(chatMsg);
       }
     },
@@ -680,6 +681,7 @@ export default {
       let chatMsg = data; //data传回onopen方法里的值
 
       if (chatMsg.type === "members") {
+        this.memberNoticeClear();
         if (chatMsg.behavior == "on") {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.msglist.push(chatMsg);
@@ -763,6 +765,7 @@ export default {
 
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have the only person in the meeting.";
+        this.memberNoticeClear();
         this.msglist.push(chatMsg);
       } else if (chatMsg.type == "message-cache") {
         for (let i = 0; i < chatMsg.content.length; i++) {
@@ -785,6 +788,7 @@ export default {
       } else if (chatMsg.type == "test") {
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have joined the meeting.";
+        this.memberNoticeClear();
         this.msglist.push(chatMsg);
       }
     },
@@ -894,6 +898,13 @@ export default {
       } else if (event.keyCode == 13) {
         this.sendMsg(); //提交的执行函数
         event.preventDefault(); //禁止回车的默认换行
+      }
+    },
+    memberNoticeClear(){
+      for(let i = this.msglist.length - 1; i >= 0; i--) {
+        if(this.msglist[i].type == "members"){
+          this.msglist.splice(i, 1);
+        }
       }
     },
   },

@@ -1623,29 +1623,6 @@ export default {
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
-
-                      // let operationId = this.operationApi.resOperationRecord(
-                      //   this.activityInfo.aid,
-                      //   "",
-                      //   "",
-                      //   "upload",
-                      //   this.userInfo.userId,
-                      //   uploadedList[i],
-                      //   metadata
-                      // );
-
-                      // 生成临时操作记录
-                      // let resOperation = {
-                      //   id: operationId,
-                      //   type: "resource",
-                      //   resRef: uploadedList[i].uid,
-                      //   operator: this.userInfo.userId,
-                      // };
-                      //
-                      // this.$store.commit("updateTempOperations", {
-                      //   behavior: "add",
-                      //   operation: resOperation,
-                      // });
                     }
                     this.operationApi.getActivityDoc(this.activityInfo.aid);
                     for (let i = 0; i < uploadedOperation.length; i++){
@@ -2393,6 +2370,7 @@ export default {
                   metadata.unit = this.editFileValidate.unit;
                   metadata.concept = this.editFileValidate.concept;
                 }
+                this.operationApi.getActivityDoc(this.activityInfo.aid);
                 let operationId = this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
                   "",

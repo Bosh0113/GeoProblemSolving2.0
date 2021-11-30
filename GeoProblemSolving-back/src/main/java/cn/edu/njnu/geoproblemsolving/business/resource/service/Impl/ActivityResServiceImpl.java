@@ -287,6 +287,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             return uploadInfos;
 
         } catch (Exception e) {
+            System.out.println(e.toString());
             return "Fail";
         }
     }

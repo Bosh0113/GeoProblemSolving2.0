@@ -342,8 +342,8 @@
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
-                  :title="file.name"
-                >{{ file.name }}</span
+                  :title="file.name + file.suffix"
+                >{{ file.name + file.suffix }}</span
                 >
                 <span class="fileItemSize">{{
                   file.fileSize | filterSizeType
@@ -1368,6 +1368,14 @@
               formData.append("aid", this.activityInfo.aid);
               formData.append("paths", temp.toString());
               formData.append("graphId", this.activityInfo.parent);
+              // 上传元数据
+              if (this.uploadValidate.type == "data"){
+                formData.append("format", this.uploadValidate.format);
+                formData.append("scale", this.uploadValidate.scale);
+                formData.append("reference", this.uploadValidate.reference);
+                formData.append("unit", this.uploadValidate.unit);
+                formData.append("concept", this.uploadValidate.concept);
+              }
               this.progressModalShow = true;
               this.axios({
                 url: "/GeoProblemSolving/rip/file/upload",
@@ -1383,8 +1391,9 @@
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
-                    let uploadedOperation = res.data.uploadedOperation;
-
+                    // multi 无actionContainer, 无需显示操作
+                    // let uploadedOperation = res.data.uploadedOperation;
+                    this.operationApi.getActivityDoc(this.activityInfo.aid);
                     let metadata = {};
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.currentFolder.files.push(uploadedList[i]);
@@ -1396,20 +1405,7 @@
                         metadata.concept = this.uploadValidate.concept;
                       }
                     }
-                    // this.operationApi.getActivityDoc(this.activityInfo.aid);
-                    // for (let i = 0; i < uploadedOperation.length; i++){
-                    //   let resOperation = {
-                    //     id: uploadedOperation[i].oid,
-                    //     type: "resource",
-                    //     resRef: uploadedOperation[i].resRef,
-                    //     operator: this.userInfo.userId,
-                    //   };
-                    //
-                    //   this.$store.commit("updateTempOperations", {
-                    //     behavior: "add",
-                    //     operation: resOperation,
-                    //   });
-                    // }
+
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
                         title: "Files too large.",
@@ -1761,7 +1757,6 @@
                 formData
               )
               .then((res) => {
-                console.log(res);
                 this.editFileModel = false;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
@@ -1815,7 +1810,7 @@
                           "/GeoProblemSolving/activityDoc/meta/" +
                           this.activityInfo.aid +
                           "/" +
-                          this.selectFileInfo.uid
+                          this.putFileInfo.uid
                         )
                         .then((res) => {
                           console.log(res.data.data);
