@@ -537,6 +537,7 @@ export default {
       extendedRecordShow: false,
       msgConcepts: [],
       msgConceptMap: [],
+      tid: ""
     };
   },
 
@@ -566,6 +567,7 @@ export default {
     getActivityInfo(event) {
       if (event.data.type === "activity") {
         this.activityInfo = event.data.activity;
+        this.tid = event.data.tid;
         this.userInfo = event.data.user;
         // console.log(this.userInfo)
         this.participants.push(this.userInfo);
@@ -734,25 +736,30 @@ export default {
           // }
         }
       } else if (chatMsg.type == "message-store") {
-        let operationId = this.operationApi.communicationRecord(
-          this.activityInfo.aid,
-          "",
-          "",
-          chatMsg.recordId,
-          chatMsg.time,
-          chatMsg.participants
-        );
+        // let operationId = this.operationApi.communicationRecord(
+        //   this.activityInfo.aid,
+        //   "",
+        //   "",
+        //   chatMsg.recordId,
+        //   chatMsg.time,
+        //   chatMsg.participants
+        // );
+        let computationResult = {
+          type: "task-record-backend",
+          oid: chatMsg.oid
+        }
+        window.parent.postMessage(computationResult, "*");
         // 生成临时操作记录
-        let resOperation = {
-          id: operationId,
-          type: "communication",
-          resRef: resList[i].uid,
-          operator: chatMsg.participants,
-        };
-        this.$store.commit("updateTempOperations", {
-          behavior: "add",
-          operation: resOperation,
-        });
+        // let resOperation = {
+        //   id: operationId,
+        //   type: "communication",
+        //   resRef: resList[i].uid,
+        //   operator: chatMsg.participants,
+        // };
+        // this.$store.commit("updateTempOperations", {
+        //   behavior: "add",
+        //   operation: resOperation,
+        // });
 
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have the only person in the meeting.";

@@ -406,7 +406,7 @@ export default {
     },
     loadOperationNode(operation) {
       // position
-      let pos_x = 50 + 220 * this.operations.length - 1;
+      let pos_x = 50 + 220 * this.operations.length;
       let pos_y = 15;
 
       // generate node
@@ -436,7 +436,7 @@ export default {
         }
       });
 
-      this.operations.push(operation);
+      // this.operations.push(operation);
     },
     removeOperationNode(operation) {
       let nodeId = this.editor.getNodesFromName(operation.id)[0];

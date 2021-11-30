@@ -693,6 +693,10 @@ export default {
         });
       });
       this.fullscreenLoading.close();
+      this.$Notice.success({
+        title: "Compute successfully",
+        desc: ""
+      });
     },
 
     download(event) {

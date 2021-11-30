@@ -183,6 +183,21 @@ public class CollaborationBehavior {
         }
     }
 
+    public void sendStoredMsgRecords(HashMap<String, CollaborationUser> participants, String oid) {
+        try {
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("type", "message-store");
+            messageObject.put("oid", oid);
+
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
+                CollaborationUser receiver = participant.getValue();
+                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // 将聊天记录按时段存储
     public MsgRecords msgCacheStore(String aid, ArrayList<ChatMsg> records) {
         // save each message

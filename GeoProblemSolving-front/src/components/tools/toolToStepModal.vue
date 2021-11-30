@@ -888,8 +888,6 @@ export default {
           this.isStepToolsetsShow(this.toolIdList[i]) == false &&
           this.isStepToolsShow(this.toolIdList[i]) == false
         ) {
-          this.toolIdList.splice(i, 1);
-
           // 操作记录
           let operationId = this.operationApi.toolOperationRecord(
             this.activityInfo.aid,
@@ -910,6 +908,7 @@ export default {
             behavior: "add",
             operation: toolOperation,
           });
+          this.toolIdList.splice(i, 1);
         }
       }
       this.updateToolist();

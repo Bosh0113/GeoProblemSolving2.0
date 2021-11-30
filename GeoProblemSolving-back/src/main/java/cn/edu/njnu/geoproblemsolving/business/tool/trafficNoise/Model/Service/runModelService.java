@@ -22,15 +22,16 @@ public class runModelService {
  */
     public static void genShpZipFile(String destFilePath, String srcFilePath, String shpfileName) throws IOException {
         //生成shpfile压缩包文件的UDX配置文件 *.udxcfg
-        String tempFilePath = ResourceUtils.getURL("classpath:").getPath() + "data\\temp\\configure.udxcfg";
-        String allText = "";
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("data/temp/configure.udxcfg");
 
-        File templateFile = new File(tempFilePath);
-        if (!templateFile.exists()) {
+        if (inputStream == null) {
             System.out.println("temp file dest not exist!");
             return;
         }
-        FileReader fileReader = new FileReader(templateFile);
+
+        String allText = "";
+
+        InputStreamReader fileReader = new InputStreamReader(inputStream,"utf8");
         BufferedReader reader = new BufferedReader(fileReader);
         String tempLine;
         while ((tempLine = reader.readLine()) != null) {

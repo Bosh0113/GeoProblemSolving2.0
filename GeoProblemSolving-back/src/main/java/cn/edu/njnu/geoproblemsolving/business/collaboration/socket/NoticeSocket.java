@@ -36,7 +36,6 @@ public class NoticeSocket {
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message) {
-        System.out.println("---------------message-----------------");
         try {
             JSONObject messageJson = JSONObject.parseObject(message);
             if (!messageJson.getString("type").equals("ping")) {
@@ -67,6 +66,8 @@ public class NoticeSocket {
     public void onClose() throws IOException {
         String unConnectId = "";
         for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
+            System.out.println(server.getValue().toString());
+            System.out.println(this.toString());
             if (server.getValue().equals(this)) {
                 unConnectId = server.getKey();
                 servers.remove(server.getKey());
@@ -84,10 +85,8 @@ public class NoticeSocket {
 
     @OnError
     public void onError(Throwable error) {
-        String unConnectId = "";
         for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
             if (server.getValue().equals(this)) {
-                unConnectId = server.getKey();
                 servers.remove(server.getKey());
                 break;
             }

@@ -29,7 +29,7 @@ export default new Vuex.Store({
     //外网版本用户服务器
     // UserServer: "http://94.191.49.160:8080/userServer",
     //测试用用户服务器
-    UserServer: "/userServer",
+    UserServer: "http://172.21.212.103:8088/userServer",
     resProxy: "https://geomodeling.njnu.edu.cn/dataTransferServer"
   },
   getters: {

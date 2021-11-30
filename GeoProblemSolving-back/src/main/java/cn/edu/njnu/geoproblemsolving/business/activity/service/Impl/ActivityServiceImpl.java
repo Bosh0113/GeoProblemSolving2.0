@@ -163,16 +163,22 @@ public class ActivityServiceImpl implements ActivityService {
 
             // set type
             activity.setType(activity.getType());
+            docParser.initActivityDoc(activity);
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
             } else if (activity.getType().equals(ActivityType.Activity_Unit)) {
                 String purpose = activity.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool) {
-                    toolSet.add(tool.getTid());
+                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
+                    activity.setToolList(toolSet);
                 }
-                activity.setToolList(toolSet);
+
+                //更新文档
+                docParser.addTools(aid, relevantPurposeTool);
             }
 
             // tools and toolsets
@@ -232,6 +238,8 @@ public class ActivityServiceImpl implements ActivityService {
             //save
             activityRepository.save(activity);
 
+            docParser.appendChildActivity(activity.getParent(), aid, activity.getName(), creatorId);
+
             return ResultUtils.success(activity);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -247,20 +255,34 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             String purpose = update.getPurpose();
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit) &&
                     !activity.getType().equals(ActivityType.Activity_Unit) ||
                     !activity.getPurpose().equals(purpose))) {
-                List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
+                relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : tools) {
-                    toolSet.add(tool.getTid());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                activity.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = activity.getType();
             update.updateTo(activity);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, activity);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新工具箱内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

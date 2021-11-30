@@ -411,6 +411,10 @@ export default {
         });
         this.$refs.invokeButton.$el.innerHTML = null;
         this.fullscreenLoading.close();
+        this.$Notice.success({
+          title: "Compute successfully",
+          desc: ""
+        });
 
         // record
         // this.operationApi.analysisRecordUpdate(
@@ -434,13 +438,9 @@ export default {
         let index = content.inputNum;
         let importer = content.importer;
         if (content.inOrOut == "in") {
-          this.$refs["input" + index][
-            index
-          ].$el.firstElementChild.style.borderColor = "red";
+          this.$refs["input" + index][0].$el.firstElementChild.style.borderColor = "red";
         } else if (content.inOrOut == "out") {
-          this.$refs["input" + index][
-            index
-          ].$el.firstElementChild.style.borderColor = "#4caf50";
+          this.$refs["input" + index][0].$el.firstElementChild.style.borderColor = "#4caf50";
         }
       } else if (behavior == "data") {
         let type = content.addOrRemove;

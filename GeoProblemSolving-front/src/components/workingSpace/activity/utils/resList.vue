@@ -1276,7 +1276,7 @@ export default {
     resId: function () {
       let address = this.selectData.address;
       if (address != "" && typeof(address) == "string"){
-        if (address.length == 34){
+        if (address.length == 36){
           return address;
         }else {
           let uidArr = address.split("data/");
@@ -1752,7 +1752,7 @@ export default {
           closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
-        
+
       } else if (/(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -1816,7 +1816,7 @@ export default {
       //         try {
       //           changeUrl = window.webkitURL.createObjectURL(file)
       //         } catch (error) {
-  
+
       //         }
       //       } else if (window.URL !== undefined) { // Mozilla (firefox)
       //         try {
@@ -1859,7 +1859,7 @@ export default {
       //     }
       //   }
       //   xhr.send();
-        
+
       // }
     },
     deleteResourceModalShow(resource) {

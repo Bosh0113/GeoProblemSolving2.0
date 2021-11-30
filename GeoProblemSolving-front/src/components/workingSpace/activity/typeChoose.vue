@@ -196,7 +196,6 @@ export default {
       this.axios
         .put(url, data)
         .then((res) => {
-          console.log(res);
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.tempLoginModal = true;
@@ -204,7 +203,7 @@ export default {
             if(res.data.data.level == 0){
               this.slctActivityInfo = res.data.data;
             }
-            this.operationApi.activityUpdate("type", this.slctActivityInfo);
+            // this.operationApi.activityUpdate("type", this.slctActivityInfo);
             this.$emit("activityInfo",this.slctActivityInfo);
             this.$emit("typeChanged", {type: this.selectType, purpose: this.purpose});
           } else {

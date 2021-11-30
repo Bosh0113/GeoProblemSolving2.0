@@ -11,21 +11,21 @@ let timer = null;
 
 function initWebSocket(para) { //初始化websocket
   let IP_Port = window.location.host;
-  var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/PExploration/${para}`;
+  var wsurl = `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${IP_Port}/GeoProblemSolving/${para}`;
   if (IP_Port == "localhost:8080") {
-    wsurl = `ws://localhost:8081/PExploration/${para}`;
+    wsurl = `ws://localhost:8081/GeoProblemSolving/${para}`;
   }
   //switch 使用时提供一个参数type
   let websock = new WebSocket(wsurl);
   websock.onmessage = function (e) {
     let url = e.target.url;
-    let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
+    let para = url.substring(url.indexOf('/GeoProblemSolving/')+"/GeoProblemSolving/".length);
     websocketonmessage(e, para);
     websockLinked[para] = true;
   }
   websock.onclose = function (e) {
     let url = e.target.url;
-    let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
+    let para = url.substring(url.indexOf('/GeoProblemSolving/')+"/GeoProblemSolving/".length);
 
     websockLinked[para] = false;
     connectorNum[para] = -1;
@@ -56,7 +56,7 @@ function initWebSocket(para) { //初始化websocket
     console.log(e);
 
     // let url = e.target.url;
-    // let para = url.substring(url.indexOf('/PExploration/')+"/PExploration/".length);
+    // let para = url.substring(url.indexOf('/GeoProblemSolving/')+"/GeoProblemSolving/".length);
 
     // websockLinked[para] = false;
     // connectorNum[para] = -1;
@@ -152,7 +152,7 @@ function setTimer() {
     for (let i = 0; i < socketSites.length; i++) {
       websocketsend(socketSites[i], messageJson);
     }
-  }, 20000);
+  }, 50000);
 }
 
 function removeTimer() {
