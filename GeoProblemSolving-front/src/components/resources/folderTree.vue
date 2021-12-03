@@ -1397,13 +1397,13 @@
                     let metadata = {};
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.currentFolder.files.push(uploadedList[i]);
-                      if (this.uploadValidate.type == "data") {
-                        metadata.format = this.uploadValidate.format;
-                        metadata.scale = this.uploadValidate.scale;
-                        metadata.reference = this.uploadValidate.reference;
-                        metadata.unit = this.uploadValidate.unit;
-                        metadata.concept = this.uploadValidate.concept;
-                      }
+                      // if (this.uploadValidate.type == "data") {
+                      //   metadata.format = this.uploadValidate.format;
+                      //   metadata.scale = this.uploadValidate.scale;
+                      //   metadata.reference = this.uploadValidate.reference;
+                      //   metadata.unit = this.uploadValidate.unit;
+                      //   metadata.concept = this.uploadValidate.concept;
+                      // }
                     }
 
                     if (sizeOverList.length > 0) {

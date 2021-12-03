@@ -780,7 +780,6 @@ export default {
     },
     removeToolset(index) {
       var removeToolsetInfo = this.stepToolsetsShow[index];
-      consoles.log(removeToolsetInfo);
       this.stepToolsetsShow.splice(index, 1);
       if (removeToolsetInfo.privacy == "Public") {
         this.publicToolsets.push(removeToolsetInfo);

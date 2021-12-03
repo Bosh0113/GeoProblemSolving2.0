@@ -652,7 +652,7 @@
 						graph.setPanning(true);//拖动
 						//禁用浏览器默认的右键菜单栏
 						mxEvent.disableContextMenu(container);
-						graph.setCellsMovable(false);//是否可移动​
+						graph.setCellsMovable(false);//线是否可移动​
 						// 是否可以移动连线，重新连接其他cell，主要用来展现中用
 						graph.setCellsLocked(true);
 

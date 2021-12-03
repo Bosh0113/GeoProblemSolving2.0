@@ -326,7 +326,7 @@ export default {
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
         }
-        let finalUrl = "https://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +

@@ -29,59 +29,6 @@
             :ops="scrollOps"
             style="height: calc(100vh - 225px); margin-top: 5px"
           >
-            <!-- <context-res
-              v-if="
-                activityInfo.purpose ==
-                'Context definition & resource collection'
-              "
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></context-res>
-            <data-processing
-              v-else-if="activityInfo.purpose == 'Data processing'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></data-processing>
-            <data-visual
-              v-else-if="activityInfo.purpose == 'Data visualization'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></data-visual>
-            <model-build
-              v-else-if="
-                activityInfo.purpose == 'Geo-analysis model construction'
-              "
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></model-build>
-            <model-evaluation
-              v-else-if="
-                activityInfo.purpose == 'Model effectiveness evaluation'
-              "
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></model-evaluation>
-            <geo-simulation
-              v-else-if="activityInfo.purpose == 'Geographical simulation'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></geo-simulation>
-            <geo-analysis
-              v-else-if="activityInfo.purpose == 'Data analysis'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></geo-analysis>
-            <decision-making
-              v-else-if="activityInfo.purpose == 'Decision making'"
-              :activityInfo="activityInfo"
-              :participants="participants"
-            ></decision-making>
-            <universal-space
-              v-else
-              :activityInfo="activityInfo"
-              :participants="participants"
-              :projectInfo="projectInfo"
-            ></universal-space> -->
             <universal-space
               :activityInfo="activityInfo"
               :participants="participants"

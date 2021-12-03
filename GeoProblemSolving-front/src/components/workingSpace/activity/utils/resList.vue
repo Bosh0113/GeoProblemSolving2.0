@@ -1615,11 +1615,11 @@ export default {
                       this.activityResList.push(uploadedList[i]);
                       if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
-                        metadata.format = this.uploadDataInfo.format;
-                        metadata.scale = this.uploadDataInfo.scale;
-                        metadata.reference = this.uploadDataInfo.reference;
-                        metadata.unit = this.uploadDataInfo.unit;
-                        metadata.concept = this.uploadDataInfo.concept;
+                        // metadata.format = this.uploadDataInfo.format;
+                        // metadata.scale = this.uploadDataInfo.scale;
+                        // metadata.reference = this.uploadDataInfo.reference;
+                        // metadata.unit = this.uploadDataInfo.unit;
+                        // metadata.concept = this.uploadDataInfo.concept;
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
@@ -1708,7 +1708,7 @@ export default {
         } else {
           url = this.$store.getters.resProxy + res.address;
         }
-        let finalUrl = "http://ow365.cn/?i=28204&ssl=1&furl=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +

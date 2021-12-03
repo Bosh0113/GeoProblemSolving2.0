@@ -1,7 +1,7 @@
 <template>
   <div class="card-devices">
-    <div class="drawflow-node-title">
-      <h3>{{ name }}</h3>
+    <div class="drawflow-node-title" :title="name">
+      <h3 style="overflow: hidden;  text-overflow: ellipsis;  white-space: nowrap;">{{ name }}</h3>
     </div>
     <div class="drawflow-node-body">
       <div
@@ -135,13 +135,14 @@
               </div>
               <div class="content" v-else-if="record.type === 'geo-analysis'">
                 <span class="behavior">Geo-analysis by using tools</span>
-                <div @click="checkGeoAnalysis(record.tool,record.outputs)" style="cursor: pointer">
+                <div style="cursor: pointer">
                   <img
                     :src="toolUrl"
                     height="36px"
                     width="36px"
                     :title="record.tool.name"
                     class="resources"
+                    @click="checkGeoAnalysis(record)"
                   />
                   <Divider
                     type="vertical"
@@ -149,13 +150,14 @@
                   />
                   <img
                     v-for="result in record.outputs"
-                    :key="result.uid"
+                    :key="result.id"
                     :src="dataUrl"
                     height="36px"
                     width="36px"
                     style="margin-right: 5px"
-                    title="Result"
+                    :title="result.name"
                     class="resources"
+                    @click="checkRes(result)"
                   />
                 </div>
                 <div class="participant">
@@ -173,130 +175,7 @@
               </div>
               <Divider />
             </TimelineItem>
-            <!-- <TimelineItem>
-              <p class="time">2021-1-1 20:00:00</p>
-              <div class="content">
-                Resource <span class="behavior">upload</span>
-                <div>
-                  <img
-                    :src="dataUrl"
-                    height="36px"
-                    width="36px"
-                    title="Data"
-                    class="resources"
-                  />
-                </div>
-                <div class="participant">
-                  <span style="margin-right: 5px">People: </span>
-                  <avatar
-                    class="person"
-                    username="1XXX"
-                    :size="16"
-                    :rounded="true"
-                    title="xxx"
-                  />
-                </div>
-              </div>
-              <Divider />
-            </TimelineItem>
-            <TimelineItem>
-              <p class="time">2021-1-1</p>
-              <div class="content">
-                <span class="behavior">Tool add</span>
-                <div>
-                  <img
-                    :src="toolUrl"
-                    height="36px"
-                    width="36px"
-                    title="Data"
-                    class="resources"
-                  />
-                </div>
-                <div class="participant">
-                  <span style="margin-right: 5px">People: </span>
-                  <avatar
-                    class="person"
-                    username="mzy"
-                    :size="16"
-                    :rounded="true"
-                    title="xxx"
-                  />
-                </div>
-              </div>
-              <Divider />
-            </TimelineItem>
-            <TimelineItem>
-              <p class="time">2021-1-1</p>
-              <div class="content">
-                <span class="behavior">communication</span>
-                <div>
-                  <img
-                    :src="otherUrl"
-                    height="36px"
-                    width="36px"
-                    title="Data"
-                    class="resources"
-                  />
-                </div>
-                <div class="participant">
-                  <span style="margin-right: 5px">People: </span>
-                  <avatar
-                    class="person"
-                    username="1XXX"
-                    :size="16"
-                    :rounded="true"
-                    title="xxx"
-                  />
-                  <avatar
-                    class="person"
-                    username="1XXX"
-                    :size="16"
-                    :rounded="true"
-                    title="xxx"
-                  />
-                </div>
-              </div>
-              <Divider />
-            </TimelineItem>
-            <TimelineItem>
-              <p class="time">2021-1-1</p>
-              <div class="content">
-                <span class="behavior"
-                  >xxxx xxx xxxxxxxx xxxxxxx xxxxxxx xxx xxx xxxxx xxxxx</span
-                >
-                <div>
-                  <img
-                    :src="toolUrl"
-                    height="36px"
-                    width="36px"
-                    title="Tool"
-                    class="resources"
-                  />
-                  <Divider
-                    type="vertical"
-                    style="height: 36px; margin-top: -30px"
-                  />
-                  <img
-                    :src="dataUrl"
-                    height="36px"
-                    width="36px"
-                    title="Result"
-                    class="resources"
-                  />
-                </div>
-                <div class="participant">
-                  <span style="margin-right: 5px">People: </span>
-                  <avatar
-                    class="person"
-                    username="1XXX"
-                    :size="16"
-                    :rounded="true"
-                    title="xxx"
-                  />
-                </div>
-              </div>
-              <Divider />
-            </TimelineItem> -->
+            
           </vue-scroll>
         </Timeline>
         <div
@@ -412,11 +291,104 @@
         <Button
           type="success"
           size="small"
-          title="Preview"
+          title="Open the tool"
           icon="md-eye"
           style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
           @click="openTool(selectTool)"
         ></Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="checkAnalysisModal"
+      title="Geo-analysis information"
+      width="600"
+      footer-hide
+    >
+      <div style v-if="recordInfoFinished">
+        <Divider orientation="left">Tool Information</Divider>
+        <div class="dataInfo">
+          <Label class="dataLabel">Name:</Label>
+          <span class="dataText">{{
+            selectTool.toolName
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Type:</Label>
+          <span class="dataContent">{{ selectTool.backendType }}</span>
+          <Label class="dataLabel">Created time:</Label>
+          <span class="dataContent">{{
+            shortTimeFormat(selectTool.createdTime)
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Toolset:</Label>
+          <span class="dataContent">{{
+            selectTool.toolSet
+          }}</span>
+          <Label class="dataLabel">Tool tags:</Label>
+          <span class="dataContent">{{
+            showTags
+          }}</span>
+        </div>
+        <div class="dataInfo">
+          <Label class="dataLabel">Description:</Label>
+          <span class="dataText">{{ selectTool.description }}</span>
+        </div>
+        <div>
+          <Button
+            type="success"
+            size="small"
+            title="Open the tool"
+            icon="md-eye"
+            style="margin: 10px 20px 0 0; cursor: pointer; width: 60px"
+            @click="openTool(selectTool)"
+          ></Button>
+        </div>
+        <!-- input -->
+        <div v-if="analysisInfo.resesRef.inputs.length > 0">
+          <Divider orientation="left">Resource Input</Divider>
+          <div style="margin-top:15px; display: flex; width:500px; flex-wrap: wrap;">
+            <div v-for="(item,index) in inputList" :key="index" style="margin:5px 15px; display: flex;">
+              <img
+                :key="item.uid"
+                :src="dataUrl"
+                height="36px"
+                width="36px"
+                style="margin-right: 5px"
+                :title="item.name + item.suffix"
+                class="resources"
+                @click="showRes(item)"
+              />
+              <span style="margin-top:10px;" >{{item.name + item.suffix}}</span>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <Divider orientation="left">No Resource Input</Divider>
+        </div>
+        <!-- output -->
+        <div v-if="analysisInfo.resesRef.outputs.length > 0">
+          <Divider orientation="left">Resource Output</Divider>
+          <div style="margin-top:15px; display: flex; width:500px; flex-wrap: wrap;">
+            <div v-for="(item,index) in analysisInfo.outputs" :key="index" style="margin:5px 15px; display: flex;">
+              <img
+                :key="item.id"
+                :src="dataUrl"
+                height="36px"
+                width="36px"
+                style="margin-right: 5px"
+                :title="item.name"
+                class="resources"
+                @click="checkRes(item)"
+              />
+              <span style="margin-top:10px;" >{{item.name}}</span>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <Divider orientation="left">No Resource Output</Divider>
+        </div>
+        
       </div>
     </Modal>
   </div>
@@ -427,7 +399,7 @@ export default {
   components: {
     Avatar,
   },
-  props: ["taskId", "name","activityInfo"],
+  props: ["taskId", "name","activityInfo","parent"],
   data() {
     return {
       scrollOps: {
@@ -452,8 +424,12 @@ export default {
       chatUrl: require("@/assets/images/chat.png"),
       checkDataModal: false,
       checkToolModal: false,
+      checkAnalysisModal: false,
+      recordInfoFinished: false,
       selectData: {},
       selectTool: {},
+      analysisInfo: {},
+      inputList: [],
       resProxy: "https://geomodeling.njnu.edu.cn/dataTransferServer",
       panel: null,
     };
@@ -554,6 +530,7 @@ export default {
           this.operationRecords.push(operation);
         }
       }
+      console.log(this.operationRecords);
     },
     checkRes(item) {
       this.axios
@@ -573,8 +550,11 @@ export default {
           });
       this.checkDataModal = true;
     },
+    showRes(item){
+      this.$set(this, "selectData", item);
+      this.checkDataModal = true;
+    },
     checkTool(item) {
-      console.log(item);
       this.axios
           .get("/GeoProblemSolving/tool/" + item.id )
           .then((res) => {
@@ -594,73 +574,58 @@ export default {
           });
         this.checkToolModal = true;
     },
-    checkGeoAnalysis(toolInfo,resInfo){
-      console.log(toolInfo);
-      console.log(resInfo);
+    checkGeoAnalysis(data){
+      let inputIdList = data.resesRef.inputs;
+      let tool = data.tool
+      this.axios
+          .get("/GeoProblemSolving/tool/" + tool.id )
+          .then((res) => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
+              let list = res.data.data;
+              this.$set(this, "selectTool", list);
+              this.$set(this, "analysisInfo", data);
+              if(inputIdList.length > 0){
+                this.inputList = [];
+                let i = 0;
+                for( i ; i < inputIdList.length ; i++){
+                  this.axios
+                    .get("/GeoProblemSolving/rip/file/" + this.activityInfo.aid + "/uid/" + inputIdList[i])
+                    .then((res) => {
+                      if (res.data == "Offline") {
+                        this.$store.commit("userLogout");
+                      } else if (res.data.code == 0) {
+                        let list = res.data.data;
+                        this.inputList.push(list[0]);
+                      }
+                    })
+                    .catch((err) => {
+                      throw err;
+                    });
+                }
+                if( i >= inputIdList.length){
+                  this.recordInfoFinished = true;
+                }
+              } else {
+                this.recordInfoFinished = true;
+              }
+              
+            }
+          })
+          .catch((err) => {
+            throw err;
+          });
+      this.checkAnalysisModal = true;
     },
-    // openTool(toolInfo) {
-    //   // this.openToolModal = false;
-    //   this.openToolByPanel(toolInfo);
-    //   if (toolInfo.scope == "outer") {
-    //     this.openToolNewpage(toolInfo);
-    //   } else if (toolInfo.scope == "inner") {
-    //     this.openToolByPanel(toolInfo);
-    //   } else {
-    //     this.openToolByPanel(toolInfo);
-    //   }
-    // },
-    // openToolByPanel(toolInfo) {
-    //   //判断tool的类型，三种 modelItem（模型容器提供计算能力）, dataMethod(数据容器提供计算能力), webTool(自行开发，如mapTool)
-    //   let routerUrl = toolInfo.toolUrl;
-    //   if (toolInfo.backendType == "webTool") {
-    //     routerUrl = toolInfo.toolUrl;
-    //   } else if (toolInfo.backendType == "modelItem") {
-    //     routerUrl = "/GeoProblemSolving/computeModel";
-    //   } else if (toolInfo.backendType == "dataMethod") {
-    //     routerUrl = "/GeoProblemSolving/dataMethod";
-    //   }
-
-    //   var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-
-    //   this.panel = jsPanel.create({
-    //     theme: "success",
-    //     footerToolbar: `<p></p>`,
-    //     contentSize: "800 400",
-    //     id: toolInfo.toolName.replace(/ /g, '-'),
-    //     headerTitle: toolInfo.toolName,
-    //     content: toolContent,
-    //     container: "div#drawflow",
-    //     dragit: {
-    //       containment: 5,
-    //     },
-    //     closeOnEscape: true,
-    //     disableOnMaximized: true,
-    //   });
-    //   $(".jsPanel-content").css("font-size", "0");
-    //   // this.panelList.push(panel);//
-    //   // this.$emit("toolPanel", panel);//
-
-    //   // // 设置iframe 父子页面消息传输处理
-    //   // window.addEventListener("message", this.toolMsgHandle, false);
-    //   // let activity = this.activityInfo;
-    //   // let userInfo = this.userInfo;
-    //   // let taskList = this.operationApi.getTaskList();
-    //   // let iFrame = document.getElementById(toolInfo.tid);
-    //   // //iframe加载完毕后再发送消息，否则子页面接收不到message
-    //   // iFrame.onload = function () {
-    //   //   //iframe加载完立即发送一条消息
-    //   //   iFrame.contentWindow.postMessage(
-    //   //     {
-    //   //       user: userInfo,
-    //   //       activity: activity,
-    //   //       tasks: taskList,
-    //   //       tid: toolInfo.tid,
-    //   //       type: "activity",
-    //   //     },
-    //   //     "*"
-    //   //   );
-    //   // };
-    // },
+    openTool(toolInfo) {
+      //利用父子组件通讯
+      this.checkToolModal = false;
+      this.checkAnalysisModal = false;
+      this.parent.$refs.ToolBox.useTool(toolInfo);
+    },
     dateFormat(date) {
       let time = new Date(date);
       return time.Format("yyyy-MM-dd HH:mm:ss");
@@ -671,6 +636,7 @@ export default {
     },
     preview(data){
       this.checkDataModal = false;
+      this.checkAnalysisModal = false;
       var res = data;
       let name = data.suffix;
       if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf)$/.test(name.toLowerCase())) {
@@ -682,7 +648,7 @@ export default {
         } else {
           url = this.resProxy + res.address;
         }
-        let finalUrl = "https://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +
@@ -782,6 +748,7 @@ export default {
   border-bottom: 1px solid #e9e9e9;
   border-radius: 4px 4px 0px 0px;
   padding-left: 15px;
+  padding-right: 15px;
 }
 .drawflow-node-body {
   font-size: 14px;

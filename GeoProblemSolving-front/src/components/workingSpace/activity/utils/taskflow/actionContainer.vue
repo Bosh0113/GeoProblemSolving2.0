@@ -272,6 +272,7 @@ export default {
           taskId: nodeId,
           name: nodeName,
           activityInfo: this.activityInfo,
+          parent: this.$parent,
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -315,6 +316,9 @@ export default {
       let props = {
         taskId: nodeId,
         name: nodeName,
+        activityInfo: this.activityInfo,
+        parent: this.$parent,
+        
       };
       let data = {};
       this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -330,7 +334,7 @@ export default {
         "vue"
       );
 
-      this.taskList.push(task);
+      // this.taskList.push(task);
     },
     removeTaskNode(task) {
       let nodeId = this.editor.getNodesFromName(task.taskId)[0];
