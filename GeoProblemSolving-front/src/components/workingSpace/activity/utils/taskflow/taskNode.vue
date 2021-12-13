@@ -304,7 +304,7 @@
       width="600"
       footer-hide
     >
-      <div style v-if="recordInfoFinished">
+      <div v-if="recordInfoFinished">
         <Divider orientation="left">Tool Information</Divider>
         <div class="dataInfo">
           <Label class="dataLabel">Name:</Label>
@@ -350,7 +350,6 @@
           <div style="margin-top:15px; display: flex; width:500px; flex-wrap: wrap;">
             <div v-for="(item,index) in inputList" :key="index" style="margin:5px 15px; display: flex;">
               <img
-                :key="item.uid"
                 :src="dataUrl"
                 height="36px"
                 width="36px"
@@ -598,6 +597,7 @@ export default {
                       if (res.data == "Offline") {
                         this.$store.commit("userLogout");
                       } else if (res.data.code == 0) {
+                        console.log(res);
                         let list = res.data.data;
                         this.inputList.push(list[0]);
                       }
@@ -607,6 +607,7 @@ export default {
                     });
                 }
                 if( i >= inputIdList.length){
+                  console.log(this.inputList);
                   this.recordInfoFinished = true;
                 }
               } else {
