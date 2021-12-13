@@ -645,8 +645,11 @@ export default {
           )
           .then((res) => {
             //offline model
-
-            if (res.data.code == 0) {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
               let children = res.data.data;
               this.childActivities = children;
               this.nameConfirm = [];
@@ -693,7 +696,11 @@ export default {
         .get(url)
         .then((res) => {
           //offline model
-          if (res.data.code == 0) {
+          if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
 
@@ -722,7 +729,11 @@ export default {
         .then((res) => {
           //offline model
 
-          if (res.data.code == 0) {
+          if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
             this.buildActivityTree(

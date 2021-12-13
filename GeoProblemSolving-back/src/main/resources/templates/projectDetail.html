@@ -528,6 +528,11 @@
                                                                 <Icon type="md-git-branch" :size="25"></Icon>
                                                                 <strong>Enter Workspace</strong>
                                                             </i-button>
+                                                            <i-button class="changeInviteColor"
+                                                                      @click="showShareURL()">
+                                                                <Icon type="md-share-alt" :size="25"></Icon>
+                                                                <strong>Share Project</strong>
+                                                            </i-button>
                                                         </div>
                                                     </div>
                                                 </i-col>
@@ -866,6 +871,24 @@
                         <i-button type="primary" @click="resetProjectType()">Submit</i-button>
                     </div>
                 </Modal>
+                <Modal
+                        v-model="shareProjectUrlModalShow"
+                        title="Share project"
+                        footer-hide
+                        width="450"
+                >
+                    <span  style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
+                    <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
+                    <!--                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>-->
+                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh" @click="refreshProjectUrl()" ></i-button></span>
+                    <div v-if="shareProjectUrlList.length > 0">
+                        <div v-for="(item,index) in shareProjectUrlList" :key="index" :id="forId(index)">
+                            <span  style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
+                            <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
+                        </div>
+                    </div>
+                    <h3 style="margin-top: 45px;">Quickly share project using the web URL.</h3>
+                </Modal>
             </div>
         </div>
     </template>
@@ -883,15 +906,16 @@
             },
             created() {
                 this.tokenStr = this.getURLParameter("token");
-                console.log(this.tokenStr);
                 if (this.tokenStr != null) {
                     $.ajax({
-                        url: "/GeoProblemSolving/token/checkShareToken" + "?shareToken=" + this.tokenStr,
+                        url: "/GeoProblemSolving/token/" + this.tokenStr,
                         type: "GET",
                         async: false,
                         success: data => {
                             if (data) {
                                 this.userRole = 'Token';
+                                data.userState = true;
+                                sessionStorage.setItem('userInfo', JSON.stringify(data));
                             }
                         },
                         error: function (err) {
@@ -908,9 +932,12 @@
                             data.userState = true;
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
-                            console.log("Not logged in");
                             if (this.userRole != "Token") {
+                                console.log("Not logged in");
                                 window.location.href = '/GeoProblemSolving/login';
+                            } else if(this.userRole == "Token"){
+                                console.log("Token logged in");
+
                             }
                         }
                     },
@@ -1061,6 +1088,9 @@
                     resetProjectTypeModel: false,
                     // tool
                     workPanels: [],
+                    shareProjectUrlModalShow: false,
+                    shareProjectUrl: "",
+                    shareProjectUrlList: [],
                 }
             },
             watch: {
@@ -1174,6 +1204,58 @@
                             }
                         })()
                     }
+                },
+                showShareURL() {
+                    let url = window.location.href;
+                    $.ajax({
+                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.activityInfo.aid,
+                        type: "GET",
+                        async: false,
+                        success: data => {
+                            if (data) {
+                                this.userRole = 'Token';
+                                this.shareProjectUrl = url + "&token=" + data;
+                                this.shareProjectUrlModalShow = true;
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Check token info fail.");
+                        }
+                    });
+                },
+                copyProjectUrl() {
+                    var input = document.createElement("input");   // 直接构建input
+                    input.value = this.shareProjectUrl;  // 设置内容 需要复制的内容
+                    document.body.appendChild(input);    // 添加临时实例
+                    input.select();   // 选择实例内容
+                    document.execCommand("Copy");   // 执行复制
+                    document.body.removeChild(input); // 删除临时实例
+                    this.$Message.success('Copy successfully!');
+                    this.shareProjectUrlModalShow = false;
+                },
+                refreshProjectUrl() {
+                    let url = window.location.href;
+                    $.ajax({
+                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.activityInfo.aid,
+                        type: "GET",
+                        async: false,
+                        success: data => {
+                            if (data) {
+                                this.userRole = 'Token';
+                                this.shareProjectUrl = url + "&token=" + data;
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Check token info fail.");
+                        }
+                    });
+                },
+                addProjectUrl() {
+                    let url = window.location.href;
+                    this.shareProjectUrlList.push(url + "123456");
+                },
+                forId(index) {
+                    return "forid_" +index
                 },
                 changeMenuItem(name) {
                     if (name == "task"){

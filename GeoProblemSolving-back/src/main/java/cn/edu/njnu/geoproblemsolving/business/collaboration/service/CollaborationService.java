@@ -666,6 +666,7 @@ public class CollaborationService {
                     //做消息转发
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                     collaborationBehavior.sendTasKAssignment(participants, sender, messageObject, null);
+                    break;
                 }
                 case "general": {
                     //message transmission
