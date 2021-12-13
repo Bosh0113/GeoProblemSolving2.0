@@ -6,6 +6,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.Use
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.Impl.UserDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import cn.hutool.http.HttpException;
@@ -109,6 +110,9 @@ public class UserDispatchImpl implements UserDispatch {
             JSONObject getResult = restTemplate.getForObject(getUserTagUrl, JSONObject.class);
             if (getResult.getInteger("code") != 0){
                 System.out.println("Fail: Acquiring user's tag from userServer.");
+                //增加临时用户的处理
+                UserEntity userById = userDao.findUserById(userId);
+                if (userById != null) return new JSONObject();
                 return null;
             }
             return getResult.getJSONObject("data");

@@ -499,6 +499,7 @@ public class DocInterpret implements ActivityDocParser {
         ArrayList<HashMap<String, String>> resInfoList = new ArrayList<>();
         List<Node> resNodes = activityDocXml.selectNodes("/Activity/ResourceCollection/Resource[@state = 'accessible']");
         for (int i = 0; i < resNodes.size(); i++) {
+            //虚假的随机访问，实际上每次get，都需要从头往后
             Element resEle = (Element) resNodes.get(i);
             HashMap<String, String> resInfo = new HashMap<>();
             String uid = resEle.attributeValue("id");
@@ -1161,11 +1162,13 @@ public class DocInterpret implements ActivityDocParser {
     @Override
     public Object userJoin(String aid, String userId) {
         try {
-            JSONObject userTag = userDispatch.getUserTag(userId);
-            if (userTag == null) return null;
-            JSONArray domains = userTag.getJSONArray("domain");
-            JSONArray organizations = userTag.getJSONArray("organization");
+            // JSONObject userTag = userDispatch.getUserTag(userId);
+            // if (userTag == null) return null;
+            // JSONArray domains = userTag.getJSONArray("domain");
+            // JSONArray organizations = userTag.getJSONArray("organization");
             UserEntity user = userDao.findUserByIdOrEmail(userId);
+            ArrayList<String> domains = user.getDomain();
+            ArrayList<String> organizations = user.getOrganizations();
             // syncGlobalVariables(aid);
             loadXML(aid);
             if (operatingDoc == null) return null;
@@ -1202,7 +1205,7 @@ public class DocInterpret implements ActivityDocParser {
         loadXML(aid);
         if (operatingDoc == null) return null;
         if (userIds == null || userIds.isEmpty()) return null;
-        JSONObject usersTag = userDispatch.getUsersTag(userIds);
+        // JSONObject usersTag = userDispatch.getUsersTag(userIds);
         Element participantsEle = (Element) activityDocXml.selectSingleNode("/Activity/Participants");
         for (String userId : userIds) {
             UserEntity user = userDao.findUserByIdOrEmail(userId);
@@ -1213,9 +1216,8 @@ public class DocInterpret implements ActivityDocParser {
             personEle.addAttribute("role", "ordinary-member");
             personEle.addAttribute("state", "in");
 
-            JSONObject userTag = usersTag.getJSONObject(userId);
-            JSONArray domains = userTag.getJSONArray("domain");
-            JSONArray organizations = userTag.getJSONArray("organization");
+            ArrayList<String> domains = user.getDomain();
+            ArrayList<String> organizations = user.getOrganizations();
 
             if (domains != null && !domains.isEmpty()) {
                 for (Object item : domains) {
