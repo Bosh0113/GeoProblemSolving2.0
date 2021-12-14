@@ -1221,18 +1221,19 @@
                     document.execCommand("Copy");   // 执行复制
                     document.body.removeChild(input); // 删除临时实例
                     this.$Message.success('Copy successfully!');
-                    this.shareProjectUrlModalShow = false;
+                    // this.shareProjectUrlModalShow = false;
                 },
                 refreshProjectUrl() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.activityInfo.aid,
+                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
                         type: "GET",
                         async: false,
                         success: data => {
                             if (data) {
                                 this.userRole = 'Token';
-                                this.shareProjectUrl = url + "&token=" + data;
+                                this.shareProjectUrl = url + "&token=" + data.data;
+                                this.$Message.success('Refresh successfully!');
                             }
                         },
                         error: function (err) {
