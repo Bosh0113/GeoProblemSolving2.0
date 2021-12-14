@@ -1240,13 +1240,13 @@
                         }
                     });
                 },
-                addProjectUrl() {
-                    let url = window.location.href;
-                    this.shareProjectUrlList.push(url + "123456");
-                },
-                forId(index) {
-                    return "forid_" +index
-                },
+                // addProjectUrl() {
+                //     let url = window.location.href;
+                //     this.shareProjectUrlList.push(url + "123456");
+                // },
+                // forId(index) {
+                //     return "forid_" +index
+                // },
                 changeMenuItem(name) {
                     if (name == "task"){
                         this.initTaskSocket();
@@ -1257,7 +1257,7 @@
                         if (this.userState == false) {
                             window.location.href = "/GeoProblemSolving/login"
                         } else {
-                            if (this.userRole == 'visitor'){
+                            if (this.userRole == 'visitor') {
                                 this.$Notice.error({
                                     title: "You haven't joined the project",
                                     desc: "Please join the project first."
@@ -1267,13 +1267,7 @@
                             } else {
                                 window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
                             }
-
-
-
-
-
-
-
+                        }
                     }else{
                         this.activeMenu = name;
                         var tokenParam = '';
