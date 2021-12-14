@@ -877,13 +877,27 @@
                         v-model="shareProjectUrlModalShow"
                         title="Share project"
                         footer-hide
-                        width="450"
+                        width="600"
                 >
-                    <span  style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
-                    <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
-                    <!--                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>-->
-                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh" @click="refreshProjectUrl()" ></i-button></span>
-                    <h3 style="margin-top: 45px;">Quickly share project using the web URL.</h3>
+                    <Alert show-icon closable>
+                        Tips:
+                        <Icon type="ios-bulb-outline" slot="icon"></Icon>
+                        <template slot="desc">Create temporary operators and quickly share project by using the web URL.</template>
+                    </Alert>
+                    <div style="margin-top: 10px; min-height: 50px;">
+                        <span  style="float: left;margin: 5px 0;"><h4 style="width: 120px; height: 30px; line-height: 30px;"/>{{ shareProjectUrl.TempUserName}}: </h4></span>
+                        <span  style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl.url" id="shareProjectUrl" style="width: 350px; height: 30px;"/></span>
+                        <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
+                        <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>
+                    </div>
+                    <div v-if="shareProjectUrlList.length > 0" >
+                        <div v-for="(item,index) in shareProjectUrlList" :key="index" :id="forId(index)" style="min-height: 45px;">
+                            <span  style="float: left;margin: 5px 0;"><h4 style="width: 120px; height: 30px; line-height: 30px;"/>{{ item.TempUserName}}: </h4></span>
+                            <span  style="float: left;margin: 5px 0;"><i-input v-model="item.url" id="shareProjectUrl" style="width: 350px; height: 30px;"/></span>
+                            <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyAddProjectUrl(index)" >copy</i-button></span>
+                            <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-remove" @click="removeProjectUrl(index)" ></i-button></span>
+                        </div>
+                    </div>
                 </Modal>
             </div>
         </div>
@@ -1078,7 +1092,7 @@
                     // tool
                     workPanels: [],
                     shareProjectUrlModalShow: false,
-                    shareProjectUrl: "",
+                    shareProjectUrl: {},
                     shareProjectUrlList: [],
                     tempUser: false
                 }
@@ -1169,13 +1183,13 @@
                     return null;
                 },
                 userEnter() {
-                    if (!this.userInfo.userState) {
-                        window.location.href = "/GeoProblemSolving/login";
-                    } else {
-                        if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
-                            window.location.href = "/GeoProblemSolving/projectList";
+                        if (!this.userInfo.userState) {
+                            window.location.href = "/GeoProblemSolving/login";
+                        } else {
+                            if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
+                                window.location.href = "/GeoProblemSolving/projectList";
+                            }
                         }
-                    }
                 },
                 resizeContent() {
                     if (window.innerHeight > 735) {
@@ -1196,13 +1210,22 @@
                 showShareURL() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
+                        url: "/GeoProblemSolving/token/all/" + this.projectInfo.aid  + "/"  + this.userInfo.userId,
                         type: "GET",
                         async: false,
                         success: data => {
                             if (data) {
-                                this.userRole = 'Token';
-                                this.shareProjectUrl = url + "&token=" + data.data;
+                                if(data.data.length > 0){
+                                    let list = data.data;
+                                    for( let i = 0 ;i < list.length ; i++) {
+                                        list[i].url = url + "&token=" + list[i].Token;
+                                    }
+                                    this.shareProjectUrl = list[0];
+                                    this.shareProjectUrlList = [];
+                                    for( let i = 1 ; i < list.length ; i++){
+                                        this.shareProjectUrlList.push(list[i]);
+                                    }
+                                }
                                 this.shareProjectUrlModalShow = true;
                             }
                         },
@@ -1212,8 +1235,8 @@
                     });
                 },
                 copyProjectUrl() {
-                    var input = document.createElement("input");   // 直接构建input
-                    input.value = this.shareProjectUrl;  // 设置内容 需要复制的内容
+                    let input = document.createElement("input");   // 直接构建input
+                    input.value = this.shareProjectUrl.url;  // 设置内容 需要复制的内容
                     document.body.appendChild(input);    // 添加临时实例
                     input.select();   // 选择实例内容
                     document.execCommand("Copy");   // 执行复制
@@ -1221,7 +1244,35 @@
                     this.$Message.success('Copy successfully!');
                     // this.shareProjectUrlModalShow = false;
                 },
-                refreshProjectUrl() {
+                copyAddProjectUrl(index) {
+                    let input = document.createElement("input");   // 直接构建input
+                    input.value = this.shareProjectUrlList[index].url;  // 设置内容 需要复制的内容
+                    document.body.appendChild(input);    // 添加临时实例
+                    input.select();   // 选择实例内容
+                    document.execCommand("Copy");   // 执行复制
+                    document.body.removeChild(input); // 删除临时实例
+                    this.$Message.success('Copy successfully!');
+                    // this.shareProjectUrlModalShow = false;
+                },
+                // refreshProjectUrl() {
+                //     let url = window.location.href;
+                //     $.ajax({
+                //         url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
+                //         type: "GET",
+                //         async: false,
+                //         success: data => {
+                //             if (data) {
+                //                 this.userRole = 'Token';
+                //                 this.shareProjectUrl = url + "&token=" + data.data;
+                //                 this.$Message.success('Refresh successfully!');
+                //             }
+                //         },
+                //         error: function (err) {
+                //             console.log("Check token info fail.");
+                //         }
+                //     });
+                // },
+                addProjectUrl() {
                     let url = window.location.href;
                     $.ajax({
                         url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
@@ -1229,15 +1280,35 @@
                         async: false,
                         success: data => {
                             if (data) {
-                                this.userRole = 'Token';
-                                this.shareProjectUrl = url + "&token=" + data.data;
-                                this.$Message.success('Refresh successfully!');
+                                let info = data.data;
+                                info.url = url + "&token=" + data.data.Token;
+                                this.shareProjectUrlList.push(info);
                             }
                         },
                         error: function (err) {
                             console.log("Check token info fail.");
                         }
                     });
+                },
+                removeProjectUrl(index) {
+                    let rm = this.shareProjectUrlList[index];
+                    //删除请求
+                    $.ajax({
+                        url: "/GeoProblemSolving/token/" + rm.Token ,
+                        type: "DELETE",
+                        async: false,
+                        success: data => {
+                            if (data) {
+                                this.shareProjectUrlList.splice(index,1);
+                            }
+                        },
+                        error: function (err) {
+                            console.log("Check token info fail.");
+                        }
+                    });
+                },
+                forId(index) {
+                    return "forid_" +index
                 },
                 changeMenuItem(name) {
                     if (name == "task") {
@@ -1507,8 +1578,8 @@
                                     title: "Result",
                                     desc: "The member has been removed from the project."
                                 });
-                                for (let i = 0; i < this.participants.length; i++) {
-                                    if (this.participants[i].userId == this.removeMemberId) {
+                                for (let i = 0; i < this.participants.length; i++){
+                                    if (this.participants[i].userId == this.removeMemberId){
                                         this.participants.splice(i, 1);
                                     }
                                 }
