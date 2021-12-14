@@ -117,13 +117,12 @@ public class CommonUtil {
                 List<String> audience = decodedJWT.getAudience();
                 String userId = audience.get(0);
                 String aid = audience.get(1);
-                String inviterName = audience.get(3);
                 HashMap<String, String> tempUserInfo = new HashMap<>();
                 tempUserInfo.put("userId", userId);
                 tempUserInfo.put("aid", aid);
                 return tempUserInfo;
             }catch (JWTDecodeException e){
-                LOGGER.warn("JWT token decode failed: " + e.toString());
+                LOGGER.warn("JWT token decode failed: " + e);
                 return null;
             }
 

@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 /**
  * @ClassName ShareTokenController
  * @Description 临时用户
@@ -31,11 +34,16 @@ public class ShareTokenController {
     }
 
     @RequestMapping(value = "/{token}", method = RequestMethod.GET)
-    public JsonResult getTempUserInfo(@PathVariable String token){
+    public JsonResult getTempUserInfo(@PathVariable String token, HttpServletRequest httpReq){
         String userId = CommonUtil.getTokenUserId(token);
         if (userId == null) return ResultUtils.error(-2, "Wrong token.");
-        UserEntity tempUserInfo = tokenService.getTempUserInfo(userId);
+        UserEntity tempUserInfo = tokenService.getTempUserInfo(token);
         if (tempUserInfo == null) return ResultUtils.error(-2, "No such temp user, id: " + userId);
+        HttpSession session = httpReq.getSession();
+        session.setAttribute("userId", tempUserInfo.getUserId());
+        session.setAttribute("name", tempUserInfo.getName());
+        session.setMaxInactiveInterval(60 * 60 * 2);
+        System.out.println("User login. User name: " + tempUserInfo.getName());
         return ResultUtils.success(tempUserInfo);
     }
 }

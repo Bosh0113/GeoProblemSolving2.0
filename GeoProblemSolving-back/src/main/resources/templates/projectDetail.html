@@ -906,23 +906,6 @@
             },
             created() {
                 this.tokenStr = this.getURLParameter("token");
-                if (this.tokenStr != null) {
-                    $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.tokenStr,
-                        type: "GET",
-                        async: false,
-                        success: data => {
-                            if (data) {
-                                this.userRole = 'Token';
-                                data.userState = true;
-                                sessionStorage.setItem('userInfo', JSON.stringify(data));
-                            }
-                        },
-                        error: function (err) {
-                            console.log("Check token info fail.");
-                        }
-                    });
-                }
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
                     type: "POST",
@@ -932,12 +915,22 @@
                             data.userState = true;
                             sessionStorage.setItem('userInfo', JSON.stringify(data));
                         } else {
-                            if (this.userRole != "Token") {
-                                console.log("Not logged in");
-                                window.location.href = '/GeoProblemSolving/login';
-                            } else if(this.userRole == "Token"){
-                                console.log("Token logged in");
-
+                            //验证token
+                            if (this.tokenStr != null) {
+                                $.ajax({
+                                    url: "/GeoProblemSolving/token/" + this.tokenStr,
+                                    type: "GET",
+                                    async: false,
+                                    success: data => {
+                                        if (data) {
+                                            data.data.userState = true;
+                                            sessionStorage.setItem('userInfo', JSON.stringify(data.data));
+                                        }
+                                    },
+                                    error: function (err) {
+                                        console.log("Check token info fail.");
+                                    }
+                                });
                             }
                         }
                     },
@@ -1178,7 +1171,6 @@
                     return null;
                 },
                 userEnter() {
-                    if (this.userRole != "Token") {
                         if (!this.userInfo.userState) {
                             window.location.href = "/GeoProblemSolving/login";
                         } else {
@@ -1186,8 +1178,6 @@
                                 window.location.href = "/GeoProblemSolving/projectList";
                             }
                         }
-
-                    }
                 },
                 resizeContent() {
                     if (window.innerHeight > 735) {
@@ -1208,13 +1198,13 @@
                 showShareURL() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.activityInfo.aid,
+                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
                         type: "GET",
                         async: false,
                         success: data => {
                             if (data) {
                                 this.userRole = 'Token';
-                                this.shareProjectUrl = url + "&token=" + data;
+                                this.shareProjectUrl = url + "&token=" + data.data;
                                 this.shareProjectUrlModalShow = true;
                             }
                         },
@@ -1277,7 +1267,13 @@
                             } else {
                                 window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
                             }
-                        }
+
+
+
+
+
+
+
                     }else{
                         this.activeMenu = name;
                         var tokenParam = '';

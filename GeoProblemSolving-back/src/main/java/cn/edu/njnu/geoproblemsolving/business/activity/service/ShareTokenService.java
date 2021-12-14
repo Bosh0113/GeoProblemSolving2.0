@@ -57,9 +57,9 @@ public class ShareTokenService {
             //还得把这个临时用户删除
             tempUser = new UserEntity();
             tempUser.setUserId(userId);
-            ArrayList<String> joinedProject = new ArrayList<>();
-            joinedProject.add(aid);
-            tempUser.setJoinedProjects(joinedProject);
+//            ArrayList<String> joinedProject = new ArrayList<>();
+//            joinedProject.add(aid);
+//            tempUser.setJoinedProjects(joinedProject);
             tempUser.setName("TempOperator" + (int)(Math.random() * 1000) + 1);
             userDao.saveLocalUser(tempUser);
 
