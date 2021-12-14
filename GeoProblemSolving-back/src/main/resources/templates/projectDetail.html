@@ -226,7 +226,6 @@
             background-color: #f4a942;
             color: white;
         }
-
         .ivu-card-body {
             display: inherit;
         }
@@ -278,9 +277,9 @@
                     <menu-item name="task" class="projectMenuItem" style="padding: 14px">
                         <Icon type="md-calendar" title="Tasks" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-                    <!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
-                    <!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
-                    <!--                    </menu-item>-->
+<!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
+<!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
+<!--                    </menu-item>-->
                     <menu-item name="resource" class="projectMenuItem" style="padding: 14px">
                         <Icon type="ios-folder" title="Resources" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
@@ -880,18 +879,14 @@
                         footer-hide
                         width="450"
                 >
-                    <span style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl"
-                                                                      style="width: 320px; height: 30px;"/></span>
-                    <span style="float: left;margin: 5px 0;"><i-button type="primary"
-                                                                       @click="copyProjectUrl()">copy</i-button></span>
+                    <span  style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
+                    <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
                     <!--                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>-->
-                    <span style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh"
-                                                                        @click="refreshProjectUrl()"></i-button></span>
+                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh" @click="refreshProjectUrl()" ></i-button></span>
                     <div v-if="shareProjectUrlList.length > 0">
                         <div v-for="(item,index) in shareProjectUrlList" :key="index" :id="forId(index)">
-                            <span style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl"
-                                                                              style="width: 320px; height: 30px;"/></span>
-                            <span style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()">copy</i-button></span>
+                            <span  style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
+                            <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
                         </div>
                     </div>
                     <h3 style="margin-top: 45px;">Quickly share project using the web URL.</h3>
@@ -1108,8 +1103,8 @@
                 }
             },
             methods: {
-                initTaskSocket() {
-                    if (this.$refs.taskTreeEl.taskSocket != null) {
+                initTaskSocket(){
+                    if (this.$refs.taskTreeEl.taskSocket != null){
                         return;
                     }
                     this.$refs.taskTreeEl.taskSocket = null;
@@ -1230,18 +1225,19 @@
                     document.execCommand("Copy");   // 执行复制
                     document.body.removeChild(input); // 删除临时实例
                     this.$Message.success('Copy successfully!');
-                    this.shareProjectUrlModalShow = false;
+                    // this.shareProjectUrlModalShow = false;
                 },
                 refreshProjectUrl() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.activityInfo.aid,
+                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
                         type: "GET",
                         async: false,
                         success: data => {
                             if (data) {
                                 this.userRole = 'Token';
-                                this.shareProjectUrl = url + "&token=" + data;
+                                this.shareProjectUrl = url + "&token=" + data.data;
+                                this.$Message.success('Refresh successfully!');
                             }
                         },
                         error: function (err) {
@@ -1249,13 +1245,13 @@
                         }
                     });
                 },
-                addProjectUrl() {
-                    let url = window.location.href;
-                    this.shareProjectUrlList.push(url + "123456");
-                },
-                forId(index) {
-                    return "forid_" + index
-                },
+                // addProjectUrl() {
+                //     let url = window.location.href;
+                //     this.shareProjectUrlList.push(url + "123456");
+                // },
+                // forId(index) {
+                //     return "forid_" +index
+                // },
                 changeMenuItem(name) {
                     if (name == "task") {
                         this.initTaskSocket();
@@ -1277,7 +1273,7 @@
                                 window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
                             }
                         }
-                    } else {
+                    }else{
                         this.activeMenu = name;
                         var tokenParam = '';
                         if (this.tokenStr != null) {
