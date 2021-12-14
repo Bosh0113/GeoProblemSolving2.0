@@ -1,8 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
-import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.Config.SpringUtil;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.service.CollaborationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

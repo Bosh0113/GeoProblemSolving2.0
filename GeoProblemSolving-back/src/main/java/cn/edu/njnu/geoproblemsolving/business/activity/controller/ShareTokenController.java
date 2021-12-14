@@ -33,6 +33,13 @@ public class ShareTokenController {
         return ResultUtils.success(token);
     }
 
+    /**
+     * 使用token登录， token 同 aid 绑定的
+     *
+     * @param token
+     * @param httpReq
+     * @return
+     */
     @RequestMapping(value = "/{token}", method = RequestMethod.GET)
     public JsonResult getTempUserInfo(@PathVariable String token, HttpServletRequest httpReq){
         String userId = CommonUtil.getTokenUserId(token);

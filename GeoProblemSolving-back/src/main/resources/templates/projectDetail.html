@@ -226,6 +226,7 @@
             background-color: #f4a942;
             color: white;
         }
+
         .ivu-card-body {
             display: inherit;
         }
@@ -277,9 +278,9 @@
                     <menu-item name="task" class="projectMenuItem" style="padding: 14px">
                         <Icon type="md-calendar" title="Tasks" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
-<!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
-<!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
-<!--                    </menu-item>-->
+                    <!--                    <menu-item name="workspace" class="projectMenuItem" style="padding: 14px">-->
+                    <!--                        <Icon type="md-git-branch" title="Workspace" size="35" style="margin: 0 3px;"></Icon>-->
+                    <!--                    </menu-item>-->
                     <menu-item name="resource" class="projectMenuItem" style="padding: 14px">
                         <Icon type="ios-folder" title="Resources" size="35" style="margin: 0 3px;"></Icon>
                     </menu-item>
@@ -528,8 +529,10 @@
                                                                 <Icon type="md-git-branch" :size="25"></Icon>
                                                                 <strong>Enter Workspace</strong>
                                                             </i-button>
-                                                            <i-button class="changeInviteColor"
-                                                                      @click="showShareURL()">
+                                                            <i-button
+                                                                    v-if="!tempUser"
+                                                                    class="changeInviteColor"
+                                                                    @click="showShareURL()">
                                                                 <Icon type="md-share-alt" :size="25"></Icon>
                                                                 <strong>Share Project</strong>
                                                             </i-button>
@@ -562,7 +565,7 @@
                                                 <div slot="extra">
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member') & !tempUser"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
@@ -603,7 +606,7 @@
 
                 <div v-show="activeMenu=='workspace'" :style="{height: contentPageCSS + 'px'}">
                     <div style="background:#eee;padding: 10px;">
-                        <div >
+                        <div>
                             <iframe style="border-width:0"
                                     :style="{height: contentPageCSS - 20 + 'px'}"
                                     :src="ipPort+'/activityInfo/' + projectInfo.aid"></iframe>
@@ -877,14 +880,18 @@
                         footer-hide
                         width="450"
                 >
-                    <span  style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
-                    <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
+                    <span style="float: left;margin: 5px 0;"><i-input v-model="shareProjectUrl" id="shareProjectUrl"
+                                                                      style="width: 320px; height: 30px;"/></span>
+                    <span style="float: left;margin: 5px 0;"><i-button type="primary"
+                                                                       @click="copyProjectUrl()">copy</i-button></span>
                     <!--                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>-->
-                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh" @click="refreshProjectUrl()" ></i-button></span>
+                    <span style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh"
+                                                                        @click="refreshProjectUrl()"></i-button></span>
                     <div v-if="shareProjectUrlList.length > 0">
                         <div v-for="(item,index) in shareProjectUrlList" :key="index" :id="forId(index)">
-                            <span  style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
-                            <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
+                            <span style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl"
+                                                                              style="width: 320px; height: 30px;"/></span>
+                            <span style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()">copy</i-button></span>
                         </div>
                     </div>
                     <h3 style="margin-top: 45px;">Quickly share project using the web URL.</h3>
@@ -1084,6 +1091,7 @@
                     shareProjectUrlModalShow: false,
                     shareProjectUrl: "",
                     shareProjectUrlList: [],
+                    tempUser: false
                 }
             },
             watch: {
@@ -1100,8 +1108,8 @@
                 }
             },
             methods: {
-                initTaskSocket(){
-                    if (this.$refs.taskTreeEl.taskSocket != null){
+                initTaskSocket() {
+                    if (this.$refs.taskTreeEl.taskSocket != null) {
                         return;
                     }
                     this.$refs.taskTreeEl.taskSocket = null;
@@ -1118,12 +1126,13 @@
 
                     this.$refs.taskTreeEl.sendMessage({"type": "test"});
                 },
-                closeTaskSocket(){
-                    if (this.$refs.taskTreeEl.taskSocket != null && this.$refs.taskTreeEl.taskSocket.readyState == this.$refs.taskTreeEl.taskSocket.OPEN){
+                closeTaskSocket() {
+                    if (this.$refs.taskTreeEl.taskSocket != null && this.$refs.taskTreeEl.taskSocket.readyState == this.$refs.taskTreeEl.taskSocket.OPEN) {
                         this.$refs.taskTreeEl.taskSocket.close();
                     }
                 },
                 roleIdentity() {
+                    this.tempUser = this.userInfo.userInfo.length > 40;
                     this.userRole = roleIdentify(
                         this.projectInfo.members,
                         this.userInfo.userId
@@ -1171,13 +1180,13 @@
                     return null;
                 },
                 userEnter() {
-                        if (!this.userInfo.userState) {
-                            window.location.href = "/GeoProblemSolving/login";
-                        } else {
-                            if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
-                                window.location.href = "/GeoProblemSolving/projectList";
-                            }
+                    if (!this.userInfo.userState) {
+                        window.location.href = "/GeoProblemSolving/login";
+                    } else {
+                        if (this.projectInfo.privacy != "Public" && this.userRole == "visitor") {
+                            window.location.href = "/GeoProblemSolving/projectList";
                         }
+                    }
                 },
                 resizeContent() {
                     if (window.innerHeight > 735) {
@@ -1245,19 +1254,19 @@
                     this.shareProjectUrlList.push(url + "123456");
                 },
                 forId(index) {
-                    return "forid_" +index
+                    return "forid_" + index
                 },
                 changeMenuItem(name) {
-                    if (name == "task"){
+                    if (name == "task") {
                         this.initTaskSocket();
-                    }else {
+                    } else {
                         this.closeTaskSocket();
                     }
-                    if(name == 'workspace') {
+                    if (name == 'workspace') {
                         if (this.userState == false) {
                             window.location.href = "/GeoProblemSolving/login"
                         } else {
-                            if (this.userRole == 'visitor'){
+                            if (this.userRole == 'visitor') {
                                 this.$Notice.error({
                                     title: "You haven't joined the project",
                                     desc: "Please join the project first."
@@ -1267,14 +1276,8 @@
                             } else {
                                 window.location.href = "/GeoProblemSolving/activityInfo/" + this.projectInfo.aid
                             }
-
-
-
-
-
-
-
-                    }else{
+                        }
+                    } else {
                         this.activeMenu = name;
                         var tokenParam = '';
                         if (this.tokenStr != null) {
@@ -1521,8 +1524,8 @@
                                     title: "Result",
                                     desc: "The member has been removed from the project."
                                 });
-                                for (let i = 0; i < this.participants.length; i++){
-                                    if (this.participants[i].userId == this.removeMemberId){
+                                for (let i = 0; i < this.participants.length; i++) {
+                                    if (this.participants[i].userId == this.removeMemberId) {
                                         this.participants.splice(i, 1);
                                     }
                                 }
@@ -1539,7 +1542,10 @@
                                     .post("/GeoProblemSolving/notice/save", notice)
                                     .then(res => {
                                         if (res.data == "Success") {
-                                            this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": this.removeMemberId});
+                                            this.$refs.navigationEl.sendMessage({
+                                                "type": "Notice",
+                                                "receiver": this.removeMemberId
+                                            });
                                         }
                                     })
                                     .catch(err => {
@@ -1662,7 +1668,10 @@
                                                         desc:
                                                             "The application has been sent to managers of the project."
                                                     });
-                                                    this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": managerId});
+                                                    this.$refs.navigationEl.sendMessage({
+                                                        "type": "Notice",
+                                                        "receiver": managerId
+                                                    });
                                                     this.applyJoinModal = false;
                                                     this.haveApplied = true;
                                                 } else {

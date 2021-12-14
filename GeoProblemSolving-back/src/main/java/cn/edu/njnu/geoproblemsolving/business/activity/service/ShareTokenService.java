@@ -53,13 +53,10 @@ public class ShareTokenService {
         String aid = tempUserInfo.get("aid");
 
         UserEntity tempUser = userDao.findUserByIdOrEmail(userId);
+        //当临时被删除时，则将其删除
         if (tempUser == null){
-            //还得把这个临时用户删除
             tempUser = new UserEntity();
             tempUser.setUserId(userId);
-//            ArrayList<String> joinedProject = new ArrayList<>();
-//            joinedProject.add(aid);
-//            tempUser.setJoinedProjects(joinedProject);
             tempUser.setName("TempOperator" + (int)(Math.random() * 1000) + 1);
             userDao.saveLocalUser(tempUser);
 
