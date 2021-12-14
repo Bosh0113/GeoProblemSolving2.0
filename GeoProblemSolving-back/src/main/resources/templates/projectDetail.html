@@ -883,12 +883,6 @@
                     <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
                     <!--                    <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-add" @click="addProjectUrl()" ></i-button></span>-->
                     <span  style="float: right;margin: 5px 0;"><i-button shape="circle" icon="md-refresh" @click="refreshProjectUrl()" ></i-button></span>
-                    <div v-if="shareProjectUrlList.length > 0">
-                        <div v-for="(item,index) in shareProjectUrlList" :key="index" :id="forId(index)">
-                            <span  style="float: left;margin: 5px 0;"><i-input v-model="item" id="shareProjectUrl" style="width: 320px; height: 30px;"/></span>
-                            <span  style="float: left;margin: 5px 0;"><i-button type="primary" @click="copyProjectUrl()" >copy</i-button></span>
-                        </div>
-                    </div>
                     <h3 style="margin-top: 45px;">Quickly share project using the web URL.</h3>
                 </Modal>
             </div>
@@ -1127,7 +1121,7 @@
                     }
                 },
                 roleIdentity() {
-                    this.tempUser = this.userInfo.userInfo.length > 40;
+                    this.tempUser = this.userInfo.userId.length > 40;
                     this.userRole = roleIdentify(
                         this.projectInfo.members,
                         this.userInfo.userId
@@ -1245,13 +1239,6 @@
                         }
                     });
                 },
-                // addProjectUrl() {
-                //     let url = window.location.href;
-                //     this.shareProjectUrlList.push(url + "123456");
-                // },
-                // forId(index) {
-                //     return "forid_" +index
-                // },
                 changeMenuItem(name) {
                     if (name == "task") {
                         this.initTaskSocket();
