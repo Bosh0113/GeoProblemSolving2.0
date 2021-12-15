@@ -1275,7 +1275,7 @@
                 addProjectUrl() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
+                        url: `/GeoProblemSolving/token/${this.projectInfo.aid}/${this.userInfo.userId}`,
                         type: "GET",
                         async: false,
                         success: data => {

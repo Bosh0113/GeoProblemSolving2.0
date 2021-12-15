@@ -30,8 +30,8 @@ public class ShareTokenService {
     @Autowired
     ShareTokenRepository shareTokenRepository;
 
-    public HashSet<HashMap<String, String>> getAllToken(String aid, String inviterId){
-        HashSet<HashMap<String, String>> tokenInfos = new HashSet<>();
+    public ArrayList<HashMap<String, String>> getAllToken(String aid, String inviterId){
+        ArrayList<HashMap<String, String>> tokenInfos = new ArrayList<>();
 
         List<ShareToken> shareTokens = shareTokenRepository.findAllByAid(aid);
         if (shareTokens == null || shareTokens.size() == 0){
@@ -67,8 +67,8 @@ public class ShareTokenService {
         shareToken.setCreateTime(new Date());
         shareToken.setInviterId(inviterId);
         try {
-            Long tempUserNum = shareTokenRepository.countByAid(aid);
-            shareToken.setTempUserName("TempOperator" + tempUserNum + 1);
+            Long tempUserNum = shareTokenRepository.countByAid(aid) + 1;
+            shareToken.setTempUserName("TempOperator" + tempUserNum);
             shareTokenRepository.save(shareToken);
 
             HashMap<String, String> tokenInfo = new HashMap<>();

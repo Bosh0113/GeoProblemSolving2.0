@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeSet;
 
 /**
  * @ClassName ShareTokenController
@@ -40,7 +39,7 @@ public class ShareTokenController {
      */
     @RequestMapping(value = "/all/{aid}/{inviterId}", method = RequestMethod.GET)
     public JsonResult getTokens(@PathVariable String aid, @PathVariable String inviterId){
-        HashSet<HashMap<String, String>> allToken = tokenService.getAllToken(aid, inviterId);
+        ArrayList<HashMap<String, String>> allToken = tokenService.getAllToken(aid, inviterId);
         return ResultUtils.success(allToken);
     }
 
