@@ -1,9 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocService;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -14,9 +14,10 @@ import java.util.HashSet;
 public class ActivityDocController {
 
     private final ActivityDocService activityDocService;
-
-    public ActivityDocController(ActivityDocService activityDocService) {
+    private final NodeService nodeService;
+    public ActivityDocController(ActivityDocService activityDocService, NodeService nodeService) {
         this.activityDocService = activityDocService;
+        this.nodeService = nodeService;
     }
 
     /**
@@ -55,5 +56,12 @@ public class ActivityDocController {
     @RequestMapping(value = "/{aids}",method = RequestMethod.GET)
     public JsonResult inquiryActivityDocs(@PathVariable HashSet<String> aids){
         return activityDocService.findDocuments(aids);
+    }
+
+    //资源元数据发生修改
+    @RequestMapping(value = "/meta/{graphicId}/{aid}/{uid}", method = RequestMethod.PUT)
+    public void putDataMeta(@PathVariable String graphicId, @PathVariable String aid, @PathVariable String uid){
+        if (graphicId == null) return;
+        nodeService.putResMeta(graphicId, aid, uid);
     }
 }

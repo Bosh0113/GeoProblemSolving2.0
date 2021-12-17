@@ -12,6 +12,7 @@ var roadDataId, buildingDataId, barrierDataId, runningId;
 var roadData, buildingData, barrierData;
 var resultIdList = [];
 var userId;
+var resProxy = "https://geomodeling.njnu.edu.cn/dataTransferServer";
 
 proj4.defs("EPSG:2437", "+proj=tmerc +lat_0=0 +lon_0=120 +k=1 +x_0=500000 +y_0=0 +ellps=krass +towgs84=15.8,-154.4,-82.3,0,0,0,0 +units=m +no_defs");
 
@@ -492,6 +493,7 @@ function exportData(dataType) {
             data = {
                 aid: window.parent.activityInfo.aid,
                 uid: roadData.uid,
+                input: roadData,
                 name: roadData.name,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
@@ -506,6 +508,7 @@ function exportData(dataType) {
                 aid: window.parent.activityInfo.aid,
                 uid: buildingData.uid,
                 name: buildingData.name,
+                input: buildingData,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
             }
@@ -519,6 +522,7 @@ function exportData(dataType) {
                 aid: window.parent.activityInfo.aid,
                 uid: barrierData.uid,
                 name: barrierData.name,
+                input: barrierData,
                 user: userId,
                 graphId: window.parent.activityInfo.parent,
             }
@@ -544,6 +548,8 @@ function exportData(dataType) {
             }
         }
     }
+    data["toolId"] = window.parent.toolId;
+    data["participant"] = window.parent.onlineMembers;
 
     $.ajax({
         type: "post",
@@ -554,7 +560,9 @@ function exportData(dataType) {
         success: function (resp) {
             var result = JSON.parse(resp);
             if (result.respCode === 1) {
+                window.parent.loadingBackendOperation(result.operationId);
                 alert("Export data successfully!");
+                //
             } else {
                 alert("Fail to export data!");
             }
@@ -2075,8 +2083,13 @@ async function loadShapefile(layer, shapefilePath) {
 }
 
 function loadResultTiff(resulUrl) {
+    let uid;
+    if (typeof(resulUrl) == "string"){
+        uid = resulUrl.slice(-36);
+    }
+    let resUrl = resProxy + "/data/" + uid;
     L.leafletGeotiff(
-        url = resulUrl,
+        url = resUrl,
         options = {
             band: 0,
             displayMin: 0,

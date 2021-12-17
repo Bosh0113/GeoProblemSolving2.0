@@ -3,10 +3,13 @@ package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Controller
 //import cn.edu.njnu.trafficNoiseCaculating.UserData.Domain.EDataType;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.genBoundBoxUdxData;
@@ -44,6 +48,12 @@ public class exportRegionServlet extends HttpServlet {
     @Value("${dataContainer}")
     String dataContainerIp;
 
+    @Autowired
+    ActivityDocParser docParser;
+
+    @Autowired
+    NodeService nodeService;
+
     @RequestMapping(method = RequestMethod.POST)
     protected String doPost(@RequestBody String data, HttpServletRequest req) throws ServletException, IOException {
 
@@ -55,11 +65,13 @@ public class exportRegionServlet extends HttpServlet {
             JSONObject map = JSONObject.parseObject(data);
             String aid = map.getString("aid");
             String graphId = map.getString("graphId");
-//            String id = map.getString("uid");
             String top = map.getString("top");
             String bottom = map.getString("bottom");
             String right = map.getString("right");
             String left = map.getString("left");
+
+            String toolId = map.getString("toolId");
+            JSONArray participant = map.getJSONArray("participant");
 
 
             String resultId = UUID.randomUUID().toString().replace("-", "").toLowerCase();
@@ -107,16 +119,24 @@ public class exportRegionServlet extends HttpServlet {
                 outputEntity.setFolder(false);
                 ripDao.addResource(outputEntity);
 
-                // 将资源保存至过程中
-                HashMap<String, String> resTagMap = new HashMap<>();
-                String resTag = TagUtil.setResourceTag(outputEntity);
-                resTagMap.put(uid ,resTag);
+
+                //文档相关操作
+                HashSet<String> userIds = new HashSet<>();
+                for (Object item : participant){
+                    JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
+                    userIds.add(userInfo.getString("userId"));
+                }
+                String oid = docParser.geoAnalysisNoInput(aid, toolId, userIds, "Data processing", outputEntity);
+                //保存到节点中
+                nodeService.addResToNode(aid, uid);
+
                 //资源自动更新
                 if(graphId != null && graphId != ""){
-                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uid);
                 }
                 respJson.put("respCode", 1);
                 respJson.put("path", address);
+                respJson.put("operationId", oid);
             } else {
                 respJson.put("respCode", 0);
                 respJson.put("msg", "failed.");

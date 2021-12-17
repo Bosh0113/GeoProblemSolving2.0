@@ -129,7 +129,7 @@
                     <Col span="7" style="margin-left: 3.5%">
                       <div class="projectItem" @click="goSingleProject(mProject)">
                         <Card style="height:320px;margin-top:20px; z-index: 0;" class="projectCard">
-                          <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                          <p slot="title" class="projectsTitle" :title="mProject.name" style="width: 70%;">{{mProject.name}}</p>
                           <Button
                             class="authorBtn"
                             type="default"
@@ -147,28 +147,42 @@
                             icon="md-close"
                             title="remove"
                           ></Button>
-
-                          <!-- project显示图片 -->
-                          <!-- <Poptip trigger="hover" title="Description" :content="mProject.description" style="position:absolute;  top:50px; left:1%;">
-                            <img
-                              :src="mProject.picture"
-                              style="width:287%; height:230px; opacity: 1;"
-                            >
-                          </Poptip> -->
-
-
                           <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                           <!-- 表头结束 -->
                           <!--              200px  -->
-                          <div style="height:200px; z-index: 2;">
-                            <span style="font-weight: bold;">Description：</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{mProject.description}}
-                            </vue-scroll>
-                          </div>
+                          <Row>
+                            <Col span="7" >
+                              <div style="margin-top: 5px; margin-left:5px;">
+                                  <img
+                                    :src="mProject.picture"
+                                    v-if="mProject.picture != '' && mProject.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="mProject.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
+
                           <br/>
                           <div>
-                            <span style="float:left">CreateTime:</span>
+                            <span style="float:left">Created time:</span>
                             <span style="float:right">{{mProject.createdTime}}</span>
                           </div>
                         </Card>
@@ -190,6 +204,8 @@
                           <p
                             slot="title"
                             class="projectsTitle"
+                            :title="item.name"
+                            style="width: 70%;"
                           >{{item.name}}</p>
                           <!--                        @click.stop="quitModalShow(item)"-->
                           <Button
@@ -199,12 +215,35 @@
                           >Quit
                           </Button>
                           <!-- <img :src="item.picture" style="position:absolute; width:98%; height:230px; top:50px; left:1%; opacity: 0.5;z-index: -1;"> -->
-                          <div style="height:200px;  z-index: 2;">
-                            <span style="font-weight: bold">Description：</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{item.description}}
-                            </vue-scroll>
-                          </div>
+                          <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="item.picture"
+                                    v-if="item.picture != '' && item.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="item.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{item.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div style="height:40px">
                             <span style="float:left">CreateTime:</span>
@@ -378,7 +417,7 @@
                     <Col span="10" style="margin-left: 3.5%">
                       <div class="projectItem" @click="goSingleProject(mProject)">
                         <Card style="height:320px;margin-top:20px;" class="projectCard">
-                          <p slot="title" class="projectsTitle">{{mProject.name}}</p>
+                          <p slot="title" class="projectsTitle" :title="mProject.name" style="width: 70%;">{{mProject.name}}</p>
                           <Button
                             class="authorBtn"
                             type="default"
@@ -400,12 +439,35 @@
                           <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                           <!-- 表头结束 -->
                           <!--              200px  -->
-                          <p style="height:200px;">
-                            <span style="font-weight: bold;">Description</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{mProject.description}}
-                            </vue-scroll>
-                          </p>
+                         <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="mProject.picture"
+                                    v-if="mProject.picture != '' && mProject.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="mProject.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{mProject.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div>
                             <span style="float:left">CreateTime:</span>
@@ -431,6 +493,8 @@
                           <p
                             slot="title"
                             class="projectsTitle"
+                            :title="item.name"
+                            style="width: 70%;"
                           >{{item.name}}</p>
                           <!--                        @click.stop="quitModalShow(item)"-->
                           <Button
@@ -439,14 +503,35 @@
                             @click.stop="quitModalShow(item)"
                           >Quit
                           </Button>
-                          <p
-                            style="height:200px;"
-                          >
-                            <span style="font-weight: bold">Description</span>
-                            <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
-                              {{item.description}}
-                            </vue-scroll>
-                          </p>
+                          <Row>
+                            <Col span="7">
+                              <div style="margin-top: 5px">
+                                  <img
+                                    :src="item.picture"
+                                    v-if="item.picture != '' && item.picture != null"
+                                    style="
+                                      height: 70px;
+                                      width: 70px;
+                                      border-radius: 50%;
+                                    "
+                                  />
+                                  <avatar
+                                    :username="item.name"
+                                    :size="70"
+                                    style="margin-bottom: 6px"
+                                    v-else
+                                  ></avatar>
+                              </div>
+                            </Col>
+                            <Col span="17">
+                              <div style="height:200px; z-index: 2; position:relative;">
+                                <span style="font-weight: bold; position:absolute;">Description：</span>
+                                <vue-scroll :ops="ops" style="text-indent:2em;word-break:break-word;white-space: pre-line;">
+                                  {{item.description}}
+                                </vue-scroll>
+                              </div>
+                            </Col>
+                          </Row>
                           <br/>
                           <div style="height:40px">
                             <span style="float:left">CreateTime:</span>
@@ -544,9 +629,11 @@
 </template>
 
 <script>
+import Avatar from "vue-avatar";
+
   export default {
     name: "project",
-    components: {},
+    components: {Avatar,},
     data() {
       return {
         joinedProjectsList: [],
@@ -635,12 +722,14 @@
           // project/getProjects?aids=  用户获取项目
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
-              if(res.data.code == 0){
+              if(res.data.code == 0) {
                 this.$set(this, "createdProjectList", res.data.data)
+              }else {
+                this.$Message.error("Failed to load the created project.");
               }
             })
             .catch(err => {
-              this.$Message.error("Loading project failed.")
+              this.$Message.error("Failed to load the created project.");
             })
         }
 
@@ -651,6 +740,8 @@
             .then(res => {
               if (res.data.code == 0) {
                 this.$set(this, "joinedProjectsList", res.data.data);
+              }else {
+                this.$Message.error("Failed to load the joined project.");
               }
             })
             .catch(err => {

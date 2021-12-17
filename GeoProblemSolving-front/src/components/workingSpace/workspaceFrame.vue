@@ -53,7 +53,7 @@
       dis-hover
       class="workspaceCard"
       id="ActivityContent"
-      style="height: calc(100vh - 130px)"
+      style="height: calc(100vh - 120px)"
     >
       <h3 slot="title">
         <Breadcrumb style="display: inline-block" separator=">">
@@ -402,7 +402,6 @@ export default {
         .get("/GeoProblemSolving/project/" + urlInfo.aid)
         .then((res) => {
           //offline model
-
           if (res.data.code == 0) {
             // this.$set(this, "projectInfo", res.data.data[0])
             this.projectInfo = res.data.data;
@@ -646,8 +645,11 @@ export default {
           )
           .then((res) => {
             //offline model
-
-            if (res.data.code == 0) {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+            } else if (res.data.code == 0) {
               let children = res.data.data;
               this.childActivities = children;
               this.nameConfirm = [];
@@ -694,7 +696,11 @@ export default {
         .get(url)
         .then((res) => {
           //offline model
-          if (res.data.code == 0) {
+          if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
 
@@ -723,7 +729,11 @@ export default {
         .then((res) => {
           //offline model
 
-          if (res.data.code == 0) {
+          if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              // this.$router.push({ name: "Login" });
+              this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
             let branch = res.data.data;
             this.childActivities = branch.children;
             this.buildActivityTree(
@@ -1269,6 +1279,6 @@ export default {
 }
 
 .workspaceCard >>> .ivu-card-body {
-  padding: 0px 10px;
+  padding: 5px;
 }
 </style>

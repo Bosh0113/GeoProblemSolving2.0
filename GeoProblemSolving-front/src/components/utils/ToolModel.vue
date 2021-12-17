@@ -4,6 +4,7 @@
     <div id="collab-tool-head"></div>
     <div id="collab-tool-sidebar"></div>
     <div id="collab-tool-content" class="scrollbar">
+      <div id="edit-mask" title="The other participant is operating."></div>
       <vue-scroll :ops="scrollOps" style="height: calc(100vh - 50px)">
         <el-row
           class="state-container"
@@ -11,15 +12,15 @@
           :key="index"
           style="padding: 10px"
         >
-          <el-col class="leftContainer" span="5">
-            <el-col offset="1" span="22">
+          <el-col class="leftContainer" :span="5">
+            <el-col :offset="1" :span="22">
               <div class="modelState">
                 <p class="state-name">{{ state.name }}</p>
                 <p class="state-desc">{{ state.description }}</p>
               </div>
             </el-col>
           </el-col>
-          <el-col class="dataContainer" span="17" offset="1">
+          <el-col class="dataContainer" :span="17" :offset="1">
             <div class="_params-group">
               <el-row v-if="inEventList(state).length !== 0" class="stateTitle"
                 >Input
@@ -233,7 +234,7 @@
           </el-col>
         </el-row>
 
-        <el-row>
+        <el-row v-show="invokeButtonShow">
           <el-button
             type="primary"
             @click="invokeTest"
@@ -338,6 +339,7 @@ export default {
 
       inputEventList: [],
       outputEventList: [],
+      invokeButtonShow: true
     };
   },
 
@@ -394,7 +396,9 @@ export default {
           let eventIndex = content.inputs.eventIndex;
           let url = content.inputs.url;
           let urlName = content.inputs.urlName;
+          let uid = content.inputs.uid;
           this.$set(this.stateList[stateIndex].Event[eventIndex], "url", url);
+          this.$set(this.stateList[stateIndex].Event[eventIndex], "uid", uid);
           this.$set(
             this.stateList[stateIndex].Event[eventIndex],
             "urlName",
@@ -411,6 +415,7 @@ export default {
             "urlName",
             ""
           );
+          this.$set(this.stateList[stateIndex1].Event[findIndex], "uid", "");
         }
       } else if (behavior == "params") {
         //输入参数
@@ -439,9 +444,10 @@ export default {
 
     getSocketComputation: function (data) {
       if (data != undefined && data != null) {
-        let computeOutputs = data.computeOutputs;
-        if (computeOutputs !== "Fail") {
-          this.getStateEventOut(data.computeOutputs);
+        if (data.computeSuc) {
+          let computeOutputs = data.outputInfo;
+          this.getStateEventOut(computeOutputs);
+          this.invokeButtonShow = false;
         } else {
           this.fullscreenLoading.close();
           this.$Notice.error({
@@ -503,18 +509,17 @@ export default {
               userInfo.userId
           )
           .then((res) => {
-            console.log("initTaskResponse", res.data);
             if (res.data.code == 0) {
               let data2 = res.data.data;
               this.invokeInfo.serviceIp = data2.ip;
               this.invokeInfo.servicePort = data2.port;
               this.invokeInfo.serviceId = this.md5;
             } else {
-              this.$Notice.error({ title: "Tool initialization failed." });
+              this.$Notice.error({ title: "Tool initialization failed.",desc: res.data.msg});
             }
           })
           .catch((err) => {
-            this.$Notice.error({ title: "Tool initialization failed." });
+            this.$Notice.error({ title: "Tool initialization failed."});
           });
       }, 1500);
     },
@@ -536,6 +541,8 @@ export default {
             if (events[j].hasOwnProperty("url")) {
               detail["tag"] = events[j].name;
               detail["url"] = events[j].url;
+
+              detail["uid"] = events[j].uid;
               input.push(detail);
             } else {
               continue;
@@ -544,7 +551,7 @@ export default {
             //参数
             let template = {};
             let outputTemplate = events[j].datasetItem;
-            console.log(outputTemplate);
+            // console.log(outputTemplate);
             //如果是external template["type"] = id,不然为空
             if (outputTemplate.type === "external") {
               template = {
@@ -576,6 +583,23 @@ export default {
       //传递开始运行信息
       runTool();
       //测试数据没有弄 直接运行 根据ip+id
+
+      // this.operationApi.getActivityDoc(this.aid);
+      // let operationId = guid();
+      // this.operationApi.analysisRecord(
+      //   this.aid,
+      //   operationId,
+      //   "",
+      //   this.userId,
+      //   this.toolInfo.tid,
+      //   "Geographical simulation",
+      //   this.invokeInfo.inputs,
+      //   [],
+      //   [],
+      //   onlineMembers
+      // );
+
+      // console.log(this.invokeInfo.inputs)
       sendModelOperation(
         this.aid,
         this.invokeInfo.serviceId,
@@ -669,11 +693,24 @@ export default {
         });
       });
       this.fullscreenLoading.close();
+      this.$Notice.success({
+        title: "Compute successfully",
+        desc: ""
+      });
     },
 
     download(event) {
-      let url = event.url.split("?")[0];
-      window.open(url);
+      let url = event.url;
+      let uid;
+      if (typeof(url) == "string"){
+        uid = url.slice(-36);
+      }
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = this.$store.getters.resProxy + "/data/" + uid;
+      a.target = "_self";
+      a.click();
+      a.remove();
     },
 
     urlToBlob(the_url, callback) {
@@ -815,7 +852,12 @@ export default {
         "urlName",
         val.name
       );
-
+      //set input id
+      this.$set(
+        this.stateList[stateIndex].Event[eventIndex],
+        "uid",
+        val.uid
+      );
       this.selectDataDialogShow = false;
       //将stateIndex 与 eventIndex
       let content = {
@@ -823,6 +865,7 @@ export default {
         eventIndex: eventIndex,
         url: val.address,
         urlName: val.name,
+        uid: val.uid
       };
 
       selectDataOperation(content, "add");

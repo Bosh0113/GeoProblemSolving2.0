@@ -189,7 +189,7 @@ public class ActivityResController {
     }
 
     /**
-     * 将模型生成的资源绑定的到项目中
+     * 将资源从子活动复制到指定活动
      * @param modelOutput
      * @param aid
      * @return

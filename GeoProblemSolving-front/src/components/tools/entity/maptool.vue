@@ -183,6 +183,7 @@ export default {
           { required: false, message: "Drawing tool", trigger: "blur" },
         ],
       },
+      resProxy: this.$store.getters.resProxy,
     };
   },
   mounted() {
@@ -227,24 +228,24 @@ export default {
     },
     initMap() {
       this.tdtVectorMap =
-        "http://t0.tianditu.gov.cn/vec_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/vec_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtVectorAno =
-        // "http://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        // "https://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         // "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
-        "http://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/eva_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=eva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtImgMap =
-        "http://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtImgAno =
-        "http://t0.tianditu.gov.cn/cia_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.gov.cn/cia_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtTerrMap =
-        "http://t0.tianditu.com/ter_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.com/ter_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
       this.tdtTerrAno =
-        "http://t0.tianditu.com/cta_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
+        "https://t0.tianditu.com/cta_w/wmts?tk=d6b0b78f412853967d91042483385d2c" +
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
 
       this.map = L.map("map", {
@@ -262,7 +263,7 @@ export default {
       var vectorMap = L.tileLayer(this.tdtVectorMap, {
         maxZoom: 20,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var vectorAno = L.tileLayer(this.tdtVectorAno, { maxZoom: 18 });
       var vector = L.layerGroup([vectorMap, vectorAno]);
@@ -270,7 +271,7 @@ export default {
       var satelliteMap = L.tileLayer(this.tdtImgMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var satelliteAno = L.tileLayer(this.tdtImgAno, { maxZoom: 18 });
       var satellite = L.layerGroup([satelliteMap, satelliteAno]);
@@ -278,7 +279,7 @@ export default {
       var terrainMap = L.tileLayer(this.tdtTerrMap, {
         maxZoom: 18,
         attribution:
-          '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors',
+          '&copy; <a href="https://map.tianditu.gov.cn/">tianditu</a> contributors',
       });
       var terrainAno = L.tileLayer(this.tdtTerrAno, { maxZoom: 18 });
       var terrain = L.layerGroup([terrainMap, terrainAno]);
@@ -424,7 +425,7 @@ export default {
             behavior: "removeAll",
             content: JSON.stringify({}),
           };
-          
+
           sendCustomOperation(that.send_content);
         },
       });
@@ -478,7 +479,6 @@ export default {
             }
 
             var fileOfBlob = new File([this.geojsonBlob], filename);
-
             // upload
             let file = saveResources(
               [fileOfBlob],
@@ -528,11 +528,16 @@ export default {
       return false;
     },
     viewData() {
+      let uid;
+      if (typeof this.selectData.address == "string") {
+        uid = this.selectData.address.slice(-36);
+      }
+      let fileUrl = this.resProxy + "/data/" + uid;
       if (/\.(json)$/.test(this.selectData.suffix.toLowerCase())) {
         //从url获取GeoJSON数据
         var that = this;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", this.selectData.address, true);
+        xhr.open("GET", fileUrl, true);
         xhr.onload = function (e) {
           if (this.status == 200) {
             var file = JSON.parse(this.response);
@@ -547,13 +552,15 @@ export default {
             that.loadFeatures(geoJsonLayer);
             //平移至数据位置
             that.map.fitBounds(geoJsonLayer.getBounds());
+          } else {
+            this.$Message.error("Loading failed");
           }
         };
         xhr.send();
       } else if (/\.(zip)$/.test(this.selectData.suffix.toLowerCase())) {
         try {
           var that = this;
-          shp(this.selectData.address).then(function (file) {
+          shp(fileUrl).then(function (file) {
             let geoJsonLayer = L.geoJSON(file, {
               style: function (feature) {
                 return { color: "orange" };
@@ -748,14 +755,19 @@ export default {
     getSocketData(data) {
       let socketMsg = data;
       if (socketMsg.type === "resource") {
+        let dataItem = JSON.parse(socketMsg.content);
         switch (socketMsg.behavior) {
           case "update": {
-            let dataItem = JSON.parse(socketMsg.content);
             this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", dataItem.address, true);
+            let address = dataItem.address;
+            let uid;
+            if (typeof address == "string") {
+              uid = address.slice(-36);
+            }
+            xhr.open("GET", this.resProxy + "/data/" + uid, true);
             xhr.onload = function (e) {
               if (this.status == 200) {
                 var file = JSON.parse(this.response);
@@ -774,11 +786,8 @@ export default {
             break;
           }
           case "select": {
-            for (let i = 0; i < selectedResources.length; i++) {
-              this.selectData = selectedResources[i];
-              this.viewData();
-            }
-            break;
+            this.selectData = dataItem;
+            this.viewData();
           }
         }
       }
@@ -867,6 +876,14 @@ export default {
       for (let i = 0; i < resList.length; i++) {
         this.selectData = resList[i];
         this.viewData();
+
+        let send_content = {
+          type: "resource",
+          sender: this.userInfo.userId,
+          behavior: "select",
+          content: this.selectData,
+        };
+        sendCustomOperation(send_content);
       }
     },
   },

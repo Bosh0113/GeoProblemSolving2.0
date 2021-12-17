@@ -6,11 +6,13 @@ import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.Use
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.Impl.UserDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -108,11 +110,27 @@ public class UserDispatchImpl implements UserDispatch {
             JSONObject getResult = restTemplate.getForObject(getUserTagUrl, JSONObject.class);
             if (getResult.getInteger("code") != 0){
                 System.out.println("Fail: Acquiring user's tag from userServer.");
+                //增加临时用户的处理
+                UserEntity userById = userDao.findUserById(userId);
+                if (userById != null) return new JSONObject();
                 return null;
             }
             return getResult.getJSONObject("data");
         }catch (HttpException e){
             System.out.println("getUserTag" + e.toString());
+            return null;
+        }
+    }
+
+    @Override
+    public JSONObject getUsersTag(HashSet<String> userIds) {
+        String userIdStr = userIds.stream().collect(Collectors.joining(","));
+        String getUsersTagUrl = "http://" + userServerLocation + "/user/tags/" + userIdStr;
+        try {
+            JSONObject getResult = restTemplate.getForObject(getUsersTagUrl, JSONObject.class);
+            if (getResult.getInteger("code") != 0)  return null;
+            return getResult.getJSONObject("data");
+        }catch (HttpException exception){
             return null;
         }
     }

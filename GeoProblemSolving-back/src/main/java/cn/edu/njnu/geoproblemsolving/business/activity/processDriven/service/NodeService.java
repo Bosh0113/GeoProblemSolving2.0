@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
+import org.dom4j.DocumentException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,15 +57,27 @@ public interface NodeService {
 
 
     //资源相关内容，将可能异常的地方在此层完成屏蔽
-    void addResToNode(String aid, ResourceEntity res);
+    HashMap<String, String> addResToNode(String aid, ResourceEntity res);
 
-    void addResToNodeBatch(String aid, HashMap<String, String> resInfo);
+    /**
+     *
+     * @param aid
+     * @param resInfo 资源字段
+     * @return
+     */
+    HashMap<String, String> addResToNodeBatch(String aid, HashMap<String, String> resInfo);
+
+    void addResToNodeBatch(String aid, HashSet<String> uids);
+
+    void addResToNode(String aid, String uid);
 
     void delResInNode(String aid, String uid);
 
     void delResInNodeBatch(String aid, HashSet<String> uid);
 
     void putResInNode(String aid, ResourceEntity res);
+
+    void putResMeta(String graphicId, String aid, String uid);
 
 
     //资源的更新

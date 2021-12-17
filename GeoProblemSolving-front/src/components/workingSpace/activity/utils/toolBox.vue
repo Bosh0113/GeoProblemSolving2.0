@@ -95,7 +95,7 @@
                 v-if="tool.toolSet"
               >
                 <div
-                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  style="text-align: center; cursor: pointer"
                   @click="expandTool(tool)"
                 >
                   <Tooltip placement="bottom" max-width="400" :transfer="true">
@@ -145,7 +145,7 @@
                 class= "tool-content" v-else
               >
                 <div
-                  style="padding-top: 5px;text-align: center; cursor: pointer"
+                  style="text-align: center; cursor: pointer"
                   @click="useTool(tool)"
                 >
                   <Tooltip placement="bottom" max-width="400" :transfer="true">
@@ -341,7 +341,7 @@ export default {
     //       this.$Message.error("Loading project failed.")
     //     })
     // },
-    
+
     changeLoginModal(status) {
       this.tempLoginModal = status;
       console.log(status);
@@ -528,20 +528,20 @@ export default {
                   this.userInfo.userId,
                   operations[i].content
                 );
-                this.$store.commit("updateTempOperations", {
-                  behavior: "add",
-                  operation: operations[i],
-                });
+                // this.$store.commit("updateTempOperations", {
+                //   behavior: "add",
+                //   operation: operations[i],
+                // });
               } else if (behavior === "bind") {
                 this.operationApi.bindTempOperation2Task(
                   this.activityInfo.aid,
                   operations[i].id,
                   event.data.task
                 );
-                this.$store.commit("updateTempOperations", {
-                  behavior: "remove",
-                  operation: operations[i],
-                });
+                // this.$store.commit("updateTempOperations", {
+                //   behavior: "remove",
+                //   operation: operations[i],
+                // });
               }
               break;
             }
@@ -583,10 +583,16 @@ export default {
               behavior: "remove",
               operation: operations[i],
             });
+            this.operationStore = true;
           }
         }
-
-        this.operationStore = true;
+      }else if (event.data.type === "task-record-backend"){
+        this.operationApi.getActivityDoc(this.activityInfo.aid);
+        let operation = this.operationApi.getOperationInfo(event.data.oid);
+        this.$store.commit("updateTempOperations", {
+          behavior: "add",
+          operation: operation,
+        });
       }
     },
     openToolNewpage(toolInfo) {

@@ -217,7 +217,7 @@ export function getActivityDoc(aid) {
 
 export function getResInfo(resId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -288,26 +288,32 @@ export function getResMetaInfo(aids) {
           let type = metaDtaList[k].getAttribute("type");
           let description = metaDtaList[k].getAttribute("description");
           if (type === "scale") {
-            scaleTemp.push({text: description});
+            scaleTemp.push(description);
           } else if (type === "format") {
-            formatTemp.push({text: description});
+            formatTemp.push(description);
           } else if (type === "reference") {
-            referenceTemp.push({text: description});
+            referenceTemp.push(description);
           } else if (type === "unit") {
-            unitTemp.push({text: description});
+            unitTemp.push(description);
           } else if (type === "concept") {
-            conceptTemp.push({text: description});
+            conceptTemp.push(description);
           }
         }
       }
     }
+    let format = Array.from(new Set(formatTemp)).filter(item=>{return item != ""});
+    let scale = Array.from(new Set(scaleTemp)).filter(item=>{return item != ""});
+    let reference = Array.from(new Set(referenceTemp)).filter(item=>{return item != ""});
+    let unit = Array.from(new Set(unitTemp)).filter(item=>{return item != ""});
+    let concept = Array.from(new Set(conceptTemp)).filter(item=>{return item != ""});
     resMetaInfo = {
-      format: Array.from(new Set(formatTemp)),
-      scale: Array.from(new Set(scaleTemp)),
-      reference: Array.from(new Set(referenceTemp)),
-      unit: Array.from(new Set(unitTemp)),
-      concept: Array.from(new Set(conceptTemp))
+      format: format.map(item=>{return {text: item}}),
+      scale: scale.map(item=>{return {text: item}}),
+      reference: reference.map(item=>{return {text: item}}),
+      unit: unit.map(item=>{return {text: item}}),
+      concept: concept.map(item=>{return {text: item}})
     };
+
     return resMetaInfo;
   } else {
     throw new Error(result.msg)
@@ -316,7 +322,7 @@ export function getResMetaInfo(aids) {
 
 export function getMemberInfo(pid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -334,7 +340,7 @@ export function getMemberInfo(pid) {
 
 export function getToolInfo(tid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -354,7 +360,7 @@ export function getToolInfo(tid) {
 
 export function getOperationInfo(oid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -428,7 +434,7 @@ export function getOperationInfo(oid) {
 
 export function getTaskInfo(taskId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -453,7 +459,7 @@ export function getTaskInfo(taskId) {
 
 export function getTaskList() {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -486,7 +492,7 @@ export function getTaskList() {
 
 export function getTaskDependencies() {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -516,7 +522,7 @@ export function getTaskDependencies() {
 
 export function getToollist() {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -534,7 +540,7 @@ export function getToollist() {
 
 export function getReslist() {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -551,7 +557,7 @@ export function getReslist() {
 // independent operations(Temporary operations)
 export function getTempOperations() {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -696,7 +702,7 @@ function updateActivityDoc(aid) {
 export function activityUpdate(updateType, activityInfo) {
   if (xmlDoc === null) {
     if (xmlDoc === null){
-      alert("Failed to record operation.Please try it again!");
+      alert("Failed to record operation. Please try it again!");
       return;
     }
   }
@@ -771,7 +777,7 @@ export function activityUpdate(updateType, activityInfo) {
 
 export function taskUpdate(aid, behavior, taskInfo) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
   let time1 = new Date(taskInfo.startTime);
@@ -804,6 +810,17 @@ export function taskUpdate(aid, behavior, taskInfo) {
     if (Task !== null && Task.localName == "Task") {
       Task.setAttribute("state", "removed");
     }
+
+    // remove dependency
+    let relations = xmlDoc.getElementsByTagName("Relation");
+    for(var i = 0; i < relations.length; i++) {
+      let Relation = relations[i];
+      let relationId = Relation.getAttribute("id");
+      if(relationId.indexOf(taskInfo.taskId) == 0 || relationId.indexOf(taskInfo.taskId) == 36){
+        Relation.parentNode.removeChild(Relation);
+      }
+    }
+
     // remove operation in this task
     let operations = Task.childNodes;
     for (var i = 0; i < operations.length; i++) {
@@ -830,7 +847,7 @@ export function taskUpdate(aid, behavior, taskInfo) {
 
 export function taskDependencyRecord(aid, behavior, last, next) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -868,7 +885,7 @@ export function taskDependencyRecord(aid, behavior, last, next) {
 
 export function participantUpdate(aid, behavior, userId, name, role, domains) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -940,7 +957,7 @@ export function participantUpdate(aid, behavior, userId, name, role, domains) {
 
 export function bindTempOperation2Task(aid, operationId, taskId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -970,7 +987,7 @@ export function bindTempOperation2Task(aid, operationId, taskId) {
 
 export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, metadata) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1060,27 +1077,37 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
     if (metadata != undefined && metadata != {}) {
       let MatedataList = Resource.childNodes;
       for (let i = 0; i < MatedataList.length; i++) {
-        if (MatedataList[i].getAttribute("type") === "scale") {
-          if (metadata.scale != undefined) {
-            MatedataList[i].setAttribute("description", metadata.scale);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "reference") {
-          if (metadata.reference != undefined) {
-            MatedataList[i].setAttribute("description", metadata.reference);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "unit") {
-          if (metadata.unit != undefined) {
-            MatedataList[i].setAttribute("description", metadata.unit);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "concept") {
-          if (metadata.concept != undefined) {
-            MatedataList[i].setAttribute("description", metadata.concept);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "format") {
-          if (metadata.format != undefined) {
-            MatedataList[i].setAttribute("description", metadata.format);
-          }
-        }
+        Resource.removeChild(MatedataList[i]);
+      }
+      if (metadata.format != undefined && metadata.format != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "format");
+        Metadata.setAttribute("description", metadata.format);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.scale != undefined && metadata.scale != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "scale");
+        Metadata.setAttribute("description", metadata.scale);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.reference != undefined && metadata.reference != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "reference");
+        Metadata.setAttribute("description", metadata.reference);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.unit != undefined && metadata.unit != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "unit");
+        Metadata.setAttribute("description", metadata.unit);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.concept != undefined && metadata.concept != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "concept");
+        Metadata.setAttribute("description", metadata.concept);
+        Resource.appendChild(Metadata);
       }
     }
 
@@ -1214,7 +1241,7 @@ export function toolOperationRecord(aid, oid, taskId, behavior, userId, toolInfo
 
 export function communicationRecord(activity, oid, taskId, toolId, resId, time, onlineMembers) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1274,7 +1301,7 @@ export function communicationRecord(activity, oid, taskId, toolId, resId, time, 
 
 export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs, outputs, params, participants) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1352,10 +1379,58 @@ export function analysisRecord(aid, oid, taskId, userId, toolId, purpose, inputs
   return operationId;
 }
 
+export function analysisRecordUpdate(aid, oid, outputs) {
+  if (xmlDoc === null) {
+    alert("Failed to record operation. Please try it again!");
+    return;
+  }
+
+
+  // save output data
+  let ResourceCollection = xmlDoc.getElementsByTagName("ResourceCollection")[0];
+  if (ResourceCollection == undefined) return;
+
+  for (var i = 0; i < outputs.length; i++) {
+    let Resource = xmlDoc.createElement('Resource');
+    Resource.setAttribute("id", outputs[i].uid);
+    Resource.setAttribute("name", outputs[i].name);
+    Resource.setAttribute("type", outputs[i].type);
+    Resource.setAttribute("format", outputs[i].suffix);
+    Resource.setAttribute("description", outputs[i].description);
+    Resource.setAttribute("provider", outputs[i].provider);
+    Resource.setAttribute("href", outputs[i].address);
+    Resource.setAttribute("state", "accessible");
+
+    ResourceCollection.appendChild(Resource);
+  }
+
+
+  //OperationRecords
+  let OperationRecords = xmlDoc.getElementsByTagName("OperationRecords")[0];
+  if (OperationRecords == undefined) return;
+
+  let operationId = oid;
+  let Operation = xmlDoc.getElementById(operationId);
+  if (Operation == undefined) return;
+
+  // update operation record
+  for (var i = 0; i < outputs.length; i++) {
+    let ResRef = xmlDoc.createElement('ResRef');
+    ResRef.setAttribute("idRef", outputs[i].uid);
+    ResRef.setAttribute("type", "output");
+    Operation.appendChild(ResRef);
+  }
+  OperationRecords.appendChild(Operation);
+
+
+  updateActivityDoc(aid);
+  return operationId;
+}
+
 // Child Activity
 export function activityRecord(oid, behavior, userId, childInfo) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1414,7 +1489,7 @@ export function activityRecord(oid, behavior, userId, childInfo) {
 
 export function processRecord(aid, oid, behavior, userId, last, next, protocalId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1489,7 +1564,7 @@ export function deleteActivityDoc(aid) {
 
 export function deleteOperation(aid, operationId) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 
@@ -1504,7 +1579,7 @@ export function deleteOperation(aid, operationId) {
 // remove independent operations(Temporary operations) > 48h
 function clearTempOperations(aid) {
   if (xmlDoc === null) {
-    alert("Failed to record operation.Please try it again!");
+    alert("Failed to record operation. Please try it again!");
     return;
   }
 

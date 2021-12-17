@@ -122,6 +122,9 @@ public class CollaborationBehavior {
                     user.getValue().getSession().getBasicRemote().sendText(messageObject.toString());
                 }
             } else {
+                if(!receivers.contains(sender.getUserId())) {
+                    receivers.add(sender.getUserId());
+                }
                 messageObject.put("receivers", receivers);
                 // send message
                 for (String receiver : receivers) {
@@ -170,6 +173,21 @@ public class CollaborationBehavior {
             messageObject.put("time", msgRecords.getCreatedTime());
             messageObject.put("recordId", msgRecords.getRecordId());
             messageObject.put("participants", msgRecords.getParticipants());
+
+            for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
+                CollaborationUser receiver = participant.getValue();
+                receiver.getSession().getBasicRemote().sendText(messageObject.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendStoredMsgRecords(HashMap<String, CollaborationUser> participants, String oid) {
+        try {
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("type", "message-store");
+            messageObject.put("oid", oid);
 
             for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
                 CollaborationUser receiver = participant.getValue();
@@ -349,7 +367,13 @@ public class CollaborationBehavior {
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "computation");
-        messageObject.put("computeOutputs", computeResult.getOutputs());
+        messageObject.put("computeSuc", computeResult.isComputeSuc());
+        if (computeResult.isComputeSuc()){
+            //模型运算输出
+            messageObject.put("outputInfo", computeResult.getOutputs());
+            //生成的资源
+            messageObject.put("operationId", computeResult.getOid());
+        }
         for (Map.Entry<String, CollaborationUser> participant : participants.entrySet()) {
             for (int i = 0; i < oldReceiverStr.size(); i++) {
                 if (oldReceiverStr.get(i).equals(participant.getValue().getUserId())) {

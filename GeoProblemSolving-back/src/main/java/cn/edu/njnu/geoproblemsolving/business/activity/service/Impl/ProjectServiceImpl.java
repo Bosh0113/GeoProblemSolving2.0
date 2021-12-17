@@ -9,6 +9,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -25,6 +26,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,8 +50,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final ActivityDocParser docParser;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, ActivityDocParser docParser) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -58,6 +61,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -87,6 +91,7 @@ public class ProjectServiceImpl implements ProjectService {
             return ResultUtils.error(-1, "None");
         }
     }
+
 
     @Override
     public JSONObject findProjectsByPage(int page, int size) {
@@ -213,6 +218,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+
             return ResultUtils.success(project);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -233,22 +239,38 @@ public class ProjectServiceImpl implements ProjectService {
                 updateProjectListPage = isUpdateProjectListStaticPage(aid, !project.getPrivacy().equals("Private"));
             }
 
+
             //补充绑定对于 purpose 的工具
+            //mongoTemplate 底层实现为 arrayList
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit)
                     && !project.getType().equals(ActivityType.Activity_Unit)
                     || !project.getPurpose().equals(update.getPurpose()))) {
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool) {
-                    toolSet.add(tool.getTid());
+                relevantPurposeTool = toolService.getRelevantPurposeTool(update.getPurpose());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                project.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = project.getType();
             update.updateTo(project);
             projectRepository.save(project);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, project);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             if (updateProjectListPage) {
@@ -447,6 +469,9 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
 
+
+            //更新文档
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
@@ -496,6 +521,9 @@ public class ProjectServiceImpl implements ProjectService {
             project.setActiveTime(dateFormat.format(new Date()));
             projectRepository.save(project);
 
+
+            //更新文档
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 
@@ -583,6 +611,10 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
             nodeService.userExitActivity(aid, userId);
+            //判断是否为临时用户，若是则删除，临时用户的id长度为两个uuid
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
 
             //退出子活动
             projectUtil.quitSubProject(aid, userId, 0);

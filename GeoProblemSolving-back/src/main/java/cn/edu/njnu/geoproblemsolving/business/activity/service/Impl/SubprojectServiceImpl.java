@@ -8,6 +8,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -40,8 +41,9 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    private final ActivityDocParser docParser;
 
-    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, ActivityDocParser docParser) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
@@ -50,6 +52,7 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -98,6 +101,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // set type
             subproject.setType(subproject.getType());
+            // 初始化文档
+            docParser.initActivityDoc(subproject);
             if (subproject.getType().equals(ActivityType.Activity_Group)) {
                 subproject.setChildren(new ArrayList<>());
             }else if (subproject.getType().equals(ActivityType.Activity_Unit)){
@@ -105,15 +110,19 @@ public class SubprojectServiceImpl implements SubprojectService {
                 String purpose = subproject.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool){
-                    toolSet.add(tool.getTid());
+                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool){
+                        toolSet.add(tool.getTid());
+                    }
+                    subproject.setToolList(toolSet);
                 }
-                subproject.setToolList(toolSet);
+
+                //若是 Activity_Unit, 则绑定工具
+                docParser.addTools(subprojectId, relevantPurposeTool);
             }
 
             // folder
             folderDao.createFolder(subproject.getName(), "", subprojectId);
-
             // update project info
             String projectId = subproject.getParent();
             Project project = projectRepository.findById(projectId).get();
@@ -130,6 +139,15 @@ public class SubprojectServiceImpl implements SubprojectService {
             // Save
             subprojectRepository.save(subproject);
             projectRepository.save(project);
+            /*
+            activity doc operation
+            1. init subproject document
+            2. append child activity
+            3. add tool, if need
+             */
+            //添加依赖
+            docParser.appendChildActivity(projectId, subprojectId, subproject.getName(), creatorId);
+
 
             return ResultUtils.success(subproject);
         } catch (Exception ex) {
@@ -164,21 +182,35 @@ public class SubprojectServiceImpl implements SubprojectService {
             Subproject subproject = (Subproject) result.get();
 
             String purpose = update.getPurpose();
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit) &&
                     !subproject.getType().equals(ActivityType.Activity_Unit) ||
                     !subproject.getPurpose().equals(purpose)
             )){
-                List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
+                relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool){
-                    toolSet.add(tool.getTid());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool){
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                subproject.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = subproject.getType();
             update.updateTo(subproject);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, subproject);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -391,6 +423,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //更新文档
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
 
@@ -433,6 +467,8 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             subprojectRepository.save(subproject);
 
+            //update doc
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 
@@ -506,6 +542,10 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
+            //删除临时用户
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
             //update node
             nodeService.userExitActivity(aid, userId);
 

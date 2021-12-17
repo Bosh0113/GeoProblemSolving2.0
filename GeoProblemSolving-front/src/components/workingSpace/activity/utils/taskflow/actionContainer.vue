@@ -73,7 +73,7 @@ export default {
         },
       },
       taskList: [],
-      relaions: [],
+      relations: [],
       operations: [],
       // task link
       taskLinkBtn: false,
@@ -113,6 +113,8 @@ export default {
             this.removeTaskNode(data.task);
             this.generateTaskNode(data.task);
           }
+
+          this.taskListUpdate(data.behavior, data.task);
         }
 
         this.$store.commit("clearActivityTasks");
@@ -131,6 +133,8 @@ export default {
             this.removeOperationNode(data.operation);
             this.loadOperationNode(data.operation);
           }
+
+          this.operationsUpdate(data.behavior, data.operation);
         }
 
         this.$store.commit("clearTempOperations");
@@ -139,7 +143,7 @@ export default {
   },
   mounted() {
     this.taskList = this.operationApi.getTaskList();
-    this.relaions = this.operationApi.getTaskDependencies();
+    this.relations = this.operationApi.getTaskDependencies();
     this.operations = this.operationApi.getTempOperations();
 
     const id = document.getElementById("drawflow");
@@ -202,6 +206,42 @@ export default {
         }
       });
     },
+    taskListUpdate(behavior, task) {
+      if (behavior === "add") {
+        this.taskList.push(task);
+      }
+      for (let i = 0; i < this.taskList.length; i++) {
+        if (this.taskList[i].taskId == task.taskId) {
+          if (behavior === "remove") {
+            this.taskList.splice(i, 1);
+            this.relationUpdate(task.taskId);
+          } else if (behavior === "update") {
+            this.taskList[i] = task;
+          }
+        }
+      }
+    },
+    operationsUpdate(behavior, operation) {
+      if (behavior === "add") {
+        this.operations.push(operation);
+      }
+      for (let i = 0; i < this.operations.length; i++) {
+        if (this.operations[i].id == operation.id) {
+          if (behavior === "remove") {
+            this.operations.splice(i, 1);
+          } else if (behavior === "update") {
+            this.operations[i] = operation;
+          }
+        }
+      }
+    },
+    relationUpdate(taskId) {
+      for (let i = 0; i < this.relations.length; i++) {
+        if(this.relations[i].from == taskId || this.relations[i].to == taskId){
+          this.relations.splice(i, 1);
+        }
+      }
+    },
     generateAllTaskNodes() {
       (this.todo = 0), (this.doing = 0), (this.done = 0);
       for (var i = 0; i < this.taskList.length; i++) {
@@ -231,6 +271,8 @@ export default {
         let props = {
           taskId: nodeId,
           name: nodeName,
+          activityInfo: this.activityInfo,
+          parent: this.$parent,
         };
         let data = {};
         this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -274,6 +316,9 @@ export default {
       let props = {
         taskId: nodeId,
         name: nodeName,
+        activityInfo: this.activityInfo,
+        parent: this.$parent,
+        
       };
       let data = {};
       this.editor.registerNode("TaskNode", TaskNode, props, {});
@@ -289,7 +334,7 @@ export default {
         "vue"
       );
 
-      this.taskList.push(task);
+      // this.taskList.push(task);
     },
     removeTaskNode(task) {
       let nodeId = this.editor.getNodesFromName(task.taskId)[0];
@@ -298,16 +343,16 @@ export default {
       }
     },
     addConnections() {
-      for (var i = 0; i < this.relaions.length; i++) {
+      for (var i = 0; i < this.relations.length; i++) {
         // output
-        let fromId = this.editor.getNodesFromName(this.relaions[i].from)[0];
+        let fromId = this.editor.getNodesFromName(this.relations[i].from)[0];
         let fromNode = this.editor.getNodeFromId(fromId);
         if (JSON.stringify(fromNode.outputs) === "{}") {
           this.editor.addNodeOutput(fromId);
         }
 
         //input
-        let toId = this.editor.getNodesFromName(this.relaions[i].to)[0];
+        let toId = this.editor.getNodesFromName(this.relations[i].to)[0];
         let toNode = this.editor.getNodeFromId(toId);
         if (JSON.stringify(toNode.inputs) === "{}") {
           this.editor.addNodeInput(toId);
@@ -365,7 +410,7 @@ export default {
     },
     loadOperationNode(operation) {
       // position
-      let pos_x = 50 + 220 * this.operations.length - 1;
+      let pos_x = 50 + 220 * this.operations.length;
       let pos_y = 15;
 
       // generate node
@@ -395,7 +440,7 @@ export default {
         }
       });
 
-      this.operations.push(operation);
+      // this.operations.push(operation);
     },
     removeOperationNode(operation) {
       let nodeId = this.editor.getNodesFromName(operation.id)[0];
@@ -479,7 +524,7 @@ export default {
 #background2 {
   width: 100%;
   height: calc(100vh - 325px);
-  background-image: url("/static/Images/logogrey.png");
+  background-image: url("../../../../../../static/Images/logogrey.png");
   background-repeat: no-repeat;
   position: absolute;
   top: 100px;

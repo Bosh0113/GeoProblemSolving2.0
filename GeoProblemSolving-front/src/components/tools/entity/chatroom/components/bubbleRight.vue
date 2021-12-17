@@ -5,7 +5,12 @@
       <template>
         <Row>
           <div style="float: right">
-            <Row style="margin: 8px 12px 0 0">
+            <Row style="margin: 8px 12px 0 0" v-if="list.receivers != undefined && list.receivers.length > 0">
+              <div class="user_name">
+                {{ list.sender.name }} (Private chat)
+              </div>
+            </Row>
+            <Row style="margin: 8px 12px 0 0" v-else>
               <div class="user_name">{{ list.sender.name }}</div>
             </Row>
             <Row>

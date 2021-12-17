@@ -287,6 +287,7 @@ export default {
       getRecordsFinish: false,
       msgRecords: [],
       msgRecordDatails: [],
+      aid: "",
     };
   },
   computed: {
@@ -297,13 +298,6 @@ export default {
   },
   watch: {},
   updated: function () {
-    // this.$refs["vs"].scrollTo(
-    //   {
-    //     y: "100%"
-    //   },
-    //   0,
-    //   "easeInQuad"
-    // );
     if (this.openPanel) {
       for (let i = 0; i < this.receivedChatMsgs.length; i++) {
         this.allChatMsgs.push(this.receivedChatMsgs.shift());
@@ -425,6 +419,7 @@ export default {
       }
     },
     startWebSocket() {
+      this.aid = this.activityInfo.aid;
       this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
       let send_msg = {
         type: "test",
@@ -437,6 +432,7 @@ export default {
       this.receivedChatMsgs = [];
       let chatMsg = data;
       if (chatMsg.type === "members") {
+        this.memberNoticeClear();
         if (chatMsg.behavior == "on") {
           chatMsg["content"] = chatMsg.activeUser.name + " join the meeting.";
           this.receivedChatMsgs.push(chatMsg);
@@ -457,7 +453,7 @@ export default {
               this.allChatMsgs[i].status = "done";
               msgCheck = true;
             } else if (
-              (this.allChatMsgs[i].status =
+              (this.allChatMsgs[i].status ==
                 "sending" && current - time > threshold)
             ) {
               this.allChatMsgs[i].status = "failed";
@@ -475,21 +471,23 @@ export default {
           }
         }
       } else if (chatMsg.type == "message-store") {
-        this.operationApi.communicationRecord(
-          this.activityInfo.aid,
-          "",
-          "",
-          "",
-          chatMsg.recordId,
-          chatMsg.time,
-          chatMsg.participants
-        );
-        chatMsg["type"] = "members";
-        chatMsg["content"] = "You have the only person in the meeting.";
-        this.receivedChatMsgs.push(chatMsg);
+        // this.operationApi.communicationRecord(
+        //   this.activityInfo.aid,
+        //   "",
+        //   "",
+        //   "",
+        //   chatMsg.recordId,
+        //   chatMsg.time,
+        //   chatMsg.participants
+        // );
+        // chatMsg["type"] = "members";
+        // chatMsg["content"] = "You have the only person in the meeting.";
+        // this.memberNoticeClear();
+        // this.receivedChatMsgs.push(chatMsg);
       } else if (chatMsg.type == "test") {
         chatMsg["type"] = "members";
         chatMsg["content"] = "You have joined the meeting.";
+        this.memberNoticeClear();
         this.receivedChatMsgs.push(chatMsg);
       }
     },
@@ -521,12 +519,23 @@ export default {
             type: "members",
             content: "Lost the connection with others.",
           };
+          this.memberNoticeClear();
           this.allChatMsgs.push(chatMsg);
         }
       }
       this.typingMsg = "";
     },
+    memberNoticeClear(){
+      for(let i = this.allChatMsgs.length - 1; i >= 0; i--) {
+        if(this.allChatMsgs[i].type == "members"){
+          this.allChatMsgs.splice(i, 1);
+        }
+      }
+    },
   },
+  beforeDestroy() {
+    this.socketApi.close("MsgServer/" + this.aid);
+  }
 };
 </script>
 <style scoped>
@@ -538,7 +547,7 @@ export default {
   word-break: break-word;
 }
 #msgPanelBtn {
-  z-index: 100;
+  z-index: 1001;
   position: fixed;
   right: 30px;
   bottom: 70px;
@@ -546,7 +555,7 @@ export default {
   background-color: #fff;
 }
 #msgPanel {
-  z-index: 99;
+  z-index: 1000;
   width: 340px;
   height: 450px;
   position: fixed;
@@ -726,19 +735,19 @@ export default {
   width: 100%;
 }
 
-.topnav_box::-webkit-scrollbar {  
-  width: 5px;  
-  height:10px;     
+.topnav_box::-webkit-scrollbar {
+  width: 5px;
+  height:10px;
   background-color:transparent;
-}  
-.topnav_box::-webkit-scrollbar-track {
-  border-radius: 10px; 
-  background-color:transparent;    
-    
 }
-.topnav_box::-webkit-scrollbar-thumb {  
+.topnav_box::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color:transparent;
+
+}
+.topnav_box::-webkit-scrollbar-thumb {
   border-radius: 10px;
   height: 30px;
   background-color:#b5b1b1;
-} 
+}
 </style>

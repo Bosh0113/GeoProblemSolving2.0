@@ -18,6 +18,8 @@ function guid() {
     return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
 }
 
+let resProxy = "https://geomodeling.njnu.edu.cn/dataTransferServer";
+
 // basic information
 var toolId = "";
 var activityInfo = null;
@@ -181,12 +183,14 @@ var taskList = [];
 
             activityInfo = event.data.activity;
             userInfo = event.data.user;
+            onlineMembers = [userInfo];
             toolId = event.data.tid;
             taskList = event.data.tasks;
 
             componentStatus = true;
 
             getParticipants();
+            getParentActivities();
             getResources();
 
             // socket
@@ -328,7 +332,7 @@ var taskList = [];
 
     // post message to parent page
     function postIframeMsg(data) {
-        window.parent.postMessage(data, '*')
+        window.parent.postMessage(data, '*');
     }
 }
 
@@ -379,12 +383,12 @@ var taskList = [];
         for (let i = 0; i < participants.length; i++) {
             let avatar = ""
             if (participants[i].avatar == undefined || participants[i].avatar == "") {
-                avatar = "/static/collabTemplate/img/icon_avatar.png";
+                avatar = "./static/collabTemplate/img/icon_avatar.png";
             } else {
                 avatar = UserServer + participants[i].avatar;
             }
             let peopleElement = `<div class="card participants" id="${participants[i].userId}">
-                                <img src="${avatar}" class="participant-avatar" onerror="src='/static/collabTemplate/img/icon_avatar.png'"/>
+                                <img src="${avatar}" class="participant-avatar" onerror="src='./static/collabTemplate/img/icon_avatar.png'"/>
                                 <div class="participant-info">
                                     <div class="participant-info-name">${participants[i].name}</div>
                                     <div class="participant-info-role">${participants[i].role}</div>
@@ -424,6 +428,7 @@ var taskList = [];
     var resources = [];
     var selectedResources = [];
     var loadResChannel = null;
+    var parentResources = [];
 
     //data
     function getResources() {
@@ -445,6 +450,7 @@ var taskList = [];
                 } else if (result.code == 0) {
                     let rootRes = result.data;
                     resources = resToCurrentFolder(rootRes);
+                    importParentRes();
                     showResList();
 
                 }
@@ -453,6 +459,67 @@ var taskList = [];
                 throw err;
             }
         });
+    }
+
+    function getParentActivities() {
+        let parents = [];
+        if (activityInfo.level > 0 && activityInfo.aid != "" && activityInfo.aid != undefined) {
+            let url = "";
+            if (activityInfo.level == 1) {
+                url = "/GeoProblemSolving/subproject/" + activityInfo.aid + "/lineage";
+            } else if (activityInfo.level > 1) {
+                url = "/GeoProblemSolving/activity/" + activityInfo.aid + "/lineage";
+            }
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let list = result.data.ancestors;
+                        for (let i = 1; i < list.length; i++) {
+                            parents.push(list[i].aid);
+                        }
+                        getParentActivitiesFile(parents);
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+
+        }
+    }
+
+    function getParentActivitiesFile(parents) {
+        if (parents != undefined && parents.length > 0) {
+            $.ajax({
+                url: "/GeoProblemSolving/rip/file/" + parents.toString(),
+                type: "GET",
+                async: false,
+                success: function (result) {
+                    if (result == "Offline") {
+                        confirm("You are offline, please login.");
+                    } else if (result.code == 0) {
+                        let fileList = result.data;
+                        parentResources = [];
+                        for (let i = 0; i < parents.length; i++) {
+                            parentResources.push(fileList[parents[i]]);
+                        }
+                    } else {
+                        console.log(result.msg);
+                    }
+                },
+                error: function (err) {
+                    throw err;
+                }
+            });
+        }
     }
 
     // page
@@ -471,7 +538,7 @@ var taskList = [];
     function addfolder(folder) {
         let resElement = `<div class="card resource" title="${folder.name}">
                             <input class="form-check-input" type="checkbox" id="${folder.uid}">
-                            <img src="/static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
+                            <img src="./static/collabTemplate/img/folder.png" class="folder-${folder.uid} res-icon"/>
                             <div class="folder-${folder.uid} res-name">${folder.name}</div>
                         </div>`
         $("#resource-list").append(resElement);
@@ -504,7 +571,7 @@ var taskList = [];
             case "data": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/data.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/data.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -512,7 +579,7 @@ var taskList = [];
             case "model": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/model.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/model.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -520,7 +587,7 @@ var taskList = [];
             case "paper": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/paper.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/paper.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -528,7 +595,7 @@ var taskList = [];
             case "document": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/document.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/document.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -536,7 +603,7 @@ var taskList = [];
             case "image": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}" >
-                            <img src="/static/collabTemplate/img/image.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/image.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -544,7 +611,7 @@ var taskList = [];
             case "video": {
                 resElement = `<div class="card resource" title="${fileName}">
                             <input class="form-check-input" type="checkbox" id="${file.uid}">
-                            <img src="/static/collabTemplate/img/video.png" class="res-icon" />
+                            <img src="./static/collabTemplate/img/video.png" class="res-icon" />
                             <div class="res-name">${fileName}</div>
                         </div>`
                 break;
@@ -552,7 +619,7 @@ var taskList = [];
             case "others": {
                 resElement = `<div class="card resource" title="${fileName}">
                     <input class="form-check-input" type="checkbox" id="${file.uid}">
-                        <img src="/static/collabTemplate/img/otherfile.png" class="res-icon" />
+                        <img src="./static/collabTemplate/img/otherfile.png" class="res-icon" />
                         <div class="res-name">${fileName}</div>
                         </>`
                 break;
@@ -622,16 +689,27 @@ var taskList = [];
             folders: [],
             files: []
         }
+
         for (let i = 0; i < rootRes.length; i++) {
             if (rootRes[i].folder) {
                 currentFolder.folders.push(rootRes[i]);
             } else {
+                let address = rootRes[i].address;
+                if (typeof (address) == "string") {
+                    address = address.slice(-36);
+                }
+                rootRes[i].address = resProxy + "/data/" + address;
                 currentFolder.files.push(rootRes[i]);
             }
         }
         return currentFolder;
     }
 
+    function importParentRes() {
+        for (let i = 0; i < parentResources.length; i++) {
+            resources.files.push.apply(resources.files, parentResources[i]);
+        }
+    }
 
     // resource related operations
     function selectFile(file) {
@@ -1043,8 +1121,17 @@ var taskList = [];
                     "operations": [operation],
                     "task": ""
                 });
+            } else if (from === "transfer") {
             }
         }
+    }
+
+    function refreshOperation(oid) {
+        let message = {
+            type: "task-record-backend",
+            oid: oid
+        };
+        postIframeMsg(message)
     }
 
     // Synchronize
@@ -1127,9 +1214,9 @@ var taskList = [];
         timer: null,
         websockLinked: false,
 
-        initSocketChannel: function (opeChannel, dataChannel, compChannel, peopleChannel) {
+        initSocketChannel: function (opeChannel, resChannel, compChannel, peopleChannel) {
             operationChannel = opeChannel;
-            dataChannel = dataChannel;
+            dataChannel = resChannel;
             computationChannel = compChannel;
             participantChannel = peopleChannel;
         },
@@ -1162,13 +1249,17 @@ var taskList = [];
                 console.log("Connection closed (" + e.code + ")");
                 this.removeTimer();
                 this.websockLinked = false;
+
+                if (e.code == 1006) {
+                    this.initWebSocket(aid, toolId);
+                }
             }
 
             //连接发生错误的回调方法
             this.websock.onerror = () => {
                 console.log("WebSocket error!");
-                this.removeTimer();
-                this.websockLinked = false;
+                // this.removeTimer();
+                // this.websockLinked = false;
             }
 
         },
@@ -1250,22 +1341,37 @@ var taskList = [];
                                 }
                                 dataChannel(data);
                                 // record
-                                addOperations(message.sender, message, "transfer");
+                                // addOperations(message.sender, message, "transfer");
                             }
                         }
                         break;
                     }
                     case "geo-analysis": {
-                        addOperations(message.sender, message, "transfer");
+                        // addOperations(message.sender, message, "transfer");
                     }
                     case "computation": {
                         if (computationChannel != undefined && typeof computationChannel == "function") {
                             computationChannel(data);
+                            if (data.computeSuc) {
+                                let computationResult = {
+                                    type: "task-record-backend",
+                                    oid: data.operationId
+                                }
+                                postIframeMsg(computationResult);
+                            }
                         }
                         break;
                     }
                     case "test": {
-
+                        try {
+                            content = JSON.parse(data.content);
+                            setCollaborationMode(content.mode);
+                            setOperator(content.operator);
+                            setWaitingLine(content.waiting);
+                        } catch (err) {
+                            console.log(err);
+                        }
+                        break;
                     }
                 }
             } catch (err) {
@@ -1352,13 +1458,14 @@ var taskList = [];
             }
         },
 
-        receiveDataComputation: function (aid, serviceId, serviceToken, inputs, params) {
+        receiveDataComputation: function (aid, serviceId, serviceToken, inputData, inputs, params) {
             // computationChannel = callback;
             let invokeMsg = {
                 type: "computation",
                 tid: serviceId,
                 token: serviceToken,
                 urls: inputs,
+                inputs: inputData,
                 params: params,
                 computeAbleModel: false,
                 sender: userInfo.userId,
@@ -1368,11 +1475,11 @@ var taskList = [];
                 this.websocketSend(invokeMsg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+                    this.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
                 }, 1000)
             }
         },
@@ -1426,11 +1533,11 @@ var taskList = [];
                 this.websocketSend(msg);
             } else if (this.websock.readyState === this.websock.CONNECTING) {
                 setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
+                    this.receiveDataInputDataOperation(inputMdl, addOrRemove);
                 }, 1000)
             } else {
                 setTimeout(function () {
-                    this.receiveDataInputDataOperation(inputs);
+                    this.receiveDataInputDataOperation(inputMdl, addOrRemove);
                 }, 1000)
             }
         },
@@ -1580,6 +1687,12 @@ var taskList = [];
         return resaveFile(file, JSON.stringify(info));
     }
 
+
+    function loadingBackendOperation(oid) {
+        refreshOperation(oid)
+    }
+
+
     /**
      * 活动socket转态信息
      * get socket status
@@ -1646,20 +1759,21 @@ var taskList = [];
      * @param aid
      * @param serviceId
      * @param serviceToken
+     * @param inputData
      * @param inputs
      * @param params
      * @param callback
      */
-    function sendDataOperation(aid, serviceId, serviceToken, inputs, params) {
-        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputs, params);
+    function sendDataOperation(aid, serviceId, serviceToken, inputData, inputs, params) {
+        CollabSocket.receiveDataComputation(aid, serviceId, serviceToken, inputData, inputs, params);
     }
 
     /**
      * 建立协同数据通道
      * build call back channel
      */
-    function buildSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel) {
-        CollabSocket.initSocketChannel(opeChannel, dataChannel, compChannel, peopleChannel);
+    function buildSocketChannel(opeChannel, resChannel, compChannel, peopleChannel) {
+        CollabSocket.initSocketChannel(opeChannel, resChannel, compChannel, peopleChannel);
     }
 
     //

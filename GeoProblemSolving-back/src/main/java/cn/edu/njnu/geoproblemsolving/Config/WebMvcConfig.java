@@ -27,11 +27,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/activityDriven/**",
                         "/subproject/**",
                         "/task/**",
-                        "/notice/**"
+                        "/notice/**",
+                        "/token/**"
                 )//拦截的请求
                 .excludePathPatterns(
                         "/rip/file/allPublic",
-                        "/user/changePwd/**"
+                        "/user/changePwd/**",
+                        "/token/*",
+                        "/token/all/**"
                 );//不拦截的请求
     }
     /*

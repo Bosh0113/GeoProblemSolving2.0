@@ -10,6 +10,7 @@ import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.imp
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONObject;
+import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,7 +109,7 @@ public class GeoActivityDriveController {
      * @return
      */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public JsonResult setActivityRelation(@RequestBody JSONObject protocolJson) {
+    public JsonResult setActivityRelation(@RequestBody JSONObject protocolJson) throws DocumentException {
         JSONObject relation = protocolJson.getJSONObject("relation");
         JSONObject restriction = protocolJson.getJSONObject("restriction");
         Integer level = protocolJson.getInteger("level");

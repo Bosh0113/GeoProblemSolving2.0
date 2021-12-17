@@ -2,11 +2,12 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -42,7 +43,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
-    private final DocInterpret docParse;
+    private final ActivityDocParser docParser;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -52,7 +53,8 @@ public class ActivityServiceImpl implements ActivityService {
                                FolderDaoImpl folderDao,
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
-                               ToolService toolService, NodeService nodeService, DocInterpret docParse) {
+                               ToolService toolService,
+                               NodeService nodeService, ActivityDocParser docParser) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
 //        this.mongoTemplate = mongoTemplate;
@@ -62,7 +64,7 @@ public class ActivityServiceImpl implements ActivityService {
         this.projectUtil = httpUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
-        this.docParse = docParse;
+        this.docParser = docParser;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -161,16 +163,22 @@ public class ActivityServiceImpl implements ActivityService {
 
             // set type
             activity.setType(activity.getType());
+            docParser.initActivityDoc(activity);
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
             } else if (activity.getType().equals(ActivityType.Activity_Unit)) {
                 String purpose = activity.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : relevantPurposeTool) {
-                    toolSet.add(tool.getTid());
+                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
+                    activity.setToolList(toolSet);
                 }
-                activity.setToolList(toolSet);
+
+                //更新文档
+                docParser.addTools(aid, relevantPurposeTool);
             }
 
             // tools and toolsets
@@ -230,6 +238,8 @@ public class ActivityServiceImpl implements ActivityService {
             //save
             activityRepository.save(activity);
 
+            docParser.appendChildActivity(activity.getParent(), aid, activity.getName(), creatorId);
+
             return ResultUtils.success(activity);
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -245,20 +255,34 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity = (Activity) result.get();
 
             String purpose = update.getPurpose();
+            List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
                     (update.getType().equals(ActivityType.Activity_Unit) &&
                     !activity.getType().equals(ActivityType.Activity_Unit) ||
                     !activity.getPurpose().equals(purpose))) {
-                List<Tool> tools = toolService.getRelevantPurposeTool(purpose);
+                relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                for (Tool tool : tools) {
-                    toolSet.add(tool.getTid());
+                if (!relevantPurposeTool.isEmpty()){
+                    for (Tool tool : relevantPurposeTool) {
+                        toolSet.add(tool.getTid());
+                    }
                 }
-                activity.setToolList(toolSet);
+                update.setToolList(toolSet);
             }
 
+            ActivityType oldType = activity.getType();
             update.updateTo(activity);
+
+            //activityType 发生改变
+            if (update.getType() != null && !oldType.equals(update.getType())){
+                docParser.changeActivityType(aid, activity);
+            }
+
+            if (!relevantPurposeTool.isEmpty()){
+                //更新工具箱内容
+                docParser.putTools(aid, relevantPurposeTool);
+            }
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -611,18 +635,11 @@ public class ActivityServiceImpl implements ActivityService {
 
             activityRepository.save(activity);
 
+
+            //update doc
+            docParser.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
-
-            //Save it in the activity doc.
-            HashMap<String, String> userInfoMap = new HashMap<>();
-            userInfoMap.put("userId", user.getUserId());
-            userInfoMap.put("email", user.getEmail());
-            userInfoMap.put("name", user.getName());
-            userInfoMap.put("role", "ordinary-member");
-            docParse.inActivity(aid, userInfoMap);
-
-
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -660,13 +677,10 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
             activityRepository.save(activity);
 
+            //update doc
+            docParser.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
-
-            //Store it in the activity doc. todo
-            docParse.insActivity(aid, userIds);
-
-
             return ResultUtils.success(members);
         }catch (Exception e){
             return ResultUtils.error(-2, e.toString());
@@ -693,6 +707,12 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+
+            //删除临时用户
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
+
             //update node
             nodeService.userExitActivity(aid, userId);
 

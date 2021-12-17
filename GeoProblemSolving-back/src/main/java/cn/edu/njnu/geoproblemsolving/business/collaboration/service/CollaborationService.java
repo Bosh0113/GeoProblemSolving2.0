@@ -1,8 +1,9 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
+import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.DocInterpret;
+import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -66,10 +67,13 @@ public class CollaborationService {
     ActivityResDaoImpl ripDao;
 
     @Autowired
-    DocInterpret activityDocParse;
+    GeoAnalysisProcess geoAnalysisProcess;
 
     @Autowired
-    GeoAnalysisProcess geoAnalysisProcess;
+    NodeService nodeService;
+
+    @Autowired
+    ActivityDocParser docParser;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -77,8 +81,6 @@ public class CollaborationService {
     @Value("${dataMethodProxyServerLocation}")
     String dataProxyServer;
 
-
-    private CollaborationConfig collaborationConfig;
     //global static
     private static final Map<String, CollaborationConfig> groups = new ConcurrentHashMap<>(); // collaboration groups
 
@@ -123,14 +125,19 @@ public class CollaborationService {
 
     public void operationStart(String groupKey, Session session, EndpointConfig config) {
         CollaborationConfig collaborationConfig;
+        // System.out.println("0---Operation On Open----In user------: " + ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("name"));
+        // System.out.println("1-----Operation on open-----groupKey-------:" + groupKey);
         try {
             //Check if the session existence.
             if (groups.containsKey(groupKey)) {
                 collaborationConfig = groups.get(groupKey);
+                // System.out.println("2.1-Operation On Open---Exists Group------:" + collaborationConfig.getAid());
             } else {
                 collaborationConfig = new CollaborationConfig(groupKey);
                 groups.put(groupKey, collaborationConfig);
+                // System.out.println("2.1--Operation On Open--New Group------:" + collaborationConfig.getAid());
             }
+
 
             // current operator
             String userId = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("userId").toString();
@@ -140,18 +147,32 @@ public class CollaborationService {
             HashMap<String, CollaborationUser> participants;
             if (collaborationConfig.getParticipants() == null) {
                 participants = new HashMap<>();
+                // System.out.println("3.1--Operation On Open---This is no people. -----");
             } else {
                 participants = collaborationConfig.getParticipants();
+
+                // String name = "";
+                // for (Map.Entry<String, CollaborationUser> item : participants.entrySet()){
+                //     CollaborationUser value = item.getValue();
+                //     name += ":" + value.getName();
+                // }
+                // System.out.println("3.1--Operation On Open--Exists participants----" + name);
             }
             participants.put(userId, collaborationUser);
             collaborationConfig.setParticipants(participants);
             // groups.put(groupKey, collaborationConfig);
 
-            // 发布当前协同操作模式
             if (participants.size() > 1) {
                 // 通知新成员上线，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "on");
+
+                // 发布当前协同操作模式
                 collaborationBehavior.sendCollaborationStatus(collaborationConfig, session);
+            } else if (participants.size() == 1) {
+                // 初始化协同操作模式
+                collaborationConfig.setMode(CollaborationMode.Free);
+                collaborationConfig.setOperator("");
+                collaborationConfig.setApplyQueue(new ArrayList<>());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,7 +193,7 @@ public class CollaborationService {
 
             String time = messageObject.getString("time");
 
-            List<String> receivers = null;
+            List<String> receivers;
             try {
                 receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
             } catch (NullPointerException ex) {
@@ -233,17 +254,33 @@ public class CollaborationService {
         CollaborationConfig collaborationConfig;
         try {
             String groupKey = toolId + aid;
+
+
+            // System.out.println("1---transfer---groupId: " +  groupKey);
             collaborationConfig = groups.get(groupKey);
+
+
+            // String name = "";
+            // for (Map.Entry<String, CollaborationUser> item : collaborationConfig.getParticipants().entrySet()){
+            //     CollaborationUser value = item.getValue();
+            //     name += ":" + value.getName();
+            // }
+            //
+            // System.out.println("1---Operation Transfer---Exists participant: " +  name);
+            // System.out.println("1---Operation Transfer---Participant num: " +  collaborationConfig.getParticipants().size());
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
+
+            // System.out.println("3---transfer---messageType:" + messageType);
+            // System.out.println("4---transfer---sender: " +  messageObject.getString("sender"));
 
             if (messageType.equals("ping")) return;
 
             String user = messageObject.getString("sender");
             CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
 
-            List<String> receivers = null;
+            List<String> receivers;
             try {
                 receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
             } catch (NullPointerException ex) {
@@ -252,12 +289,18 @@ public class CollaborationService {
 
             switch (messageType) {
                 case "test": {
-                    collaborationConfig.setMode(CollaborationMode.Free);
-                    collaborationConfig.setOperator("");
-                    collaborationConfig.setApplyQueue(new ArrayList<>());
-                    groups.put(groupKey, collaborationConfig);
+                    JSONObject collaboration = new JSONObject();
+                    if(collaborationConfig.getMode() == null) {
+                        collaborationConfig.setMode(CollaborationMode.Free);
+                        collaborationConfig.setOperator("");
+                        collaborationConfig.setApplyQueue(new ArrayList<>());
+                        groups.put(groupKey, collaborationConfig);
+                    }
+                    collaboration.put("mode", collaborationConfig.getMode());
+                    collaboration.put("operator", collaborationConfig.getOperator());
+                    collaboration.put("waiting", collaborationConfig.getApplyQueue().size());
 
-                    collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, "test", "test");
+                    collaborationBehavior.transferOperation(collaborationConfig.getParticipants(), messageType, sender, receivers, "test", collaboration.toJSONString());
                     break;
                 }
                 case "mode": {
@@ -284,29 +327,13 @@ public class CollaborationService {
                     }
 
                     groups.put(groupKey, collaborationConfig);
+
                     collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
 
                     break;
                 }
                 case "control-stop": {
-                    String ctrUser = "";
-                    if (collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Apply)) {
-                        List<String> applyQueue = collaborationConfig.getApplyQueue();
-                        if (applyQueue != null && applyQueue.size() > 0) {
-                            ctrUser = applyQueue.remove(0);
-                            collaborationConfig.setOperator(ctrUser);
-                            collaborationConfig.setApplyQueue(applyQueue);
-                        } else {
-                            collaborationConfig.setOperator("");
-                        }
-                        groups.put(groupKey, collaborationConfig);
-
-                        collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
-                    } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
-                        collaborationConfig.setOperator("");
-                        groups.put(groupKey, collaborationConfig);
-                        collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), null, messageType);
-                    }
+                    collaborationCtrChange(collaborationConfig, groupKey, sender, messageType);
                     break;
                 }
                 case "resource":
@@ -353,7 +380,7 @@ public class CollaborationService {
                     ComputeMsg computeMsg = new ComputeMsg();
                     //读取当前 group 下的计算队列
                     HashMap<String, ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
-                    if (computeRecords == null) computeRecords = new HashMap<String, ComputeMsg>();
+                    if (computeRecords == null) computeRecords = new HashMap<>();
 
                     Boolean isComputeModel = messageObject.getBoolean("computeAbleModel");
                     // computeMsg.setOutputs(outputs);
@@ -369,7 +396,9 @@ public class CollaborationService {
                     RestTemplate restTemplate = new RestTemplate();
                     String graphId = messageObject.getString("graphId");
 
-                    HashMap<String, String> resTagMap = new HashMap<>();
+                    HashSet<String> outResIds = new HashSet<>();
+                    HashSet<String> inResIds = new HashSet<>();
+                    ArrayList<ResourceEntity> outputRes = new ArrayList<>();
                     if (isComputeModel) {
                     /*
                      1. 根据模型 md5 获取合适的 taskService
@@ -388,7 +417,6 @@ public class CollaborationService {
                         String servicePort = messageObject.getString("servicePort");
                         String serviceMd5 = messageObject.getString("serviceMd5");
                         JSONArray inputs = messageObject.getJSONArray("inputs");
-                        // JSONArray outputs = messageObject.getJSONArray("outputs");
 
                         computeMsg.setServiceIp(serviceIp);
                         computeMsg.setServicePort(servicePort);
@@ -494,18 +522,18 @@ public class CollaborationService {
                         返回结果到主线程的话，主线程（单个websocket）对应一个的内存池
                          */
                         System.out.println("end: " + groupKey);
-                        System.out.println(collaborationConfig);
                         if (resJson == null) {
                             computeMsg.setOutputs("Fail");
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                             return;
                         }
-                        String sucTaskTid = resJson.getString("tid");
-                        HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
-                        ComputeMsg sucMessage = computeList.get(sucTaskTid);
+                        // String sucTaskTid = resJson.getString("tid");
+                        // HashMap<String, ComputeMsg> computeList = computeTasks.getCache(groupKey);
+                        // ComputeMsg sucMessage = computeList.get(sucTaskTid);
+                        computeMsg.setComputeSuc(true);
                         JSONArray sucOutputs = resJson.getJSONArray("outputs");
+                        computeMsg.setOutputs(sucOutputs);
                         //将所有返回内容存入项目中,不做持久化暂时没用
-                        sucMessage.setOutputs(sucOutputs);
                         for (int i = 0; i < sucOutputs.size(); i++) {
                             JSONObject outItem = sucOutputs.getJSONObject(i);
                             String address = outItem.getString("url").split("\\?")[0];
@@ -527,21 +555,16 @@ public class CollaborationService {
                             resourceEntity.setFolder(false);
                             //已经将数据存入资源中心
                             ripDao.addResource(resourceEntity);
-
-                            String resTag = TagUtil.setResourceTag(resourceEntity);
-                            resTagMap.put(uid ,resTag);
-
-                            //Save it in the activity document todo
-                            activityDocParse.uploadResource(aid, resourceEntity);
-                        }
-                        //资源自动更新
-                        if(graphId != null && graphId != ""){
-                            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                            outputRes.add(resourceEntity);
+                            outResIds.add(uid);
                         }
 
-                        HashMap<String, CollaborationUser> receivers1 = sucMessage.getReceivers();
-                        HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                        collaborationBehavior.sendComputeResult(participants, receivers1, computeMsg);
+                        //更新文档
+                        for (Object item : inputs){
+                            JSONObject input = JSONObject.parseObject(JSONObject.toJSONString(item));
+                            inResIds.add(input.getString("uid"));
+                        }
+
                     } else {
                     /*
                     从缓存中获得数据处理任务
@@ -551,8 +574,11 @@ public class CollaborationService {
                      */
                         String token = messageObject.getString("token");
                         String serviceId = messageObject.getString("tid");
+                        //前端整理好的输入格式
                         JSONObject urls = messageObject.getJSONObject("urls");
                         String params = messageObject.getString("params");
+                        //输入数据
+                        JSONArray inputs = messageObject.getJSONArray("inputs");
                         JSONArray paramsArray = new JSONArray();
                         if (!params.equals("")){
                             String[] split = params.split(",");
@@ -581,6 +607,7 @@ public class CollaborationService {
                             computeMsg.setOutputs("Fail");
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
                         }else {
+                            computeMsg.setComputeSuc(true);
                             Map<String, String> outputs = jsonObject.getObject("urls", HashMap.class);
                             for (Map.Entry item: outputs.entrySet()){
                                 String outputName = (String)item.getKey();
@@ -603,30 +630,42 @@ public class CollaborationService {
                                     outputEntity.setActivityId(aid);
                                     outputEntity.setFolder(false);
                                     ripDao.addResource(outputEntity);
-
-                                    String resTag = TagUtil.setResourceTag(outputEntity);
-                                    resTagMap.put(uid ,resTag);
-
-                                    //Save it in the activity document todo
-                                }
-                                //资源自动更新
-                                if(graphId != null && graphId != ""){
-                                    geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resTagMap);
+                                    outputRes.add(outputEntity);
+                                    outResIds.add(uid);
                                 }
                             }
                             computeMsg.setOutputs(outputs);
-                            HashMap<String, CollaborationUser> oldParticipants = computeMsg.getReceivers();
-                            HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
-                            collaborationBehavior.sendComputeResult(participants, oldParticipants, computeMsg);
+
+                            //输入数据
+                            for (Object item : inputs){
+                                JSONObject input = JSONObject.parseObject(JSONObject.toJSONString(item));
+                                inResIds.add(input.getString("uid"));
+                            }
                         }
 
                     }
+
+                    //更新文档
+                    String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    computeMsg.setOid(oid);
+
+                    //更新当前节点
+                    nodeService.addResToNodeBatch(aid, outResIds);
+                    //资源自动更新
+                    if(graphId != null && graphId != ""){
+                        geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, outResIds);
+                    }
+
+                    HashMap<String, CollaborationUser> oldParticipants = computeMsg.getReceivers();
+                    HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
+                    collaborationBehavior.sendComputeResult(participants, oldParticipants, computeMsg);
                     break;
                 }
                 case "task":{
                     //做消息转发
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                     collaborationBehavior.sendTasKAssignment(participants, sender, messageObject, null);
+                    break;
                 }
                 case "general": {
                     //message transmission
@@ -641,13 +680,34 @@ public class CollaborationService {
         }
     }
 
+    // 协同操作控制
+    private void collaborationCtrChange(CollaborationConfig collaborationConfig, String groupKey, CollaborationUser sender, String messageType){
+        String ctrUser = "";
+        if (collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Apply)) {
+            List<String> applyQueue = collaborationConfig.getApplyQueue();
+            if (applyQueue != null && applyQueue.size() > 0) {
+                ctrUser = applyQueue.remove(0);
+                collaborationConfig.setOperator(ctrUser);
+                collaborationConfig.setApplyQueue(applyQueue);
+            } else {
+                collaborationConfig.setOperator("");
+            }
+            groups.put(groupKey, collaborationConfig);
 
+            collaborationBehavior.sendControlInfo(collaborationConfig, applyQueue, sender, messageType);
+        } else if(collaborationConfig.getMode().equals(CollaborationMode.SemiFree_Occupy)){
+            collaborationConfig.setOperator("");
+            groups.put(groupKey, collaborationConfig);
+            collaborationBehavior.sendControlInfo(collaborationConfig, new ArrayList<>(), null, messageType);
+        }
+    }
 
     public void communicationClose(String groupKey, Session session) {
         CollaborationConfig collaborationConfig;
         try {
             collaborationConfig = groups.get(groupKey);
             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
+
             // remove people
             CollaborationUser collaborationUser = null;
             for (Map.Entry<String, CollaborationUser> user : participants.entrySet()) {
@@ -665,7 +725,11 @@ public class CollaborationService {
                 // 持久化存储
                 if (communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0) {
                     MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
-                    collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), msgRecords);
+                    //聊天记录存入文档
+                    String oid = docParser.storeMessageRecord(null, msgRecords);
+
+                    //将 oid 发送给前端
+                    collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), oid);
                 }
                 // 通知成员退出，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
@@ -687,7 +751,16 @@ public class CollaborationService {
     public void operationClose(String groupKey, Session session) {
         CollaborationConfig collaborationConfig;
         try {
+            // System.out.println("0---Operation close---groupId: " +  groupKey);
             collaborationConfig = groups.get(groupKey);
+
+            // String name = "";
+            // for (Map.Entry<String, CollaborationUser> item : collaborationConfig.getParticipants().entrySet()){
+            //     CollaborationUser value = item.getValue();
+            //     name += ":" + value.getName();
+            // }
+            //
+            // System.out.println("1---Operation close---Exist Participants: " +  name);
             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
             // remove people
             CollaborationUser collaborationUser = null;
@@ -704,6 +777,9 @@ public class CollaborationService {
                     break;
                 }
             }
+
+            // collaboration mode
+            collaborationCtrChange(collaborationConfig, groupKey, collaborationUser, "control-stop");
 
             // 通知成员退出，发布新的成员列表
             collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "off");
