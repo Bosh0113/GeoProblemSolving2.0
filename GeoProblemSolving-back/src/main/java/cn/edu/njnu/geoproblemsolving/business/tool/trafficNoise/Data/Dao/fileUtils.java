@@ -44,7 +44,7 @@ public class fileUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Faid to download " + fileName + "!");
+            System.out.println("Failed to download " + fileName + "!");
         }
         return "success";
     }

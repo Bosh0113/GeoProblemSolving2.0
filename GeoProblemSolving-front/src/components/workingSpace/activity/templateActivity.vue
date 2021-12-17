@@ -10,12 +10,12 @@
           style="height: 38px; line-height: 38px; z-index: 1"
           @on-select="changeMenuItem"
         >
-          <MenuItem name="Workspace">
+          <!-- <MenuItem name="Workspace">
             <Icon type="ios-globe" />Workspace
           </MenuItem>
           <MenuItem name="Task">
             <Icon type="ios-git-network"/>Task management
-          </MenuItem>
+          </MenuItem> -->
           <MenuItem name="Workflow">
             <Icon type="ios-git-network"/>Workflow
           </MenuItem>
@@ -27,7 +27,7 @@
         <!-- <div v-show="activeMenu == 'Introduction'">
           <activity-show :activityInfo="activityInfo"></activity-show>
         </div> -->
-        <div v-show="activeMenu == 'Workspace'">
+        <!-- <div v-show="activeMenu == 'Workspace'">
           <vue-scroll
             :ops="scrollOps"
             style="height: calc(100vh - 225px); margin-top: 5px"
@@ -41,10 +41,10 @@
         </div>
         <div v-show="activeMenu == 'Task'">
           <task-manager :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo" ref="task"></task-manager>
-        </div>
-        <!-- <div v-show="activeMenu == 'Workflow'">
-          <new-workflow :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo" ref="workflow"></new-workflow>
         </div> -->
+        <div v-show="activeMenu == 'Workflow'">
+          <new-workflow :activityInfo="activityInfo" :userInfo="userInfo" :projectInfo="projectInfo" ref="workflow"></new-workflow>
+        </div>
       </div>
     </div>
     <Modal
@@ -201,8 +201,7 @@ export default {
       memberRoleModal: false,
       userRoleBtn: false,
       roleSelected: "",
-      taskSocketId: "OperationServer/task-vueTask"
-      // taskSocketId: "OperationServer/workflow"
+      taskSocketId: "OperationServer/workflow"
     };
   },
   created() {
@@ -211,14 +210,13 @@ export default {
   },
   mounted() {
     this.operationApi.getActivityDoc(this.activityInfo.aid);
-    // this.startSocket();
+    this.startSocket();
   },
   watch: {
     activityInfo: {
       immediate: true,
       handler(){
-          this.taskSocketId = `OperationServer/task${this.projectInfo.aid}/${this.activityInfo.aid}`;
-          // this.taskSocketId = `OperationServer/workflow${this.projectInfo.aid}/${this.activityInfo.aid}`;
+          this.taskSocketId = `OperationServer/workflow${this.projectInfo.aid}/${this.activityInfo.aid}`;
       }
     }
   },
@@ -226,12 +224,12 @@ export default {
     this.closeTaskSocket();
   },
   methods: {
-    // startSocket(){
-    //   let that = this;
-    //   setTimeout(function(){
-    //     that.initTaskSocket();
-    //   },3000);
-    // },
+    startSocket(){
+      let that = this;
+      setTimeout(function(){
+        that.initTaskSocket();
+      },3000);
+    },
     roleIdentity(activity) {
       return this.userRoleApi.roleIdentify(
         activity.members,
@@ -642,20 +640,12 @@ export default {
     },
     changeMenuItem(name) {
       this.activeMenu = name;
-      if (name == "Task"){
-        this.initTaskSocket();
-      }else {
-        this.closeTaskSocket();
-      }
-    },
-    // changeMenuItem(name) {
-    //   this.activeMenu = name;
     //   if (name == "Workflow"){
     //     this.initTaskSocket();
     //   }else {
     //     this.closeTaskSocket();
     //   }
-    // },
+    },
     getParticipants() {
       let url = "";
       let activity = this.activityInfo;
@@ -688,24 +678,11 @@ export default {
           type: "test",
           sender: this.userInfo.userId
         };
-        socketApi.sendSock(this.taskSocketId, sockMsg, this.$refs.task.socketOnMessage);
+        socketApi.sendSock(this.taskSocketId, sockMsg, this.$refs.workflow.socketOnMessage);
       }else {
-        console.log(`${this.projectInfo.name}: ${this.activityInfo.name}task has connected.`);
+        console.log(`workflow${this.projectInfo.name}: ${this.activityInfo.name}task has connected.`);
       }
     },
-    // initTaskSocket(){
-    //   if (!socketApi.getSocketInfo(this.taskSocketId).linked){
-    //     socketApi.initWebSocket(this.taskSocketId);
-    //     let sockMsg = {
-    //       type: "test",
-    //       sender: this.userInfo.userId
-    //     };
-    //     socketApi.sendSock(this.taskSocketId, sockMsg, this.$refs.workflow.socketOnMessage);
-    //     console.log("1");
-    //   }else {
-    //     console.log(`workflow${this.projectInfo.name}: ${this.activityInfo.name}task has connected.`);
-    //   }
-    // },
     closeTaskSocket(){
       if (socketApi.getSocketInfo(this.taskSocketId).linked){
         socketApi.close(this.taskSocketId);

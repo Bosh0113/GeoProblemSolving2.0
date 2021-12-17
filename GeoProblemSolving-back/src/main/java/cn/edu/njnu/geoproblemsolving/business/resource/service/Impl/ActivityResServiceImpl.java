@@ -162,7 +162,6 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             //restTemplate工具类
             RestTemplateUtil httpUtil = new RestTemplateUtil();
             HashSet<String> uploadUids = new HashSet<>();
-            ArrayList<HashMap<String, String>> uploadSucOperation;
             for (Part part : parts) {
                 try {
                     if (part.getName().equals("file")) {
@@ -709,6 +708,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             activityResDao.updateRes(query, update);
             return resList;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -723,6 +723,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         } else if (key.equals("privacy")) {
             //通过 privacy 进行查询
             return sResByPrivacy(value, projectRes, returnRes);
+        } else if (key.equals("uid")) {
+            //通过 privacy 进行查询
+            return sResByUid(value, projectRes, returnRes);
         }
         return null;
     }
@@ -752,6 +755,19 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                 }
             }
         }
+        return choseRes;
+    }
+
+    private ArrayList<ResourceEntity> sResByUid(String uid, List<ResourceEntity> projectRes, ArrayList<ResourceEntity> choseRes) {
+        projectRes.stream().forEach(res -> {
+            if (res.getFolder()) {
+                sResByType(uid, res.getChildren(), choseRes);
+            } else {
+                if (res.getUid().equals(uid)) {
+                    choseRes.add(res);
+                }
+            }
+        });
         return choseRes;
     }
 

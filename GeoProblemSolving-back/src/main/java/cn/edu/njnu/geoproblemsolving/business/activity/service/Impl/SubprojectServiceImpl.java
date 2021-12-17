@@ -542,6 +542,10 @@ public class SubprojectServiceImpl implements SubprojectService {
             subproject.setActiveTime(dateFormat.format(new Date()));
 
             subprojectRepository.save(subproject);
+            //删除临时用户
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
             //update node
             nodeService.userExitActivity(aid, userId);
 

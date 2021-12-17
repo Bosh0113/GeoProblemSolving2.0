@@ -26,7 +26,6 @@ public class NoticeSocket {
     public void onOpen(Session session, EndpointConfig config) throws IOException {
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
 
-        System.out.println("Notice HttpSession:" + httpSession);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
         System.out.println("Notice已连接：" + "用户名-" + httpSession.getAttribute("name") + "-----" + "连接时间：" + nowDate);

@@ -1397,13 +1397,13 @@
                     let metadata = {};
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.currentFolder.files.push(uploadedList[i]);
-                      if (this.uploadValidate.type == "data") {
-                        metadata.format = this.uploadValidate.format;
-                        metadata.scale = this.uploadValidate.scale;
-                        metadata.reference = this.uploadValidate.reference;
-                        metadata.unit = this.uploadValidate.unit;
-                        metadata.concept = this.uploadValidate.concept;
-                      }
+                      // if (this.uploadValidate.type == "data") {
+                      //   metadata.format = this.uploadValidate.format;
+                      //   metadata.scale = this.uploadValidate.scale;
+                      //   metadata.reference = this.uploadValidate.reference;
+                      //   metadata.unit = this.uploadValidate.unit;
+                      //   metadata.concept = this.uploadValidate.concept;
+                      // }
                     }
 
                     if (sizeOverList.length > 0) {
@@ -1707,6 +1707,7 @@
       },
       fileEditModelShow(fileInfo) {
         let metadata = {};
+        console.log(fileInfo);
         this.putFileInfo = fileInfo;
         this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileValidate.name = fileInfo.name;
@@ -1714,12 +1715,22 @@
         this.editFileValidate.description = fileInfo.description;
         if (this.editFileValidate.type == "data") {
           metadata = this.operationApi.getResInfo(fileInfo.uid);
-          this.oldMetadata = metadata;
-          this.editFileValidate.format = metadata.format;
-          this.editFileValidate.scale = metadata.scale;
-          this.editFileValidate.reference = metadata.reference;
-          this.editFileValidate.unit = metadata.unit;
-          this.editFileValidate.concept = metadata.concept;
+          console.log(metadata);
+          if(metadata == undefined || metadata == null || metadata == ""){
+            this.oldMetadata = {};
+            this.editFileValidate.format = "";
+            this.editFileValidate.scale = "";
+            this.editFileValidate.reference = "";
+            this.editFileValidate.unit = "";
+            this.editFileValidate.concept = "";
+          } else {
+            this.oldMetadata = metadata;
+            this.editFileValidate.format = metadata.format;
+            this.editFileValidate.scale = metadata.scale;
+            this.editFileValidate.reference = metadata.reference;
+            this.editFileValidate.unit = metadata.unit;
+            this.editFileValidate.concept = metadata.concept;
+          }
         }
         this.editFileModel = true;
       },
@@ -1787,21 +1798,18 @@
                     // 检查元数据发生修改
                     let metadataChanged = false;
                     if (
-                      this.oldMetadata.format != this.editFileValidate.format ||
-                      this.oldMetadata.scale != this.editFileValidate.scale ||
-                      this.oldMetadata.reference != this.editFileValidate.reference ||
-                      this.oldMetadata.unit != this.editFileValidate.unit ||
-                      this.oldMetadata.concept != this.editFileValidate.concept
+                      this.oldMetadata.format != metadata.format ||
+                      this.oldMetadata.scale != metadata.scale ||
+                      this.oldMetadata.reference != metadata.reference ||
+                      this.oldMetadata.unit != metadata.unit ||
+                      this.oldMetadata.concept != metadata.concept
                     ) {
                       metadataChanged = true;
                     }
                     if (metadataChanged) {
                       this.axios
                         .put(
-                          "/GeoProblemSolving/activityDoc/meta/" +
-                          this.activityInfo.aid +
-                          "/" +
-                          this.putFileInfo.uid
+                          "/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}"
                         )
                         .then((res) => {
                           console.log(res.data.data);

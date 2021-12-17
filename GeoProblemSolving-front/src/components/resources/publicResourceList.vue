@@ -314,18 +314,19 @@ export default {
     show(index) {
       var res = this.showList[index];
       let name = this.showList[index].suffix;
-      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf)$/.test(name.toLowerCase())) {
+      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf|csv)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         let url = "";
-        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
+        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
+        } else if(res.address.indexOf("/PExploration/resource") != -1){
+          url = "https://geomodeling.njnu.edu.cn" + res.address;
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
         }
-        console.log(url);
-        let finalUrl = "https://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +

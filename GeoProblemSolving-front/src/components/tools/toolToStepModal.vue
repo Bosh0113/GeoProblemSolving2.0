@@ -780,7 +780,6 @@ export default {
     },
     removeToolset(index) {
       var removeToolsetInfo = this.stepToolsetsShow[index];
-      consoles.log(removeToolsetInfo);
       this.stepToolsetsShow.splice(index, 1);
       if (removeToolsetInfo.privacy == "Public") {
         this.publicToolsets.push(removeToolsetInfo);
@@ -828,6 +827,7 @@ export default {
         newStepTools.push(tool.tid);
       });
 
+      this.operationApi.getActivityDoc(this.activityInfo.aid);
       // 更新协同文档
       // add 只能添加工具集和工具，不能单独添加工具集中的工具
       for (var i = 0; i < this.stepToolsetsShow.length; i++) {

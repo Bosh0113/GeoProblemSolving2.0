@@ -707,6 +707,12 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActiveTime(dateFormat.format(new Date()));
 
             activityRepository.save(activity);
+
+            //删除临时用户
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
+
             //update node
             nodeService.userExitActivity(aid, userId);
 

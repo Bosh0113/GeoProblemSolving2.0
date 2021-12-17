@@ -190,9 +190,13 @@
 		>
 			<div style="margin-top: 40px;">
 				<h3 style="position:absolute; left:3%; top:3%; ">Workflow</h3>
-				<div style="position:absolute; right:5%; z-index:1;margin-top:10px;">
-					<button @click="zoomActual()">ZoomActual</button>
-					<button @click="getXml()">XmlOutput</button>
+				<div style="position:absolute; right:3%; z-index:1;margin-top:10px;">
+					<button @click="zoomActual()" style=" cursor: pointer;">ZoomActual</button>
+					<button @click="getXml()"  style=" cursor: pointer;">XmlOutput</button>
+				</div>
+				<div style="position:absolute; right:26%; z-index:1;margin-top:10px;">
+					<Button type="primary" @click="zoomIn()" shape="circle" icon="md-add" title="Zoom In"></Button>
+					<Button type="primary" @click="zoomOut()" shape="circle" icon="md-remove" title="Zoom Out"></Button>
 				</div>
 				<div id="graphContainer" :style="{height:heightChange()}"></div>
 			</div>
@@ -620,432 +624,444 @@
 			changeIntro(type){
 				this.introType = type;
 			},
-				initMxGraph(){
-					if (!mxClient.isBrowserSupported()) {
-						// 判断是否支持mxgraph
-						mxUtils.error('Browser is not supported!', 200, false);
-					} else {
-						// 在容器中创建图表
-						let container = document.getElementById('graphContainer');
-						let MxGraph = mxGraph;
-						let MxCodec = mxCodec;
-						var graph = new MxGraph(container);
-						this.graph = graph;
-						var parent = graph.getDefaultParent();
+			initMxGraph(){
+				if (!mxClient.isBrowserSupported()) {
+					// 判断是否支持mxgraph
+					mxUtils.error('Browser is not supported!', 200, false);
+				} else {
+					// 在容器中创建图表
+					let container = document.getElementById('graphContainer');
+					let MxGraph = mxGraph;
+					let MxCodec = mxCodec;
+					var graph = new MxGraph(container);
+					this.graph = graph;
+					var parent = graph.getDefaultParent();
 
-						//定义布局
-      					var layout = new mxHierarchicalLayout(graph);
+					//定义布局
+					var layout = new mxHierarchicalLayout(graph);
 
-						graph.getModel().beginUpdate();
-						try {
-							this.operationListToGraph();
-							layout.execute(parent);
-							graph.center(true,true,0.1,0.5);
+					graph.getModel().beginUpdate();
+					try {
+						this.operationListToGraph();
+						layout.execute(parent);
+						graph.center(true,true,0.1,0.1);
 
-							// graph.setEnabled(false);//graph只能预览
-							graph.setCellsResizable(false);//节点不可改变大小
-							mxGraphHandler.prototype.setMoveEnabled(false);//是否可以移动
+						// graph.setEnabled(false);//graph只能预览
+						graph.setCellsResizable(false);//节点不可改变大小
+						mxGraphHandler.prototype.setMoveEnabled(false);//是否可以移动
+						graph.setPanning(true);//拖动
+						//禁用浏览器默认的右键菜单栏
+						mxEvent.disableContextMenu(container);
+						graph.setCellsMovable(false);//线是否可移动​
+						// 是否可以移动连线，重新连接其他cell，主要用来展现中用
+						graph.setCellsLocked(true);
 
-						} finally {
-							// Updates the display
-							graph.getModel().endUpdate();
-						}
-						this.graph = graph;
-						// this.zoomActual();
-   						// this.restoreModel();
+					} finally {
+						// Updates the display
+						graph.getModel().endUpdate();
 					}
-				},
+					this.graph = graph;
+					// this.zoomActual();
+					// this.restoreModel();
+				}
+			},
 
-				operationListToGraph(){
-					let list = this.operationList;
-					//读取input和output信息，并生成vertex
-					list.forEach((item, index) =>{
-						if(item.type == "geo-analysis"){
-							if(item.resList.length > 0){
-								for(let i = 0 ; i < item.resList.length ; i++){
-									if(item.resList[i].type == "input"){
-										this.inputList.push({
-											resId: item.resList[i].resId,
-											type: item.resList[i].type,
-											vertexId: item.id,
-										})
-									} else {
-										this.outputList.push({
-											resId: item.resList[i].resId,
-											type: item.resList[i].type,
-											vertexId: item.id,
-										})
-									}
-								}
-							}
-							let vertex = this.graph.insertVertex(
-								this.graph.getDefaultParent(),
-								item.id,
-								item.name,
-								200,
-								200,
-								150, //width
-								30, //height
-								"noedeStyle"
-							);
-
-							//绑定相关信息
-							vertex.nodeAttribute = {};
-							vertex.nodeAttribute.resList = item.resList;
-
-							this.vertexList.push(vertex);
-						}
-					});
-
-					//利用input和output信息 生成边edge
-					for(let i = 0 ; i < this.inputList.length ; i++){
-						for(let j = 0 ; j < this.outputList.length ; j++){
-							if(this.inputList[i].resId == this.outputList[j].resId){
-								let headVertex = this.getVertexById(this.outputList[j].vertexId);
-								let tailVertex = this.getVertexById(this.inputList[i].vertexId);
-
-								//判断是否为重复边
-								let isNewEdge = true;
-								for(let k = 0 ; k < this.edgeList.length ; k++){
-									if(this.edgeList[k].headId == headVertex.id && this.edgeList[k].tailId == tailVertex.id){
-										isNewEdge = false;
-									}
-								}
-								if(isNewEdge){
-									let edge = this.graph.insertEdge(
-										this.graph.getDefaultParent(),
-										null,
-										'',
-										headVertex,
-										tailVertex
-									);
-									//绑定相关信息
-									edge.edgeAttribute = {};
-									edge.edgeAttribute.headId = headVertex.id;
-									edge.edgeAttribute.tailId = tailVertex.id;
-									// console.log(edge); //如果需要  可以将信息补充道edge中
-									this.edgeList.push({
-										headId: headVertex.id,
-										tailId: tailVertex.id,
-										resId: this.inputList[i].resId,
+			operationListToGraph(){
+				let list = this.operationList;
+				//读取input和output信息，并生成vertex
+				list.forEach((item, index) =>{
+					if(item.type == "geo-analysis"){
+						if(item.resList.length > 0){
+							for(let i = 0 ; i < item.resList.length ; i++){
+								if(item.resList[i].type == "input"){
+									this.inputList.push({
+										resId: item.resList[i].resId,
+										type: item.resList[i].type,
+										vertexId: item.id,
+									})
+								} else {
+									this.outputList.push({
+										resId: item.resList[i].resId,
+										type: item.resList[i].type,
+										vertexId: item.id,
 									})
 								}
 							}
 						}
-					}
-				},
-				getVertexById(vertexId){
-					for(let i = 0 ; i < this.vertexList.length ; i++){
-						if(this.vertexList[i].id == vertexId){
-							return this.vertexList[i];
-						}
-					}
-				},
-				listenGraphEvent() {
-					// 监听双击事件
-					this.graph.addListener(mxEvent.DOUBLE_CLICK, async (graph, evt) => {
-						// DOUBLE_CLICK
-						if (evt.properties.cell != undefined) {
-							let cell = evt.properties.cell;
-							console.log(cell);
-							this.selectVertex = cell;
-
-							//临时实验
-							this.selectVertex.backendType = "dataMethod";
-							this.selectVertex.tid = "cc94e0c1-5958-4715-a4e0-4360d5fa6e06";
-							this.selectVertex.toolUrl = null;
-
-							// this.vertexInfoShow = true;
-							this.openTool();
-						}
-					});
-					// 监听单击事件
-					this.graph.addListener(mxEvent.CLICK, async (graph, evt) => {
-						// DOUBLE_CLICK
-						if (evt.properties.cell != undefined) {
-							let cell = evt.properties.cell;
-							console.log(cell);
-							this.tempToolInfo = cell;
-
-							//临时实验
-							this.tempToolInfo.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
-							this.getToolInfo();
-
-						}
-					});
-				},
-				openTool(){
-					let toolInfo = this.selectVertex;
-					let routerUrl = toolInfo.toolUrl;
-					if ( toolInfo.backendType == "webTool") {
-						routerUrl = toolInfo.toolUrl;
-					} else if ( toolInfo.backendType == "modelItem") {
-						routerUrl = "/GeoProblemSolving/computeModel";
-					} else if ( toolInfo.backendType == "dataMethod") {
-						routerUrl = "/GeoProblemSolving/dataMethod";
-					}
-					var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
-
-					jsPanel.create({
-						id: 'panel',
-						theme: 'primary',
-						headerTitle: '测试',
-						contentSize: {
-							width: 1000,
-							height: 600
-						},
-						contentOverflow: 'hidden',
-						content: toolContent,
-						container: "div#workflow",
-						boxShadow: 5,
-						dragit: {
-							containment: [70, 30, -50, 20],
-						},
-        				closeOnEscape: true,
-        				disableOnMaximized: true,
-						callback: function () {
-							this.content.style.padding = '0px';
-						}
-					});
-
-					 // 设置iframe 父子页面消息传输处理
-					window.addEventListener("message", this.toolMsgHandle, false);
-					let activity = this.projectInfo;
-					let userInfo = this.userInfo;
-					let taskList = this.operationApi.getTaskList();
-					let iFrame = document.getElementById(toolInfo.tid);
-					//iframe加载完毕后再发送消息，否则子页面接收不到message
-					iFrame.onload = function () {
-						//iframe加载完立即发送一条消息
-						iFrame.contentWindow.postMessage(
-						{
-							user: userInfo,
-							activity: activity,
-							tasks: taskList,
-							tid: toolInfo.tid,
-							type: "activity",
-						},
-						"*"
+						let vertex = this.graph.insertVertex(
+							this.graph.getDefaultParent(),
+							item.id,
+							item.name,
+							200,
+							200,
+							150, //width
+							30, //height
+							"noedeStyle"
 						);
-					};
-				},
-				toolMsgHandle(event) {
-					if (event.data.type === "task") {
-						let operations = event.data.operations;
-						let behavior = event.data.behavior;
-						for (let i = 0; i < operations.length; i++) {
-							let operationType = operations[i].type;
-							switch (operationType) {
-								case "resource": {
-								if (behavior === "record") {
-									this.operationApi.resOperationRecord(
-									this.activityInfo.aid,
-									operations[i].id,
-									event.data.task,
-									behavior,
-									this.userInfo.userId,
-									operations[i].content
-									);
-									this.$store.commit("updateTempOperations", {
-									behavior: "add",
-									operation: operations[i],
-									});
-								} else if (behavior === "bind") {
-									this.operationApi.bindTempOperation2Task(
-									this.activityInfo.aid,
-									operations[i].id,
-									event.data.task
-									);
-									this.$store.commit("updateTempOperations", {
-									behavior: "remove",
-									operation: operations[i],
-									});
-								}
-								break;
-								}
-								case "communication": {
-								break;
-								}
-								case "geo-analysis": {
-								if (behavior === "record") {
-									this.operationApi.analysisRecord(
-									this.activityInfo.aid,
-									operations[i].id,
-									event.data.task,
-									this.userInfo.userId,
-									operations[i].toolId,
-									operations[i].purpose,
-									operations[i].inputs,
-									operations[i].outputs,
-									operations[i].params,
-									operations[i].participants
-									);
-								} else if (behavior === "bind") {
-									this.operationApi.bindTempOperation2Task(
-									this.activityInfo.aid,
-									operations[i].id,
-									event.data.task
-									);
-								}
-								break;
+
+						//绑定相关信息
+						vertex.nodeAttribute = {};
+						vertex.nodeAttribute.resList = item.resList;
+
+						this.vertexList.push(vertex);
+					}
+				});
+
+				//利用input和output信息 生成边edge
+				for(let i = 0 ; i < this.inputList.length ; i++){
+					for(let j = 0 ; j < this.outputList.length ; j++){
+						if(this.inputList[i].resId == this.outputList[j].resId){
+							let headVertex = this.getVertexById(this.outputList[j].vertexId);
+							let tailVertex = this.getVertexById(this.inputList[i].vertexId);
+
+							//判断是否为重复边
+							let isNewEdge = true;
+							for(let k = 0 ; k < this.edgeList.length ; k++){
+								if(this.edgeList[k].headId == headVertex.id && this.edgeList[k].tailId == tailVertex.id){
+									isNewEdge = false;
 								}
 							}
+							if(isNewEdge){
+								let edge = this.graph.insertEdge(
+									this.graph.getDefaultParent(),
+									null,
+									'',
+									headVertex,
+									tailVertex
+								);
+								//绑定相关信息
+								edge.edgeAttribute = {};
+								edge.edgeAttribute.headId = headVertex.id;
+								edge.edgeAttribute.tailId = tailVertex.id;
+								// console.log(edge); //如果需要  可以将信息补充道edge中
+								this.edgeList.push({
+									headId: headVertex.id,
+									tailId: tailVertex.id,
+									resId: this.inputList[i].resId,
+								})
+							}
+						}
+					}
+				}
+			},
+			getVertexById(vertexId){
+				for(let i = 0 ; i < this.vertexList.length ; i++){
+					if(this.vertexList[i].id == vertexId){
+						return this.vertexList[i];
+					}
+				}
+			},
+			listenGraphEvent() {
+				// 监听双击事件
+				this.graph.addListener(mxEvent.DOUBLE_CLICK, async (graph, evt) => {
+					// DOUBLE_CLICK
+					if (evt.properties.cell != undefined) {
+						let cell = evt.properties.cell;
+						console.log(cell);
+						this.selectVertex = cell;
 
+						//临时实验
+						this.selectVertex.backendType = "dataMethod";
+						this.selectVertex.tid = "cc94e0c1-5958-4715-a4e0-4360d5fa6e06";
+						this.selectVertex.toolUrl = null;
+
+						// this.vertexInfoShow = true;
+						this.openTool();
+					}
+				});
+				// 监听单击事件
+				this.graph.addListener(mxEvent.CLICK, async (graph, evt) => {
+					// DOUBLE_CLICK
+					if (evt.properties.cell != undefined) {
+						let cell = evt.properties.cell;
+						console.log(cell);
+						this.tempToolInfo = cell;
+
+						//临时实验
+						this.tempToolInfo.tid = "0acca386-2f51-420b-972d-3ab69171c7cc";
+						this.getToolInfo();
+
+					}
+				});
+			},
+			openTool(){
+				let toolInfo = this.selectVertex;
+				let routerUrl = toolInfo.toolUrl;
+				if ( toolInfo.backendType == "webTool") {
+					routerUrl = toolInfo.toolUrl;
+				} else if ( toolInfo.backendType == "modelItem") {
+					routerUrl = "/GeoProblemSolving/computeModel";
+				} else if ( toolInfo.backendType == "dataMethod") {
+					routerUrl = "/GeoProblemSolving/dataMethod";
+				}
+				var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
+
+				jsPanel.create({
+					id: 'panel',
+					theme: 'primary',
+					headerTitle: '测试',
+					contentSize: {
+						width: 1000,
+						height: 600
+					},
+					contentOverflow: 'hidden',
+					content: toolContent,
+					container: "div#workflow",
+					boxShadow: 5,
+					dragit: {
+						containment: [70, 30, -50, 20],
+					},
+					closeOnEscape: true,
+					disableOnMaximized: true,
+					callback: function () {
+						this.content.style.padding = '0px';
+					}
+				});
+
+					// 设置iframe 父子页面消息传输处理
+				window.addEventListener("message", this.toolMsgHandle, false);
+				let activity = this.projectInfo;
+				let userInfo = this.userInfo;
+				let taskList = this.operationApi.getTaskList();
+				let iFrame = document.getElementById(toolInfo.tid);
+				//iframe加载完毕后再发送消息，否则子页面接收不到message
+				iFrame.onload = function () {
+					//iframe加载完立即发送一条消息
+					iFrame.contentWindow.postMessage(
+					{
+						user: userInfo,
+						activity: activity,
+						tasks: taskList,
+						tid: toolInfo.tid,
+						type: "activity",
+					},
+					"*"
+					);
+				};
+			},
+			toolMsgHandle(event) {
+				if (event.data.type === "task") {
+					let operations = event.data.operations;
+					let behavior = event.data.behavior;
+					for (let i = 0; i < operations.length; i++) {
+						let operationType = operations[i].type;
+						switch (operationType) {
+							case "resource": {
 							if (behavior === "record") {
+								this.operationApi.resOperationRecord(
+								this.activityInfo.aid,
+								operations[i].id,
+								event.data.task,
+								behavior,
+								this.userInfo.userId,
+								operations[i].content
+								);
 								this.$store.commit("updateTempOperations", {
 								behavior: "add",
 								operation: operations[i],
 								});
 							} else if (behavior === "bind") {
+								this.operationApi.bindTempOperation2Task(
+								this.activityInfo.aid,
+								operations[i].id,
+								event.data.task
+								);
 								this.$store.commit("updateTempOperations", {
 								behavior: "remove",
 								operation: operations[i],
 								});
 							}
+							break;
+							}
+							case "communication": {
+							break;
+							}
+							case "geo-analysis": {
+							if (behavior === "record") {
+								this.operationApi.analysisRecord(
+								this.activityInfo.aid,
+								operations[i].id,
+								event.data.task,
+								this.userInfo.userId,
+								operations[i].toolId,
+								operations[i].purpose,
+								operations[i].inputs,
+								operations[i].outputs,
+								operations[i].params,
+								operations[i].participants
+								);
+							} else if (behavior === "bind") {
+								this.operationApi.bindTempOperation2Task(
+								this.activityInfo.aid,
+								operations[i].id,
+								event.data.task
+								);
+							}
+							break;
+							}
+						}
+
+						if (behavior === "record") {
+							this.$store.commit("updateTempOperations", {
+							behavior: "add",
+							operation: operations[i],
+							});
+						} else if (behavior === "bind") {
+							this.$store.commit("updateTempOperations", {
+							behavior: "remove",
+							operation: operations[i],
+							});
 						}
 					}
-				},
-				getToolInfo(){
-					let tid = this.tempToolInfo.tid;
-					this.getToolInfoFinish = false;
-					this.axios
-					.get("/GeoProblemSolving/tool/" + tid)
-					.then((res) => {
-						if (res.data.code == 0) {
-							console.log(res.data.data);
-							this.selectToolInfo = res.data.data;
-							this.getToolInfoFinish = true;
-						} else {
-							console.log(res.data.msg);
-						}
-						})
-					.catch((err) => {
-						throw err;
-					});
-				},
-				heightChange(){
-					let count = this.vertexList.length;
-					return (count * 100 + 100) + 'px'
-				},
-				zoomActual(){
-					this.graph.zoomActual();
-					this.graph.center(true,true,0.5,0.3);//将画布放到容器中间
-				},
-
-				getXml(){
-					let encoder = new mxCodec();
-					let graphXml = encoder.encode(this.graph.getModel());
-					let xml = mxUtils.getPrettyXml(graphXml);
-					console.log(xml);
-				},
-				selectMember(member, operation) {
-					if (operation == "delete") {
-						this.slctDletMember = member;
-						this.removeMemberModal = true;
-					} else if (operation == "role") {
-						this.slctRoleMember = member;
-						this.memberRoleModal = true;
-						this.roleSelected = member.role;
-					}
-				},
-				updateUserRole() {
-					let member = this.slctRoleMember;
-					let activity = this.activityInfo;
-					let role = this.roleSelected;
-
-					// get url
-					let url = "";
-					if (activity.level == 0) {
-						url =
-						"/GeoProblemSolving/project/" +
-						activity.aid +
-						"/user?userId=" +
-						member.userId +
-						"&role=" +
-						role;
-					} else if (activity.level == 1) {
-						url =
-						"/GeoProblemSolving/subproject/" +
-						activity.aid +
-						"/user?userId=" +
-						member.userId +
-						"&role=" +
-						role;
-					} else if (activity.level > 1) {
-						url =
-						"/GeoProblemSolving/activity/" +
-						activity.aid +
-						"/user?userId=" +
-						member.userId +
-						"&role=" +
-						role;
-					} else {
-						return;
-					}
-
-					this.axios
-					.put(url)
-					.then((res) => {
+				}
+			},
+			getToolInfo(){
+				let tid = this.tempToolInfo.tid;
+				this.getToolInfoFinish = false;
+				this.axios
+				.get("/GeoProblemSolving/tool/" + tid)
+				.then((res) => {
 					if (res.data.code == 0) {
-						this.slctRoleMember.role = role;
-						this.$Notice.info({ desc: "Change the member role successfully" });
-						this.operationApi.participantUpdate(
-						this.activityInfo.aid,
-						"role",
-						member.userId,
-						member.name,
-						member.role,
-						member.domain
-						);
-						this.getParticipants();
-
-						//notice
-						let notice = {
-						recipientId: member.userId,
-						type: "notice",
-						content: {
-							title: "Role changed",
-							description:
-							"Your role in the activity: " +
-							activity.name +
-							", project: " +
-							this.projectInfo.name +
-							" has changed to " +
-							role +
-							".",
-							approve: "unknow",
-							projectId: this.projectInfo.aid,
-							projectName: this.projectInfo.name,
-							activityId: activity.aid,
-							activityName: activity.name,
-							activityLevel: activity.level,
-							// removerName: this.userInfo.name,
-							// removerId: this.userInfo.userId,
-						},
-						};
-						this.sendNotice(notice);
+						console.log(res.data.data);
+						this.selectToolInfo = res.data.data;
+						this.getToolInfoFinish = true;
 					} else {
 						console.log(res.data.msg);
 					}
 					})
-					.catch((err) => {
+				.catch((err) => {
 					throw err;
-					});
-				},
-				roleCompare(role1, role2) {
-					return this.userRoleApi.roleCompare(role1, role2);
-				},
-				avatarUrl(url) {
-					let avatarUrl = this.$store.state.UserServer + url;
-					return avatarUrl;
-				},
-				gotoPersonalSpace(id) {
-					if (id == this.$store.getters.userId) {
-						window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
-					} else {
-						window.location.href = "/GeoProblemSolving/memberPage/" + id;
-					}
-				},
+				});
+			},
+			heightChange(){
+				let count = this.vertexList.length;
+				return (count * 100 + 100) + 'px'
+			},
+			zoomOut(){
+				this.graph.zoomOut();
+			},
+			zoomIn(){
+				this.graph.zoomIn();
+			},
+			zoomActual(){
+				this.graph.zoomActual();
+				this.graph.center(true,true,0.5,0.3);//将画布放到容器中间
+			},
+
+			getXml(){
+				let encoder = new mxCodec();
+				let graphXml = encoder.encode(this.graph.getModel());
+				let xml = mxUtils.getPrettyXml(graphXml);
+				console.log(xml);
+			},
+			selectMember(member, operation) {
+				if (operation == "delete") {
+					this.slctDletMember = member;
+					this.removeMemberModal = true;
+				} else if (operation == "role") {
+					this.slctRoleMember = member;
+					this.memberRoleModal = true;
+					this.roleSelected = member.role;
+				}
+			},
+			updateUserRole() {
+				let member = this.slctRoleMember;
+				let activity = this.activityInfo;
+				let role = this.roleSelected;
+
+				// get url
+				let url = "";
+				if (activity.level == 0) {
+					url =
+					"/GeoProblemSolving/project/" +
+					activity.aid +
+					"/user?userId=" +
+					member.userId +
+					"&role=" +
+					role;
+				} else if (activity.level == 1) {
+					url =
+					"/GeoProblemSolving/subproject/" +
+					activity.aid +
+					"/user?userId=" +
+					member.userId +
+					"&role=" +
+					role;
+				} else if (activity.level > 1) {
+					url =
+					"/GeoProblemSolving/activity/" +
+					activity.aid +
+					"/user?userId=" +
+					member.userId +
+					"&role=" +
+					role;
+				} else {
+					return;
+				}
+
+				this.axios
+				.put(url)
+				.then((res) => {
+				if (res.data.code == 0) {
+					this.slctRoleMember.role = role;
+					this.$Notice.info({ desc: "Change the member role successfully" });
+					this.operationApi.participantUpdate(
+					this.activityInfo.aid,
+					"role",
+					member.userId,
+					member.name,
+					member.role,
+					member.domain
+					);
+					this.getParticipants();
+
+					//notice
+					let notice = {
+					recipientId: member.userId,
+					type: "notice",
+					content: {
+						title: "Role changed",
+						description:
+						"Your role in the activity: " +
+						activity.name +
+						", project: " +
+						this.projectInfo.name +
+						" has changed to " +
+						role +
+						".",
+						approve: "unknow",
+						projectId: this.projectInfo.aid,
+						projectName: this.projectInfo.name,
+						activityId: activity.aid,
+						activityName: activity.name,
+						activityLevel: activity.level,
+						// removerName: this.userInfo.name,
+						// removerId: this.userInfo.userId,
+					},
+					};
+					this.sendNotice(notice);
+				} else {
+					console.log(res.data.msg);
+				}
+				})
+				.catch((err) => {
+				throw err;
+				});
+			},
+			roleCompare(role1, role2) {
+				return this.userRoleApi.roleCompare(role1, role2);
+			},
+			avatarUrl(url) {
+				let avatarUrl = this.$store.state.UserServer + url;
+				return avatarUrl;
+			},
+			gotoPersonalSpace(id) {
+				if (id == this.$store.getters.userId) {
+					window.location.href = "/GeoProblemSolving/newPersonalPage/overView";
+				} else {
+					window.location.href = "/GeoProblemSolving/memberPage/" + id;
+				}
+			},
 		},
 		filters:{
 			getLength(list){
@@ -1113,10 +1129,14 @@
 	}
 	#graphContainer{
 		width: 700px;
-		height: 900px;
+		height: 800px;
+		max-width: 700px;
+		min-height: 730px;
 		border: 3px solid rgb(194, 185, 185);
 		background-image: url('./MxGraph/images/grid.gif');
 		margin: auto;
+		overflow: hidden;
+
 	}
 	button{
 		width: 80px;

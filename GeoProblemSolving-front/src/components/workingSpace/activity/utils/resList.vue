@@ -1486,6 +1486,8 @@ export default {
       }
     },
     refreshResource(){
+      this.folderStack = [{ uid: 0, name: "Home" }], //folder level
+      this.folderIdStack = [], // folder level
       this.getResList();
       this.getParentActivities();
     },
@@ -1613,11 +1615,11 @@ export default {
                       this.activityResList.push(uploadedList[i]);
                       if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
-                        metadata.format = this.uploadDataInfo.format;
-                        metadata.scale = this.uploadDataInfo.scale;
-                        metadata.reference = this.uploadDataInfo.reference;
-                        metadata.unit = this.uploadDataInfo.unit;
-                        metadata.concept = this.uploadDataInfo.concept;
+                        // metadata.format = this.uploadDataInfo.format;
+                        // metadata.scale = this.uploadDataInfo.scale;
+                        // metadata.reference = this.uploadDataInfo.reference;
+                        // metadata.unit = this.uploadDataInfo.unit;
+                        // metadata.concept = this.uploadDataInfo.concept;
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
@@ -1694,17 +1696,19 @@ export default {
       this.checkDataModal = false;
       var res = data;
       let name = data.suffix;
-      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf)$/.test(name.toLowerCase())) {
+      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf|txt)$/.test(name.toLowerCase())) {
         // if (this.panel != null) {
         //   this.panel.close();
         // }
         let url = "";
         if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else if(res.address.indexOf("/PExploration/resource") != -1){
+          url = "https://geomodeling.njnu.edu.cn" + res.address;
         } else {
           url = this.$store.getters.resProxy + res.address;
         }
-        let finalUrl = "https://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +
@@ -2380,16 +2384,15 @@ export default {
                   // 检查元数据发生修改
                   let metadataChanged = false;
                   if(
-                    this.oldMetadata.format != this.editFileValidate.format ||
-                    this.oldMetadata.scale != this.editFileValidate.scale ||
-                    this.oldMetadata.reference != this.editFileValidate.reference ||
-                    this.oldMetadata.unit != this.editFileValidate.unit ||
-                    this.oldMetadata.concept != this.editFileValidate.concept
+                    this.oldMetadata.format != metadata.format ||
+                    this.oldMetadata.scale != metadata.scale ||
+                    this.oldMetadata.reference != metadata.reference ||
+                    this.oldMetadata.unit != metadata.unit ||
+                    this.oldMetadata.concept != metadata.concept
                   ){ metadataChanged = true; }
                   if(metadataChanged){
-                    let projectId = this.$route.params.projectId;
                     this.axios
-                      .put(`/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
+                      .put(`/GeoProblemSolving/activityDoc/meta/${this.activityInfo.parent}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
                       .then((res) => {
                         console.log(res.data.data);
                       })
@@ -2454,11 +2457,11 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              for( let j = 0 ; j < this.fileList.length ; j++){
-                if(addFileList[i].uid == this.fileList[j].uid){
-                  this.fileList.splice(j,1);
-                }
-              }
+              // for( let j = 0 ; j < this.fileList.length ; j++){
+              //   if(addFileList[i].uid == this.fileList[j].uid){
+              //     this.fileList.splice(j,1);
+              //   }
+              // }
             } else {
               suc = false;
             }
