@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @Author zhngzhng
  * @Date 2021/11/19
  **/
-@Component
+@Deprecated
 public class SpringUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 

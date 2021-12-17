@@ -528,8 +528,10 @@
                                                                 <Icon type="md-git-branch" :size="25"></Icon>
                                                                 <strong>Enter Workspace</strong>
                                                             </i-button>
-                                                            <i-button class="changeInviteColor"
-                                                                      @click="showShareURL()">
+                                                            <i-button
+                                                                    v-if="!tempUser"
+                                                                    class="changeInviteColor"
+                                                                    @click="showShareURL()">
                                                                 <Icon type="md-share-alt" :size="25"></Icon>
                                                                 <strong>Share Project</strong>
                                                             </i-button>
@@ -562,7 +564,7 @@
                                                 <div slot="extra">
                                                     <div>
                                                         <Poptip trigger="hover" content="Invite members"
-                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member')"
+                                                                v-if="detailPermissionIdentity(projectInfo.permission, userRole, 'invite_member') & !tempUser"
                                                                 placement="left">
                                                             <i-button class="changeInviteColor"
                                                                       @click="inviteModalShow()">
@@ -603,7 +605,7 @@
 
                 <div v-show="activeMenu=='workspace'" :style="{height: contentPageCSS + 'px'}">
                     <div style="background:#eee;padding: 10px;">
-                        <div >
+                        <div>
                             <iframe style="border-width:0"
                                     :style="{height: contentPageCSS - 20 + 'px'}"
                                     :src="ipPort+'/activityInfo/' + projectInfo.aid"></iframe>
@@ -1092,6 +1094,7 @@
                     shareProjectUrlModalShow: false,
                     shareProjectUrl: {},
                     shareProjectUrlList: [],
+                    tempUser: false
                 }
             },
             watch: {
@@ -1126,12 +1129,13 @@
 
                     this.$refs.taskTreeEl.sendMessage({"type": "test"});
                 },
-                closeTaskSocket(){
-                    if (this.$refs.taskTreeEl.taskSocket != null && this.$refs.taskTreeEl.taskSocket.readyState == this.$refs.taskTreeEl.taskSocket.OPEN){
+                closeTaskSocket() {
+                    if (this.$refs.taskTreeEl.taskSocket != null && this.$refs.taskTreeEl.taskSocket.readyState == this.$refs.taskTreeEl.taskSocket.OPEN) {
                         this.$refs.taskTreeEl.taskSocket.close();
                     }
                 },
                 roleIdentity() {
+                    this.tempUser = this.userInfo.userId.length > 40;
                     this.userRole = roleIdentify(
                         this.projectInfo.members,
                         this.userInfo.userId
@@ -1271,7 +1275,7 @@
                 addProjectUrl() {
                     let url = window.location.href;
                     $.ajax({
-                        url: "/GeoProblemSolving/token/" + this.userInfo.userId + "/" + this.projectInfo.aid,
+                        url: `/GeoProblemSolving/token/${this.projectInfo.aid}/${this.userInfo.userId}`,
                         type: "GET",
                         async: false,
                         success: data => {
@@ -1307,12 +1311,12 @@
                     return "forid_" +index
                 },
                 changeMenuItem(name) {
-                    if (name == "task"){
+                    if (name == "task") {
                         this.initTaskSocket();
-                    }else {
+                    } else {
                         this.closeTaskSocket();
                     }
-                    if(name == 'workspace') {
+                    if (name == 'workspace') {
                         if (this.userState == false) {
                             window.location.href = "/GeoProblemSolving/login"
                         } else {
@@ -1592,7 +1596,10 @@
                                     .post("/GeoProblemSolving/notice/save", notice)
                                     .then(res => {
                                         if (res.data == "Success") {
-                                            this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": this.removeMemberId});
+                                            this.$refs.navigationEl.sendMessage({
+                                                "type": "Notice",
+                                                "receiver": this.removeMemberId
+                                            });
                                         }
                                     })
                                     .catch(err => {
@@ -1715,7 +1722,10 @@
                                                         desc:
                                                             "The application has been sent to managers of the project."
                                                     });
-                                                    this.$refs.navigationEl.sendMessage({"type": "Notice", "receiver": managerId});
+                                                    this.$refs.navigationEl.sendMessage({
+                                                        "type": "Notice",
+                                                        "receiver": managerId
+                                                    });
                                                     this.applyJoinModal = false;
                                                     this.haveApplied = true;
                                                 } else {

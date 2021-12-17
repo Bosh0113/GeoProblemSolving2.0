@@ -33,7 +33,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/rip/file/allPublic",
                         "/user/changePwd/**",
-                        "/token/*"
+                        "/token/*",
+                        "/token/all/**"
                 );//不拦截的请求
     }
     /*
