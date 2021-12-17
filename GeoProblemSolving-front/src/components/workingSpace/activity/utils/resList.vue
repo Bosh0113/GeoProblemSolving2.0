@@ -2427,7 +2427,6 @@ export default {
     shareToParentModalShow(){
       this.shareToParentModal = true;
       this.fileListChoosed = [];
-      console.log(this.activityInfo.parent);
       for(let i = 0 ; i < this.fileList.length ; i++){
         if(!this.fileList[i].fromParents){
           this.fileListChoosed.push(this.fileList[i]);
