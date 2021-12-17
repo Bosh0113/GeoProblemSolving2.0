@@ -475,7 +475,7 @@ export default {
               this.msglist[i].status = "done";
               msgCheck = true;
             } else if (
-              (this.msglist[i].status = "sending" && current - time > threshold)
+              (this.msglist[i].status == "sending" && current - time > threshold)
             ) {
               this.msglist[i].status = "failed";
             }

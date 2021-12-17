@@ -342,8 +342,8 @@
                 <span
                   @click="getFileInfo(file)"
                   class="fileItemName"
-                  :title="file.name"
-                >{{ file.name }}</span
+                  :title="file.name + file.suffix"
+                >{{ file.name + file.suffix }}</span
                 >
                 <span class="fileItemSize">{{
                   file.fileSize | filterSizeType
@@ -1368,6 +1368,14 @@
               formData.append("aid", this.activityInfo.aid);
               formData.append("paths", temp.toString());
               formData.append("graphId", this.activityInfo.parent);
+              // 上传元数据
+              if (this.uploadValidate.type == "data"){
+                formData.append("format", this.uploadValidate.format);
+                formData.append("scale", this.uploadValidate.scale);
+                formData.append("reference", this.uploadValidate.reference);
+                formData.append("unit", this.uploadValidate.unit);
+                formData.append("concept", this.uploadValidate.concept);
+              }
               this.progressModalShow = true;
               this.axios({
                 url: "/GeoProblemSolving/rip/file/upload",
@@ -1383,33 +1391,21 @@
                     var uploadedList = res.data.uploaded;
                     var failedList = res.data.failed;
                     var sizeOverList = res.data.sizeOver;
-                    let uploadedOperation = res.data.uploadedOperation;
-
+                    // multi 无actionContainer, 无需显示操作
+                    // let uploadedOperation = res.data.uploadedOperation;
+                    this.operationApi.getActivityDoc(this.activityInfo.aid);
                     let metadata = {};
                     for (var i = 0; i < uploadedList.length; i++) {
                       this.currentFolder.files.push(uploadedList[i]);
-                      if (this.uploadValidate.type == "data") {
-                        metadata.format = this.uploadValidate.format;
-                        metadata.scale = this.uploadValidate.scale;
-                        metadata.reference = this.uploadValidate.reference;
-                        metadata.unit = this.uploadValidate.unit;
-                        metadata.concept = this.uploadValidate.concept;
-                      }
+                      // if (this.uploadValidate.type == "data") {
+                      //   metadata.format = this.uploadValidate.format;
+                      //   metadata.scale = this.uploadValidate.scale;
+                      //   metadata.reference = this.uploadValidate.reference;
+                      //   metadata.unit = this.uploadValidate.unit;
+                      //   metadata.concept = this.uploadValidate.concept;
+                      // }
                     }
-                    // this.operationApi.getActivityDoc(this.activityInfo.aid);
-                    // for (let i = 0; i < uploadedOperation.length; i++){
-                    //   let resOperation = {
-                    //     id: uploadedOperation[i].oid,
-                    //     type: "resource",
-                    //     resRef: uploadedOperation[i].resRef,
-                    //     operator: this.userInfo.userId,
-                    //   };
-                    //
-                    //   this.$store.commit("updateTempOperations", {
-                    //     behavior: "add",
-                    //     operation: resOperation,
-                    //   });
-                    // }
+
                     if (sizeOverList.length > 0) {
                       this.$Notice.warning({
                         title: "Files too large.",
@@ -1711,6 +1707,7 @@
       },
       fileEditModelShow(fileInfo) {
         let metadata = {};
+        console.log(fileInfo);
         this.putFileInfo = fileInfo;
         this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileValidate.name = fileInfo.name;
@@ -1718,12 +1715,22 @@
         this.editFileValidate.description = fileInfo.description;
         if (this.editFileValidate.type == "data") {
           metadata = this.operationApi.getResInfo(fileInfo.uid);
-          this.oldMetadata = metadata;
-          this.editFileValidate.format = metadata.format;
-          this.editFileValidate.scale = metadata.scale;
-          this.editFileValidate.reference = metadata.reference;
-          this.editFileValidate.unit = metadata.unit;
-          this.editFileValidate.concept = metadata.concept;
+          console.log(metadata);
+          if(metadata == undefined || metadata == null || metadata == ""){
+            this.oldMetadata = {};
+            this.editFileValidate.format = "";
+            this.editFileValidate.scale = "";
+            this.editFileValidate.reference = "";
+            this.editFileValidate.unit = "";
+            this.editFileValidate.concept = "";
+          } else {
+            this.oldMetadata = metadata;
+            this.editFileValidate.format = metadata.format;
+            this.editFileValidate.scale = metadata.scale;
+            this.editFileValidate.reference = metadata.reference;
+            this.editFileValidate.unit = metadata.unit;
+            this.editFileValidate.concept = metadata.concept;
+          }
         }
         this.editFileModel = true;
       },
@@ -1752,7 +1759,6 @@
                 formData
               )
               .then((res) => {
-                console.log(res);
                 this.editFileModel = false;
                 if (res.data == "Offline") {
                   this.$store.commit("userLogout");
@@ -1792,21 +1798,18 @@
                     // 检查元数据发生修改
                     let metadataChanged = false;
                     if (
-                      this.oldMetadata.format != this.editFileValidate.format ||
-                      this.oldMetadata.scale != this.editFileValidate.scale ||
-                      this.oldMetadata.reference != this.editFileValidate.reference ||
-                      this.oldMetadata.unit != this.editFileValidate.unit ||
-                      this.oldMetadata.concept != this.editFileValidate.concept
+                      this.oldMetadata.format != metadata.format ||
+                      this.oldMetadata.scale != metadata.scale ||
+                      this.oldMetadata.reference != metadata.reference ||
+                      this.oldMetadata.unit != metadata.unit ||
+                      this.oldMetadata.concept != metadata.concept
                     ) {
                       metadataChanged = true;
                     }
                     if (metadataChanged) {
                       this.axios
                         .put(
-                          "/GeoProblemSolving/activityDoc/meta/" +
-                          this.activityInfo.aid +
-                          "/" +
-                          this.selectFileInfo.uid
+                          "/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}"
                         )
                         .then((res) => {
                           console.log(res.data.data);

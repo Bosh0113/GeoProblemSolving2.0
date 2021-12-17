@@ -92,6 +92,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+
     @Override
     public JSONObject findProjectsByPage(int page, int size) {
         try {
@@ -610,6 +611,10 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
             userRepository.save(user);
             nodeService.userExitActivity(aid, userId);
+            //判断是否为临时用户，若是则删除，临时用户的id长度为两个uuid
+            if (userId.length() > 40){
+                userRepository.deleteById(userId);
+            }
 
             //退出子活动
             projectUtil.quitSubProject(aid, userId, 0);

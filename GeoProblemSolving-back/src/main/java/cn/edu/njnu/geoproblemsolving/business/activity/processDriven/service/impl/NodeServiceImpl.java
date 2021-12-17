@@ -12,6 +12,8 @@ import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDao;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
+import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
+import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -19,6 +21,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -56,6 +60,9 @@ public class NodeServiceImpl implements NodeService {
     ActivityResDao activityResDao;
 
     @Autowired
+    UserDao userDao;
+
+    @Autowired
     SubprojectRepository subprojectRepository;
 
     @Autowired
@@ -64,9 +71,8 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
 
-    @Value("${userServerLocation}")
-    String userServer;
 
+    private final Logger LOGGER = LoggerFactory.getLogger(NodeServiceImpl.class);
 
     @Override
     public ActivityNode createActivityNode(String aid, Integer level) {
@@ -101,34 +107,51 @@ public class NodeServiceImpl implements NodeService {
     }
 
     public String getUserTag(String userId, String role) {
-        HashMap<String, JSONArray> userTagMap = getUserTagFromUserServer(userId);
-        if (userTagMap == null) return null;
-        JSONArray domain = userTagMap.get("domain");
-        JSONArray organization = userTagMap.get("organization");
-        return TagUtil.setUserTag(role, domain, organization);
-    }
-
-    public HashMap<String, JSONArray> getUserTagFromUserServer(String userId) {
-        String getTagUrl = "http://" + userServer + "/user/tag/" + userId;
-        try {
-            JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
-            if (response.getInteger("code") != 0) {
-                System.out.println("Fail: getUserTagFromUserServer ->" + response.getString("msg"));
-                return null;
-            }
-            JSONObject userTags = response.getJSONObject("data");
-            JSONArray domain = userTags.getJSONArray("domain");
-            JSONArray organization = userTags.getJSONArray("organization");
-            HashMap<String, JSONArray> userTagMap = new HashMap<>();
-            userTagMap.put("domain", domain);
-            userTagMap.put("organization", organization);
-            return userTagMap;
-        } catch (HttpException exception) {
-            //后面改用 AOP 方式写日志
-            System.out.println("Fail: getUserTagFromUserServer ->" + exception.toString());
+        // HashMap<String, JSONArray> userTagMap = getUserTagFromUserServer(userId);
+        UserEntity user = userDao.findUserByIdOrEmail(userId);
+        if (user == null){
+            LOGGER.warn("No such user: " + userId);
             return null;
         }
+        ArrayList<String> domain = user.getDomain();
+        ArrayList<String> organizations = user.getOrganizations();
+        JSONArray domainArr = new JSONArray();
+        JSONArray orgArr = new JSONArray();
+        if (domain != null && !domain.isEmpty()){
+            for (String item : domain){
+                domainArr.add(item);
+            }
+        }
+        if (organizations != null && !organizations.isEmpty()){
+            for (String item : organizations){
+                orgArr.add(item);
+            }
+        }
+        return TagUtil.setUserTag(role, domainArr, orgArr);
     }
+
+    // public HashMap<String, JSONArray> getUserTagFromUserServer(String userId) {
+    //     String getTagUrl = "http://" + userServer + "/user/tag/" + userId;
+    //     try {
+    //         JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
+    //         if (response.getInteger("code") != 0) {
+    //             System.out.println("Fail: getUserTagFromUserServer ->" + response.getString("msg"));
+    //             return null;
+    //         }
+    //         JSONObject userTags = response.getJSONObject("data");
+    //         JSONArray domain = userTags.getJSONArray("domain");
+    //         JSONArray organization = userTags.getJSONArray("organization");
+    //         HashMap<String, JSONArray> userTagMap = new HashMap<>();
+    //         userTagMap.put("domain", domain);
+    //         userTagMap.put("organization", organization);
+    //         return userTagMap;
+    //     } catch (HttpException exception) {
+    //         //后面改用 AOP 方式写日志
+    //         System.out.println("Fail: getUserTagFromUserServer ->" + exception.toString());
+    //         return null;
+    //     }
+    // }
+
 
 
     public HashMap<String, String> getActivityUserTag(String aid, Integer level) {
@@ -149,35 +172,63 @@ public class NodeServiceImpl implements NodeService {
         return getUsersTag(idRoleMap);
     }
 
-
-    public HashMap<String, String> getUsersTag(HashMap<String, String> idRoleMap) {
-        if (idRoleMap == null || idRoleMap.size() == 0) return null;
-        Set<String> idSet = idRoleMap.keySet();
-        String userIdStr = idSet.stream().collect(Collectors.joining(","));
-        String getTagUrl = "http://" + userServer + "/user/tags/" + userIdStr;
-        try {
-            JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
-            if (response.getInteger("code") != 0) {
-                System.out.println("Fail: getUsersTag ->" + response.getString("msg"));
-                return null;
+    public HashMap<String, String> getUsersTag(HashMap<String, String> idRoleMap){
+        //userId
+        Set<String> userIds = idRoleMap.keySet();
+        List<UserEntity> users = userDao.findUsers(userIds);
+        HashMap<String, String> userTagMap = new HashMap<>();
+        for (UserEntity user : users){
+            ArrayList<String> domain = user.getDomain();
+            ArrayList<String> organizations = user.getOrganizations();
+            JSONArray domainArr = new JSONArray();
+            JSONArray orgArr = new JSONArray();
+            if (domain != null && !domain.isEmpty()){
+                for (String item : domain){
+                    domainArr.add(item);
+                }
             }
-            HashMap<String, String> userTagMap = new HashMap<>();
-            HashMap<String, HashMap<String, ArrayList<String>>> usersTags = JSONObject.parseObject(response.getJSONObject("data").toJSONString(), HashMap.class);
-            for (Map.Entry<String, HashMap<String, ArrayList<String>>> item : usersTags.entrySet()) {
-                String userId = item.getKey();
-                String role = idRoleMap.get(userId);
-                HashMap<String, ArrayList<String>> value = JSONObject.parseObject(JSONObject.toJSONString(item.getValue()), HashMap.class);
-                JSONArray domain = JSONObject.parseObject(JSONObject.toJSONString(value.get("domain")), JSONArray.class);
-                JSONArray organization = JSONObject.parseObject(JSONObject.toJSONString(value.get("organization")), JSONArray.class);
-                String tags = TagUtil.setUserTag(role, domain, organization);
-                userTagMap.put(userId, tags);
+            if (organizations != null && !organizations.isEmpty()){
+                for (String item : organizations){
+                    orgArr.add(item);
+                }
             }
-            return userTagMap;
-        } catch (HttpException exception) {
-            System.out.println("Fail: getUsersTag -> " + exception.toString());
-            return null;
+            String userId = user.getUserId();
+            String role = idRoleMap.get(userId);
+            String tags = TagUtil.setUserTag(role, domainArr, orgArr);
+            userTagMap.put(userId, tags);
         }
+        return userTagMap;
     }
+
+
+    // public HashMap<String, String> getUsersTag(HashMap<String, String> idRoleMap) {
+    //     if (idRoleMap == null || idRoleMap.size() == 0) return null;
+    //     Set<String> idSet = idRoleMap.keySet();
+    //     String userIdStr = idSet.stream().collect(Collectors.joining(","));
+    //     String getTagUrl = "http://" + userServer + "/user/tags/" + userIdStr;
+    //     try {
+    //         JSONObject response = restTemplate.getForObject(getTagUrl, JSONObject.class);
+    //         if (response.getInteger("code") != 0) {
+    //             System.out.println("Fail: getUsersTag ->" + response.getString("msg"));
+    //             return null;
+    //         }
+    //         HashMap<String, String> userTagMap = new HashMap<>();
+    //         HashMap<String, HashMap<String, ArrayList<String>>> usersTags = JSONObject.parseObject(response.getJSONObject("data").toJSONString(), HashMap.class);
+    //         for (Map.Entry<String, HashMap<String, ArrayList<String>>> item : usersTags.entrySet()) {
+    //             String userId = item.getKey();
+    //             String role = idRoleMap.get(userId);
+    //             HashMap<String, ArrayList<String>> value = JSONObject.parseObject(JSONObject.toJSONString(item.getValue()), HashMap.class);
+    //             JSONArray domain = JSONObject.parseObject(JSONObject.toJSONString(value.get("domain")), JSONArray.class);
+    //             JSONArray organization = JSONObject.parseObject(JSONObject.toJSONString(value.get("organization")), JSONArray.class);
+    //             String tags = TagUtil.setUserTag(role, domain, organization);
+    //             userTagMap.put(userId, tags);
+    //         }
+    //         return userTagMap;
+    //     } catch (HttpException exception) {
+    //         System.out.println("Fail: getUsersTag -> " + exception.toString());
+    //         return null;
+    //     }
+    // }
 
 
     //只关注当前节点上的操作
@@ -210,7 +261,7 @@ public class NodeServiceImpl implements NodeService {
             case "put":
                 String uid = (String) res;
                 HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
-                String resourceTag = TagUtil.setResourceTag(tagMap);
+                String resourceTag = TagUtil.setResTag(tagMap);
                 resources.put(uid, resourceTag);
                 break;
         }

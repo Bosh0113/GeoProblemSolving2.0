@@ -374,11 +374,6 @@
         </div>
       </div>
     </Card>
-    <!-- 进度加载条 -->
-    <Spin fix v-show="showLoading">
-      <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-      <div>Loading</div>
-    </Spin>
     <Modal
       v-model="shareModal"
       title="Share file from personal center"
@@ -915,8 +910,6 @@
           @click="deleteResourceModalShow(selectData)"
         ></Button>
       </div>
-      <!-- <Button style="margin-right:20px" @click="dataPreview(selectData)">Preview</Button>
-      <Button style="margin-right:20px" @click="dataVisualize">Visualization</Button>-->
     </Modal>
     <Modal
       width="800px"
@@ -1066,16 +1059,6 @@
       cancel-text="Cancel"
     >
       <h3>Do you really want to delete this resource?</h3>
-    </Modal>
-    <Modal
-      v-model="showImagesPreview"
-      title="Preview"
-      :mask-closable="false"
-      width="600px"
-    >
-      <div style="display:flex;text-align:center;align-items:center;justify-content:center;">
-        <img :src="imagesPreviewUrl" style="max-width:550px; max-height:550px;">
-      </div>
     </Modal>
     <login-modal
       :tempLoginModal="tempLoginModal"
@@ -1287,10 +1270,6 @@ export default {
       // panel
       panel: null,
       resProxy: this.$store.getters.resProxy,
-      showImagesPreview:false,
-      imagesPreviewUrl:"",
-      //进度条
-      showLoading: false,
     };
   },
   computed: {
@@ -1507,6 +1486,8 @@ export default {
       }
     },
     refreshResource(){
+      this.folderStack = [{ uid: 0, name: "Home" }], //folder level
+      this.folderIdStack = [], // folder level
       this.getResList();
       this.getParentActivities();
     },
@@ -1634,37 +1615,14 @@ export default {
                       this.activityResList.push(uploadedList[i]);
                       if (this.uploadDataInfo.type == "data") {
                         this.activityDataList.push(uploadedList[i]);
-                        metadata.format = this.uploadDataInfo.format;
-                        metadata.scale = this.uploadDataInfo.scale;
-                        metadata.reference = this.uploadDataInfo.reference;
-                        metadata.unit = this.uploadDataInfo.unit;
-                        metadata.concept = this.uploadDataInfo.concept;
+                        // metadata.format = this.uploadDataInfo.format;
+                        // metadata.scale = this.uploadDataInfo.scale;
+                        // metadata.reference = this.uploadDataInfo.reference;
+                        // metadata.unit = this.uploadDataInfo.unit;
+                        // metadata.concept = this.uploadDataInfo.concept;
                       } else {
                         this.relatedResList.push(uploadedList[i]);
                       }
-
-                      // let operationId = this.operationApi.resOperationRecord(
-                      //   this.activityInfo.aid,
-                      //   "",
-                      //   "",
-                      //   "upload",
-                      //   this.userInfo.userId,
-                      //   uploadedList[i],
-                      //   metadata
-                      // );
-
-                      // 生成临时操作记录
-                      // let resOperation = {
-                      //   id: operationId,
-                      //   type: "resource",
-                      //   resRef: uploadedList[i].uid,
-                      //   operator: this.userInfo.userId,
-                      // };
-                      //
-                      // this.$store.commit("updateTempOperations", {
-                      //   behavior: "add",
-                      //   operation: resOperation,
-                      // });
                     }
                     this.operationApi.getActivityDoc(this.activityInfo.aid);
                     for (let i = 0; i < uploadedOperation.length; i++){
@@ -1735,22 +1693,22 @@ export default {
       });
     },
     preview(data){
-      console.log(data);
       this.checkDataModal = false;
       var res = data;
       let name = data.suffix;
-      if (/\.(doc|docx|xls|xlsx|ppt|pptx|xml|json|md)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
+      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf|txt)$/.test(name.toLowerCase())) {
+        // if (this.panel != null) {
+        //   this.panel.close();
+        // }
         let url = "";
         if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+        } else if(res.address.indexOf("/GeoProblemSolving/resource") != -1){
+          url = "https://geomodeling.njnu.edu.cn" + res.address;
         } else {
           url = this.$store.getters.resProxy + res.address;
         }
-        console.log(url);
-        let finalUrl = "http://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +
@@ -1772,7 +1730,7 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
 
-      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
@@ -1797,102 +1755,89 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(pdf)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url = "";
-        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
-          url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
-        } else {
-          url = this.$store.getters.resProxy + res.address;
-        }
-        console.log(url);
-
-        let that = this;
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.setRequestHeader(
-          'Content-Type',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
-        xhr.responseType = 'blob';
-        this.showLoading = true;
-        xhr.onload = function (e) {
-          if (this.status == 200) {
-            let changeUrl = ''
-            let file = new Blob([this.response], { type: 'application/pdf' })
-            if (window.createObjectURL !== undefined) { // basic
-              changeUrl = window.createObjectURL(file)
-            } else if (window.webkitURL !== undefined) { // webkit or chrome
-              try {
-                changeUrl = window.webkitURL.createObjectURL(file)
-              } catch (error) {
-
-              }
-            } else if (window.URL !== undefined) { // Mozilla (firefox)
-              try {
-                changeUrl = window.URL.createObjectURL(file)
-              } catch (error) {
-                console.log(error)
-              }
-            }
-            console.log(file);
-            console.log(changeUrl);
-            var toolURL =
-              "<iframe src=" +
-              changeUrl +
-              ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove"
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:10px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              closeOnEscape: true
-            });
-            $(".jsPanel-content").css("font-size", "0");
-          }
-        };
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                that.showLoading = false;
-            } else {
-                //请求失败
-            }
-          }
-        }
-        xhr.send();
-
-      } else if (/\.(gif|jpg|png|jpeg)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url = "";
-        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
-          url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
-        } else {
-          url = this.$store.getters.resProxy + res.address;
-        }
-
-        this.imagesPreviewUrl = url;
-        this.showImagesPreview = true;
-
-      } else {
+      }  else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Not supported file format."
         });
         return false;
       }
+      // else if (/(pdf)$/.test(name.toLowerCase())) {
+      //   if (this.panel != null) {
+      //     this.panel.close();
+      //   }
+      //   let url = "";
+      //   if(res.address.indexOf("http://221.226.60.2:8082") != -1){
+      //     url = this.$store.getters.resProxy + res.address.split("http://221.226.60.2:8082")[1];
+      //   } else {
+      //     url = this.$store.getters.resProxy + res.address;
+      //   }
+      //   console.log(url);
+
+      //   let that = this;
+      //   var xhr = new XMLHttpRequest();
+      //   xhr.open("GET", url, true);
+      //   xhr.setRequestHeader(
+      //     'Content-Type',
+      //     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      //   );
+      //   xhr.responseType = 'blob';
+      //   this.showLoading = true;
+      //   xhr.onload = function (e) {
+      //     if (this.status == 200) {
+      //       let changeUrl = ''
+      //       let file = new Blob([this.response], { type: 'application/pdf' })
+      //       if (window.createObjectURL !== undefined) { // basic
+      //         changeUrl = window.createObjectURL(file)
+      //       } else if (window.webkitURL !== undefined) { // webkit or chrome
+      //         try {
+      //           changeUrl = window.webkitURL.createObjectURL(file)
+      //         } catch (error) {
+
+      //         }
+      //       } else if (window.URL !== undefined) { // Mozilla (firefox)
+      //         try {
+      //           changeUrl = window.URL.createObjectURL(file)
+      //         } catch (error) {
+      //           console.log(error)
+      //         }
+      //       }
+      //       console.log(file);
+      //       console.log(changeUrl);
+      //       var toolURL =
+      //         "<iframe src=" +
+      //         changeUrl +
+      //         ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
+      //       this.panel = jsPanel.create({
+      //         headerControls: {
+      //           smallify: "remove"
+      //         },
+      //         theme: "primary",
+      //         footerToolbar: '<p style="height:10px"></p>',
+      //         headerTitle: "Preview",
+      //         contentSize: "800 600",
+      //         content: toolURL,
+      //         disableOnMaximized: true,
+      //         dragit: {
+      //           containment: 5
+      //         },
+      //         closeOnEscape: true
+      //       });
+      //       $(".jsPanel-content").css("font-size", "0");
+      //     }
+      //   };
+      //   xhr.onreadystatechange = function() {
+      //     if (xhr.readyState == 4) {
+      //       if (xhr.status == 200) {
+      //           that.showLoading = false;
+      //       } else {
+      //           //请求失败
+      //       }
+      //     }
+      //   }
+      //   xhr.send();
+
+      // }
     },
     deleteResourceModalShow(resource) {
       this.deleteResourceModal = true;
@@ -1979,121 +1924,6 @@ export default {
         this.metaDataEdit = false;
       } else {
         this.metaDataEdit = true;
-      }
-    },
-    dataPreview(res) {
-      let name = res.name;
-      if (/\.(doc|docx|xls|xlsx|ppt|pptx)$/.test(name.toLowerCase())) {
-        this.$Modal.confirm({
-          title: "Note",
-          content:
-            "<p>You selected file will be previewed through</p><p style='font-size:16px;font-weight:bold'>Microsoft office online service</p>",
-          onOk: () => {
-            if (this.panel != null) {
-              this.panel.close();
-            }
-            let url =
-              "http://view.officeapps.live.com/op/view.aspx?src=" + res.address;
-            let toolURL =
-              "<iframe src=" +
-              url +
-              ' style="width: 100%;height:100%" frameborder="0"></iframe>';
-            // var demoPanelTimer = null;
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove",
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:5px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5,
-              },
-              closeOnEscape: true,
-              // callback: function() {
-              //   var that = this;
-              //   demoPanelTimer = window.setInterval(function() {
-              //     that.style.zIndex = "9999";
-              //   }, 1);
-              // }
-            });
-            $(".jsPanel-content").css("font-size", "0");
-          },
-          onCancel: () => {
-            return;
-          },
-        });
-      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var toolURL =
-          "<video src=" +
-          res.address +
-          ' style="width: 100%;height:100%" controls></video>';
-        // var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove",
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5,
-          },
-          closeOnEscape: true,
-          // callback: function() {
-          //   var that = this;
-          //   demoPanelTimer = window.setInterval(function() {
-          //     that.style.zIndex = "9999";
-          //   }, 1);
-          // }
-        });
-        $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(pdf|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        var toolURL =
-          "<iframe src=" +
-          res.address +
-          ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
-        // var demoPanelTimer = null;
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove",
-          },
-          theme: "primary",
-          footerToolbar: '<p style="height:10px"></p>',
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5,
-          },
-          closeOnEscape: true,
-          // callback: function() {
-          //   var that = this;
-          //   demoPanelTimer = window.setInterval(function() {
-          //     that.style.zIndex = "9999";
-          //   }, 1);
-          // }
-        });
-        $(".jsPanel-content").css("font-size", "0");
-      } else {
-        this.$Notice.error({
-          title: "Open failed",
-          desc: "Sorry. Unsupported file format.",
-        });
-        return false;
       }
     },
     getPreviousRes() {
@@ -2540,6 +2370,7 @@ export default {
                   metadata.unit = this.editFileValidate.unit;
                   metadata.concept = this.editFileValidate.concept;
                 }
+                this.operationApi.getActivityDoc(this.activityInfo.aid);
                 let operationId = this.operationApi.resOperationRecord(
                   this.activityInfo.aid,
                   "",
@@ -2553,16 +2384,15 @@ export default {
                   // 检查元数据发生修改
                   let metadataChanged = false;
                   if(
-                    this.oldMetadata.format != this.editFileValidate.format ||
-                    this.oldMetadata.scale != this.editFileValidate.scale ||
-                    this.oldMetadata.reference != this.editFileValidate.reference ||
-                    this.oldMetadata.unit != this.editFileValidate.unit ||
-                    this.oldMetadata.concept != this.editFileValidate.concept
+                    this.oldMetadata.format != metadata.format ||
+                    this.oldMetadata.scale != metadata.scale ||
+                    this.oldMetadata.reference != metadata.reference ||
+                    this.oldMetadata.unit != metadata.unit ||
+                    this.oldMetadata.concept != metadata.concept
                   ){ metadataChanged = true; }
                   if(metadataChanged){
-                    let projectId = this.$route.params.projectId;
                     this.axios
-                      .put(`/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
+                      .put(`/GeoProblemSolving/activityDoc/meta/${this.activityInfo.parent}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
                       .then((res) => {
                         console.log(res.data.data);
                       })
@@ -2600,7 +2430,6 @@ export default {
     shareToParentModalShow(){
       this.shareToParentModal = true;
       this.fileListChoosed = [];
-      console.log(this.activityInfo.parent);
       for(let i = 0 ; i < this.fileList.length ; i++){
         if(!this.fileList[i].fromParents){
           this.fileListChoosed.push(this.fileList[i]);
@@ -2628,11 +2457,11 @@ export default {
               // this.$router.push({ name: "Login" });
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              for( let j = 0 ; j < this.fileList.length ; j++){
-                if(addFileList[i].uid == this.fileList[j].uid){
-                  this.fileList.splice(j,1);
-                }
-              }
+              // for( let j = 0 ; j < this.fileList.length ; j++){
+              //   if(addFileList[i].uid == this.fileList[j].uid){
+              //     this.fileList.splice(j,1);
+              //   }
+              // }
             } else {
               suc = false;
             }

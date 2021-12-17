@@ -1077,27 +1077,37 @@ export function resOperationRecord(aid, oid, taskId, behavior, userId, resInfo, 
     if (metadata != undefined && metadata != {}) {
       let MatedataList = Resource.childNodes;
       for (let i = 0; i < MatedataList.length; i++) {
-        if (MatedataList[i].getAttribute("type") === "scale") {
-          if (metadata.scale != undefined) {
-            MatedataList[i].setAttribute("description", metadata.scale);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "reference") {
-          if (metadata.reference != undefined) {
-            MatedataList[i].setAttribute("description", metadata.reference);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "unit") {
-          if (metadata.unit != undefined) {
-            MatedataList[i].setAttribute("description", metadata.unit);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "concept") {
-          if (metadata.concept != undefined) {
-            MatedataList[i].setAttribute("description", metadata.concept);
-          }
-        } else if (MatedataList[i].getAttribute("type") === "format") {
-          if (metadata.format != undefined) {
-            MatedataList[i].setAttribute("description", metadata.format);
-          }
-        }
+        Resource.removeChild(MatedataList[i]);
+      }
+      if (metadata.format != undefined && metadata.format != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "format");
+        Metadata.setAttribute("description", metadata.format);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.scale != undefined && metadata.scale != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "scale");
+        Metadata.setAttribute("description", metadata.scale);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.reference != undefined && metadata.reference != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "reference");
+        Metadata.setAttribute("description", metadata.reference);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.unit != undefined && metadata.unit != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "unit");
+        Metadata.setAttribute("description", metadata.unit);
+        Resource.appendChild(Metadata);
+      }
+      if (metadata.concept != undefined && metadata.concept != "") {
+        let Metadata = xmlDoc.createElement('Metadata');
+        Metadata.setAttribute("type", "concept");
+        Metadata.setAttribute("description", metadata.concept);
+        Resource.appendChild(Metadata);
       }
     }
 

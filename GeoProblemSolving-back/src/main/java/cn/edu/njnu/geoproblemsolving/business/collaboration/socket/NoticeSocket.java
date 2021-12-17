@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -36,8 +37,10 @@ public class NoticeSocket {
     //接收消息后所调用的方法
     @OnMessage
     public void onMessage(String message) {
+        // System.out.println("Notice on message");
         try {
             JSONObject messageJson = JSONObject.parseObject(message);
+            // System.out.println("-----Notice onmessage: --------:" + messageJson);
             if (!messageJson.getString("type").equals("ping")) {
                 if(messageJson.getString("type").equals("test")) {
                     // broadcast online participants
@@ -65,9 +68,11 @@ public class NoticeSocket {
     @OnClose
     public void onClose() throws IOException {
         String unConnectId = "";
+        Set<String> strings = servers.keySet();
+        // System.out.println("Onclose ---------------NoticeServer: " + strings.size());
         for (Map.Entry<String, NoticeSocket> server : servers.entrySet()) {
-            System.out.println(server.getValue().toString());
-            System.out.println(this.toString());
+            // System.out.println(server.getValue().toString());
+            // System.out.println(this.toString());
             if (server.getValue().equals(this)) {
                 unConnectId = server.getKey();
                 servers.remove(server.getKey());
@@ -79,7 +84,8 @@ public class NoticeSocket {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String nowDate = dateFormat.format(new Date());
-        System.out.println("有用户断开连接：" + unConnectId + "-----" + "断开时间：" + nowDate);
+        // System.out.println("Notice 有用户断开连接：" + unConnectId + "-----" + "断开时间：" + nowDate);
+        System.out.println("Notice 有用户断开连接："  + "-----" + "断开时间：" + nowDate);
         System.out.println("---------------------------------------------------------------------------");
     }
 
@@ -91,8 +97,7 @@ public class NoticeSocket {
                 break;
             }
         }
-        System.out.println("--------Notice on error----------------");
-        System.out.println(error.toString());
+        System.out.println("--------Notice on error----------------:" + error.toString());
     }
 
     private void broadcastMemberInfo() throws IOException {

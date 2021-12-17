@@ -722,13 +722,14 @@ import Avatar from "vue-avatar";
           // project/getProjects?aids=  用户获取项目
           this.$axios.get("/GeoProblemSolving/project/getProjects?aids=" + createdProjectIds)
             .then(res => {
-              if(res.data.code == 0){
-                console.log(res.data.data);
+              if(res.data.code == 0) {
                 this.$set(this, "createdProjectList", res.data.data)
+              }else {
+                this.$Message.error("Failed to load the created project.");
               }
             })
             .catch(err => {
-              this.$Message.error("Loading project failed.")
+              this.$Message.error("Failed to load the created project.");
             })
         }
 
@@ -739,6 +740,8 @@ import Avatar from "vue-avatar";
             .then(res => {
               if (res.data.code == 0) {
                 this.$set(this, "joinedProjectsList", res.data.data);
+              }else {
+                this.$Message.error("Failed to load the joined project.");
               }
             })
             .catch(err => {

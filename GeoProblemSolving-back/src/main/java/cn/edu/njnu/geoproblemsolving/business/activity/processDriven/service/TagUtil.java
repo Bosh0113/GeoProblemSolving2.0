@@ -6,10 +6,7 @@ import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName TagUtil
@@ -125,7 +122,6 @@ public class TagUtil {
         String organization = array2String(orgArray);
         return addFlagInTags(role, domain, organization);
     }
-
     /**
      * 为不同类型字符串添加分隔符
      * @param separator

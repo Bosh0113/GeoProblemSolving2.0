@@ -124,11 +124,6 @@
         </div>
       </div>
     </Col>
-    <!-- 进度加载条 -->
-    <Spin fix v-show="showLoading">
-      <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-      <div>Loading</div>
-    </Spin>
     <Modal
       v-model="uploadModal"
       title="Upload resource"
@@ -159,16 +154,6 @@
       </div>
       <br />
       <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple" />
-    </Modal>
-    <Modal
-      v-model="showImagesPreview"
-      title="Preview"
-      :mask-closable="false"
-      width="600px"
-    >
-      <div style="display:flex;text-align:center;align-items:center;justify-content:center;">
-        <img :src="imagesPreviewUrl" style="max-width:550px; max-height:550px;">
-      </div>
     </Modal>
   </Row>
 </template>
@@ -244,10 +229,6 @@ export default {
       panel: null,
       resAddress: "",
       resProxy: this.$store.getters.resProxy,
-      showImagesPreview:false,
-      imagesPreviewUrl:"",
-      //进度条
-      showLoading: false,
     };
   },
   mounted() {
@@ -269,7 +250,6 @@ export default {
       this.axios.get("/GeoProblemSolving/rip/file/allPublic").then(res => {
         if (res.data.code == 0){
           let tempResourceList = res.data.data;
-          console.log(tempResourceList);
           tempResourceList.reverse();
           let that = this;
           tempResourceList.forEach(function(list) {
@@ -278,7 +258,6 @@ export default {
             list.fileSize = that.filterSizeType(size);
             list.uploadTime = that.filterTimeStyle(time);
           });
-          console.log(tempResourceList);
           this.$set(this, "allResourceList", tempResourceList);
           this.dataCount = tempResourceList.length;
           this.allSelectedList = tempResourceList;
@@ -335,18 +314,19 @@ export default {
     show(index) {
       var res = this.showList[index];
       let name = this.showList[index].suffix;
-      if (/\.(doc|docx|xls|xlsx|ppt|pptx|xml|json|md)$/.test(name.toLowerCase())) {
+      if (/(doc|docx|xls|xlsx|ppt|pptx|xml|json|md|gif|jpg|png|jpeg|pdf|csv)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         let url = "";
-        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
+        if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
+        } else if(res.address.indexOf("/GeoProblemSolving/resource") != -1){
+          url = "https://geomodeling.njnu.edu.cn" + res.address;
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
         }
-        console.log(url);
-        let finalUrl = "http://view.xdocin.com/xdoc?_xdoc=" + url;
+        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
         var toolURL =
           "<iframe src=" +
           finalUrl +
@@ -368,7 +348,7 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
 
-      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
@@ -393,95 +373,6 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(pdf)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url = "";
-        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
-          url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
-        } else {
-          url = this.$store.getters.resProxy + this.showList[index].address;
-        }
-        console.log(url);
-
-        let that = this;
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.setRequestHeader(
-          'Content-Type',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
-        xhr.responseType = 'blob';
-        this.showLoading = true;
-        xhr.onload = function (e) {
-          if (this.status == 200) {
-            let changeUrl = ''
-            let file = new Blob([this.response], { type: 'application/pdf' })
-            if (window.createObjectURL !== undefined) { // basic
-              changeUrl = window.createObjectURL(file)
-            } else if (window.webkitURL !== undefined) { // webkit or chrome
-              try {
-                changeUrl = window.webkitURL.createObjectURL(file)
-              } catch (error) {
-
-              }
-            } else if (window.URL !== undefined) { // Mozilla (firefox)
-              try {
-                changeUrl = window.URL.createObjectURL(file)
-              } catch (error) {
-                console.log(error)
-              }
-            }
-            console.log(file);
-            console.log(changeUrl);
-            var toolURL =
-              "<iframe src=" +
-              changeUrl +
-              ' style="width: 100%;height:100%" frameborder="0" controls></iframe>';
-            this.panel = jsPanel.create({
-              headerControls: {
-                smallify: "remove"
-              },
-              theme: "primary",
-              footerToolbar: '<p style="height:10px"></p>',
-              headerTitle: "Preview",
-              contentSize: "800 600",
-              content: toolURL,
-              disableOnMaximized: true,
-              dragit: {
-                containment: 5
-              },
-              closeOnEscape: true
-            });
-            $(".jsPanel-content").css("font-size", "0");
-          }
-        };
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-                that.showLoading = false;
-            } else {
-                //请求失败
-            }
-          }
-        }
-        xhr.send();
-
-      } else if (/\.(gif|jpg|png|jpeg)$/.test(name.toLowerCase())) {
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url = "";
-        if(this.showList[index].address.indexOf("http://221.226.60.2:8082") != -1){
-          url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
-        } else {
-          url = this.$store.getters.resProxy + this.showList[index].address;
-        }
-
-        this.imagesPreviewUrl = url;
-        this.showImagesPreview = true;
-
       } else {
         this.$Notice.error({
           title: "Open failed",

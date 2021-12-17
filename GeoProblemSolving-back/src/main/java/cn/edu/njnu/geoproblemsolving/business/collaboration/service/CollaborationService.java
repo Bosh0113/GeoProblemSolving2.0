@@ -125,14 +125,19 @@ public class CollaborationService {
 
     public void operationStart(String groupKey, Session session, EndpointConfig config) {
         CollaborationConfig collaborationConfig;
+        // System.out.println("0---Operation On Open----In user------: " + ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("name"));
+        // System.out.println("1-----Operation on open-----groupKey-------:" + groupKey);
         try {
             //Check if the session existence.
             if (groups.containsKey(groupKey)) {
                 collaborationConfig = groups.get(groupKey);
+                // System.out.println("2.1-Operation On Open---Exists Group------:" + collaborationConfig.getAid());
             } else {
                 collaborationConfig = new CollaborationConfig(groupKey);
                 groups.put(groupKey, collaborationConfig);
+                // System.out.println("2.1--Operation On Open--New Group------:" + collaborationConfig.getAid());
             }
+
 
             // current operator
             String userId = ((HttpSession) config.getUserProperties().get(HttpSession.class.getName())).getAttribute("userId").toString();
@@ -142,18 +147,32 @@ public class CollaborationService {
             HashMap<String, CollaborationUser> participants;
             if (collaborationConfig.getParticipants() == null) {
                 participants = new HashMap<>();
+                // System.out.println("3.1--Operation On Open---This is no people. -----");
             } else {
                 participants = collaborationConfig.getParticipants();
+
+                // String name = "";
+                // for (Map.Entry<String, CollaborationUser> item : participants.entrySet()){
+                //     CollaborationUser value = item.getValue();
+                //     name += ":" + value.getName();
+                // }
+                // System.out.println("3.1--Operation On Open--Exists participants----" + name);
             }
             participants.put(userId, collaborationUser);
             collaborationConfig.setParticipants(participants);
             // groups.put(groupKey, collaborationConfig);
 
-            // 发布当前协同操作模式
             if (participants.size() > 1) {
                 // 通知新成员上线，发布新的成员列表
                 collaborationBehavior.sendParticipantsInfo(collaborationConfig.getParticipants(), collaborationUser, "on");
+
+                // 发布当前协同操作模式
                 collaborationBehavior.sendCollaborationStatus(collaborationConfig, session);
+            } else if (participants.size() == 1) {
+                // 初始化协同操作模式
+                collaborationConfig.setMode(CollaborationMode.Free);
+                collaborationConfig.setOperator("");
+                collaborationConfig.setApplyQueue(new ArrayList<>());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,7 +193,7 @@ public class CollaborationService {
 
             String time = messageObject.getString("time");
 
-            List<String> receivers = null;
+            List<String> receivers;
             try {
                 receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
             } catch (NullPointerException ex) {
@@ -235,17 +254,33 @@ public class CollaborationService {
         CollaborationConfig collaborationConfig;
         try {
             String groupKey = toolId + aid;
+
+
+            // System.out.println("1---transfer---groupId: " +  groupKey);
             collaborationConfig = groups.get(groupKey);
+
+
+            // String name = "";
+            // for (Map.Entry<String, CollaborationUser> item : collaborationConfig.getParticipants().entrySet()){
+            //     CollaborationUser value = item.getValue();
+            //     name += ":" + value.getName();
+            // }
+            //
+            // System.out.println("1---Operation Transfer---Exists participant: " +  name);
+            // System.out.println("1---Operation Transfer---Participant num: " +  collaborationConfig.getParticipants().size());
 
             JSONObject messageObject = JSONObject.parseObject(message);
             String messageType = messageObject.getString("type");
+
+            // System.out.println("3---transfer---messageType:" + messageType);
+            // System.out.println("4---transfer---sender: " +  messageObject.getString("sender"));
 
             if (messageType.equals("ping")) return;
 
             String user = messageObject.getString("sender");
             CollaborationUser sender =  collaborationBehavior.getMemberInfo(user, null);
 
-            List<String> receivers = null;
+            List<String> receivers;
             try {
                 receivers = messageObject.getJSONArray("receivers").toJavaList(String.class);
             } catch (NullPointerException ex) {
@@ -487,7 +522,6 @@ public class CollaborationService {
                         返回结果到主线程的话，主线程（单个websocket）对应一个的内存池
                          */
                         System.out.println("end: " + groupKey);
-                        System.out.println(collaborationConfig);
                         if (resJson == null) {
                             computeMsg.setOutputs("Fail");
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
@@ -631,6 +665,7 @@ public class CollaborationService {
                     //做消息转发
                     HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
                     collaborationBehavior.sendTasKAssignment(participants, sender, messageObject, null);
+                    break;
                 }
                 case "general": {
                     //message transmission
@@ -716,7 +751,16 @@ public class CollaborationService {
     public void operationClose(String groupKey, Session session) {
         CollaborationConfig collaborationConfig;
         try {
+            // System.out.println("0---Operation close---groupId: " +  groupKey);
             collaborationConfig = groups.get(groupKey);
+
+            // String name = "";
+            // for (Map.Entry<String, CollaborationUser> item : collaborationConfig.getParticipants().entrySet()){
+            //     CollaborationUser value = item.getValue();
+            //     name += ":" + value.getName();
+            // }
+            //
+            // System.out.println("1---Operation close---Exist Participants: " +  name);
             HashMap<String, CollaborationUser> participants = collaborationConfig.getParticipants();
             // remove people
             CollaborationUser collaborationUser = null;
