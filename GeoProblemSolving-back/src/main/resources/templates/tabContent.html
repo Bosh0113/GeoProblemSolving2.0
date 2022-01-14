@@ -333,7 +333,7 @@
 
                             // join the project directly
                             let url = "/GeoProblemSolving/project/" + this.applyProjectInfo.aid + "/user?userId=" + this.userInfo.userId;
-                            this.axios
+                            axios
                                 .post(url)
                                 .then((res) => {
                                     if (res.data.code == 0) {
