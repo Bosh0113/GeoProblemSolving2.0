@@ -522,7 +522,6 @@ public class CollaborationService {
                         返回结果到主线程的话，主线程（单个websocket）对应一个的内存池
                          */
                         System.out.println("end: " + groupKey);
-                        System.out.println(collaborationConfig);
                         if (resJson == null) {
                             computeMsg.setOutputs("Fail");
                             collaborationBehavior.sendComputeResult(collaborationConfig.getParticipants(), computeMsg.getReceivers(), computeMsg);
