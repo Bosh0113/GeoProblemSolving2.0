@@ -276,7 +276,7 @@ footer {
         <i>Open Geographic Modeling and Simulation</i>
       </h2>
       <p class="footerBottom">
-        Copyright © 2011-2021 OpenGMS. All rights reserved.
+        Copyright © 2011-2022 OpenGMS. All rights reserved.
       </p>
     </footer>
   </div>
