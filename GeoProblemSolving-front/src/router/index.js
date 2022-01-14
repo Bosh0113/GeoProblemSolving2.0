@@ -338,6 +338,16 @@ const routes = [
     name: "toolTemplate",
     component: resolve => require(["@/components/tools/toolPreview"], resolve)
   },
+  {
+    path: "/landisii/species",
+    name: "species",
+    component: resolve => require(["@/components/tools/entity/LandisII-tools/species"], resolve)
+  },
+  {
+    path: "/landisii/bioSuccession",
+    name: "species",
+    component: resolve => require(["@/components/tools/entity/LandisII-tools/biomass-succession"], resolve)
+  },
 ];
 
 export default new Router({
