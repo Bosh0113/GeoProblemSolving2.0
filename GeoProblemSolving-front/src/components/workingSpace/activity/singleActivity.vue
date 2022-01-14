@@ -16,9 +16,9 @@
           <MenuItem name="Task">
             <Icon type="ios-git-network"/>Task management
           </MenuItem>
-          <MenuItem name="Workflow">
+          <!-- <MenuItem name="Workflow">
             <Icon type="ios-git-network"/>Workflow
-          </MenuItem>
+          </MenuItem> -->
           <!-- <MenuItem name="Introduction">
             <Icon type="ios-paper" />About
           </MenuItem> -->
