@@ -6,7 +6,9 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Template.workflow.
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Template.workflow.ProjectInfo;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Template.workflow.WorkflowTemplate;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
@@ -24,6 +26,7 @@ import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
  * @Author zhngzhng
  * @Date 2021/11/22
  **/
+@Service
 public class DocParseServiceImpl implements DocParseServe {
     private final Logger LOGGER = LoggerFactory.getLogger(DocParseServiceImpl.class);
 
@@ -43,6 +47,12 @@ public class DocParseServiceImpl implements DocParseServe {
 
     @Autowired
     ProjectRepository projectRepository;
+
+    @Autowired
+    SubprojectRepository subprojectRepository;
+
+    @Autowired
+    ActivityRepository activityRepository;
 
     @Autowired
     UserDao userDao;
@@ -55,7 +65,7 @@ public class DocParseServiceImpl implements DocParseServe {
     private Document loadXML(String aid) {
         Optional<ActivityDoc> byId = docRepository.findById(aid);
         if (!byId.isPresent()) {
-            LOGGER.warn("Failed to load document: No such activity document, id " + aid);
+            LOGGER.warn("Failed to load document: No such activity document, id ---> " + aid);
             return null;
         }
         operatingDoc = byId.get();
@@ -327,7 +337,7 @@ public class DocParseServiceImpl implements DocParseServe {
      *
      * 具体面向的对象应该是参与式地理分析过程
      *
-     * 最主要的工作还是
+     * 加入部分内容
      * @param aid
      * @return
      */
@@ -336,7 +346,7 @@ public class DocParseServiceImpl implements DocParseServe {
         Document docXml = loadXML(aid);
         Optional<Project> byId = projectRepository.findById(aid);
         if (!byId.isPresent()){
-            LOGGER.warn("No such project, activity id is " + aid);
+            LOGGER.warn("No such project, activity id is ---> " + aid);
             return null;
         }
         Project project = byId.get();
@@ -350,14 +360,17 @@ public class DocParseServiceImpl implements DocParseServe {
         workflowTemplate.setProjectInfo(projectInfo);
         workflowTemplate.setResVisible(true);
         workflowTemplate.setName("test");
-        WorkflowTemplate template = a2WorkflowTemplate(docXml, workflowTemplate);
+        int level = 0;
+        WorkflowTemplate template = a2WorkflowTemplate(docXml, workflowTemplate, level);
 
         return template;
         /*
         工具需可见，资源可不可见
+        将八个步骤也给放进去
         {
             name: String,
             resVisible: boolean,
+            processStep: String,
             //地理问题的简单描述
             projectInfo: {
                 aid: string,
@@ -404,25 +417,31 @@ public class DocParseServiceImpl implements DocParseServe {
          }
          */
     }
-    private WorkflowTemplate a2WorkflowTemplate(Document docXml, WorkflowTemplate workflowTemplate){
+
+    /*
+    递归函数
+     */
+    private WorkflowTemplate a2WorkflowTemplate(Document docXml, WorkflowTemplate workflowTemplate, int level){
         //传入的是活动文档，所以取到的是 activity
+        //通过递归层数判断属于哪个层次 project(0)-subProject(1)-activity(>=2)
         HashMap<String, String> activityInfo = DocInterpret.getRootInfo(docXml);
         String aType = activityInfo.get("type");
-        if (aType.equals(ActivityType.Activity_Group)){
+        if (aType.equals(ActivityType.Activity_Group.toString())){
+            //group 遍历其中的子活动取出其中的操作
             HashSet<HashMap<String, String>> childActivitiesList = DocInterpret.getChildActivities(docXml);
-            if (childActivitiesList == null) {
-                //没有操作的处理
-                return workflowTemplate;
-            }
+            if (childActivitiesList == null) return workflowTemplate;
+            //递归进入下一层
             for (Iterator<HashMap<String, String>> it = childActivitiesList.iterator();it.hasNext();){
                 HashMap<String, String> aInfo = it.next();
                 String aid = aInfo.get("id");
                 Document childDocXml = loadXML(aid);
-                a2WorkflowTemplate(childDocXml, workflowTemplate);
+                ++ level;
+                a2WorkflowTemplate(childDocXml, workflowTemplate, level);
             }
-        }else if (aType.equals(ActivityType.Activity_Unit)){
+        }else if (aType.equals(ActivityType.Activity_Unit.toString())){
+            //获取 geoAnalysis 节点
             List<Node> geoAnalysisOperations = DocInterpret.getGeoAnalysisOperation(docXml);
-            if (geoAnalysisOperations == null) return null;
+            if (geoAnalysisOperations == null || geoAnalysisOperations.size() == 0) return workflowTemplate;
             HashSet<Operation> operations = new HashSet<>();
             List<Node> inputs = Lists.newLinkedList();
             for (Node operationNode : geoAnalysisOperations){
@@ -431,13 +450,15 @@ public class DocParseServiceImpl implements DocParseServe {
                 String toolRef = operationEle.attributeValue("toolRef");
                 String description = operationEle.attributeValue("purpose");
 
-                List<Node> inputResRefs = operationEle.selectNodes("//ResRef[@type= 'input']");
+                //获取 geoAnalysis 的 input 信息
+                List<Node> inputResRefs = operationEle.selectNodes(".//ResRef[@type= 'input']");
                 HashSet<OperationRes> inputRes = operationRes2Entity(inputResRefs, docXml, "file");
-                List<Node> outputResRefs = operationEle.selectNodes("//ResRef[@type = 'output']");
+                List<Node> outputResRefs = operationEle.selectNodes(".//ResRef[@type = 'output']");
                 HashSet<OperationRes> outputRes = operationRes2Entity(outputResRefs, docXml, "file");
-                List<Node> paramRefs = operationEle.selectNodes("//ResRef[@type = 'param']");
-                HashSet<OperationRes> inParam = operationRes2Entity(paramRefs, docXml, "file");
-                //throw nullPointException
+                //输入中会有类型为参数的部分
+                List<Node> paramRefs = operationEle.selectNodes(".//ResRef[@type = 'param']");
+                HashSet<OperationRes> inParam = operationRes2Entity(paramRefs, docXml, "param");
+                //throw nullPointException,将参数信息加入输入
                 inputRes.addAll(inParam);
 
                 Operation operation = new Operation();
@@ -447,26 +468,42 @@ public class DocParseServiceImpl implements DocParseServe {
                 operation.setToolId(toolRef);
                 operation.setDescription(description);
                 operations.add(operation);
+                //添加purpose 信息
+                //活动 id
+                String aid = activityInfo.get("id");
+                Activity activity;
+                if (level == 0 ){
+                    activity = projectRepository.findById(aid).get();
+                }else if (level == 1){
+                    activity = subprojectRepository.findById(aid).get();
+                }else {
+                    activity = activityRepository.findById(aid).get();
+                }
+                if (activity != null) operation.setPurpose(activity.getPurpose());
 
                 //提取 upload operation
                 inputs.addAll(inputResRefs);
                 inputs.addAll(paramRefs);
-
             }
+            //将此子活动的操作添加到整个活动流中去
             HashSet<Operation> previous = workflowTemplate.getOperations();
-            previous.addAll(operations);
-            workflowTemplate.setOperations(previous);
+            if (previous != null) operations.addAll(previous);
+            workflowTemplate.setOperations(operations);
 
+            //
             HashSet<HashMap<String, String>> resBehavior = toResBehavior(inputs, docXml);
             HashSet<HashMap<String, String>> previousResBehaviors = workflowTemplate.getResBehavior();
-            if (previousResBehaviors == null) workflowTemplate.setResBehavior(resBehavior);
-            else {
-                previousResBehaviors.addAll(resBehavior);
-                workflowTemplate.setResBehavior(previousResBehaviors);
-            }
+            if (previousResBehaviors != null) resBehavior.addAll(previousResBehaviors);
+            workflowTemplate.setResBehavior(resBehavior);
         }
+        //当前层次内容处理结束，返回上一层
+        --level;
         return workflowTemplate;
     }
+
+    /*
+    将 xml analysis 中 in/out 转换为操作资源实体
+     */
     private HashSet<OperationRes> operationRes2Entity(List<Node> inRes, Document docXml, String type){
         if (inRes == null) return null;
         HashSet<OperationRes> operationResList = new HashSet<>();
@@ -481,7 +518,7 @@ public class DocParseServiceImpl implements DocParseServe {
             operationRes.setUid(uid);
             operationRes.setType(type);
             Element resElement = DocInterpret.getResElement(docXml, uid);
-            if (resEle != null){
+            if (resElement != null){
                 operationRes.setValue(resElement.attributeValue("href"));
             }
             operationResList.add(operationRes);
@@ -489,12 +526,16 @@ public class DocParseServiceImpl implements DocParseServe {
         return operationResList;
     }
 
+    /*
+    将资源操作转换为所需的格式
+     */
     private HashSet<HashMap<String, String>> toResBehavior(List<Node> inRes, Document docXml){
         if (inRes == null) return null;
         HashSet<HashMap<String, String>> resBehaviors = new HashSet<>();
         for (Node resNode : inRes){
             Element resOperationEle = (Element)resNode;
             String uid = resOperationEle.attributeValue("idRef");
+            //获取资源的上传操作
             Element resUploadEle = DocInterpret.getResourceOperationByResId(docXml, uid);
             if (resUploadEle != null){
                 Element resInfoEle = DocInterpret.getResElement(docXml, uid);

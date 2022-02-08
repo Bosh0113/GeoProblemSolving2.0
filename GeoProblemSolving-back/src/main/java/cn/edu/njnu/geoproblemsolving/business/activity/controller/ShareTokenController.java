@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.controller;
 
 import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ShareToken;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ShareTokenService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -84,5 +85,12 @@ public class ShareTokenController {
             return ResultUtils.success();
         }
         return ResultUtils.error(-2, "Fail");
+    }
+
+    @Autowired
+    DocParseServiceImpl docParseService;
+    @RequestMapping(value = "/ssss", method = RequestMethod.GET)
+    public Object de(){
+        return docParseService.toWorkflowTemplate("7cfdacd1-599e-4313-badd-714be99bbbb7");
     }
 }

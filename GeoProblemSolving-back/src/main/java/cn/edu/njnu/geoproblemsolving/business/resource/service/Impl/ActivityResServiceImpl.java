@@ -46,7 +46,7 @@ import java.util.*;
  * @Date 2021/4/20
  **/
 @Service
-public class ActivityResServiceImpl<num> implements ActivityResService {
+public class ActivityResServiceImpl implements ActivityResService {
     @Autowired
     UserDaoImpl userDao;
 

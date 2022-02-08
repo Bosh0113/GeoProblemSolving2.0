@@ -529,7 +529,7 @@
                                                                 <strong>Enter Workspace</strong>
                                                             </i-button>
                                                             <i-button
-                                                                    v-if="!tempUser"
+                                                                    v-if="!tempUser && userRole == 'manager'"
                                                                     class="changeInviteColor"
                                                                     @click="showShareURL()">
                                                                 <Icon type="md-share-alt" :size="25"></Icon>
@@ -587,7 +587,8 @@
                                                     <vue-scroll :ops="scrollOps">
                                                         <Card v-for="member in participants"
                                                               style="margin-top: 5px;cursor: pointer;"
-                                                              @click.native=goPersonalPage(member.userId)>
+                                                              >
+<!--                                                            @click.native=goPersonalPage(member.userId)-->
                                                             <div title="Member">
                                                                 <h2 class="overEllipsis">{{member.name}}</h2>
                                                             </div>

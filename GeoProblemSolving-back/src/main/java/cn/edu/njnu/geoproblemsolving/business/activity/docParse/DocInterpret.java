@@ -382,6 +382,9 @@ public class DocInterpret {
     }
 
 
+    /*
+    May the operation resRef could be expand.
+     */
     public static String appendGeoAnalysisOperation(Document docXml,
                                        String toolId,
                                        HashSet<String> onlineMembers,
@@ -527,20 +530,20 @@ public class DocInterpret {
     Multi activity
      */
     public static HashSet<HashMap<String, String>> getChildActivities(Document docXml){
-        List<Node> childNodes = docXml.selectNodes("/Acitivty/ChildActivities/Child");
+        List<Node> childNodes = docXml.selectNodes("/Activity/ChildActivities/Child[@state = 'accessible']");
         if (childNodes == null) {
             LOGGER.info("This isn't ChildActivities");
             return null;
         }
-        HashSet<HashMap<String, String>> childActivityList = new HashSet<HashMap<String, String>>();
+        HashSet<HashMap<String, String>> childActivityList = new HashSet<>();
         for (Iterator<Node> it = childNodes.iterator(); it.hasNext();){
             Element childEle = (Element)it.next();
+            HashMap<String, String> aInfo = new HashMap<>();
             for (Iterator<Attribute> aIt = childEle.attributeIterator();aIt.hasNext();){
-                HashMap<String, String> aInfo = new HashMap<>();
                 Attribute attribute = aIt.next();
                 aInfo.put(attribute.getName(), attribute.getValue());
-                childActivityList.add(aInfo);
             }
+            childActivityList.add(aInfo);
         }
         return childActivityList;
     }
