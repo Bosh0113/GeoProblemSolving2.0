@@ -1695,7 +1695,7 @@ var taskList = [];
 
 
   /**
-   * 活动socket转态信息
+   * 活动socket状态信息
    * get socket status
    */
   function getSocketInfo() {
@@ -1713,6 +1713,12 @@ var taskList = [];
   /**
    * 模型计算操作回调函数
    * send custom operations
+   * @param aid
+   * @param serviceMd5
+   * @param serviceIp
+   * @param servicePort
+   * @param inputs
+   * @param outputs
    */
   function sendModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs) {
     CollabSocket.reciveModelOperation(aid, serviceMd5, serviceIp, servicePort, inputs, outputs);

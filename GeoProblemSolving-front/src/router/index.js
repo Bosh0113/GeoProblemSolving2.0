@@ -345,8 +345,13 @@ const routes = [
   },
   {
     path: "/landisii/bioSuccession",
-    name: "species",
+    name: "bioSuccession",
     component: resolve => require(["@/components/tools/entity/LandisII-tools/biomass-succession"], resolve)
+  },
+  {
+    path: "/landisii/climateConfig",
+    name: "climateConfig",
+    component: resolve => require(["@/components/tools/entity/LandisII-tools/climateConfig"], resolve)
   },
 ];
 

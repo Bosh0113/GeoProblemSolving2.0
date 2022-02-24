@@ -5,7 +5,8 @@
     <div id="collab-tool-content">
       <div id="edit-mask" title="The other participant is operating."></div>
 
-      <!-- coding for your tools // begin-->
+      <!-- coding for your tools // begin-->      
+      <vue-scroll :ops="ops" style="height: calc(100vh - 40px)">
       <div style="padding: 10px">
         <div style="margin-bottom: 5px">
           <Button @click="add">Add</Button>
@@ -33,6 +34,7 @@
           <Button @click="handleSelectAll(false)">Cancel all selected</Button>
         </div>
       </div>
+      </vue-scroll>
       <Modal
         v-model="addSpeciesModal"
         width="800"
@@ -277,6 +279,16 @@
 export default {
   data() {
     return {
+      ops: {
+        bar: {
+          background: "#808695",
+        },
+      },
+      // basic info
+      activityInfo: {},
+      userInfo: {},
+      resources: [],
+      //
       selectSpecies: [],
       fields: [
         {
@@ -442,8 +454,35 @@ export default {
     };
   },
   created() {},
-  mounted() {},
+  mounted() {
+    // 加载协同组件
+    loadCollabComponent();
+    this.getStepInfo();
+  },
   methods: {
+    getStepInfo() {
+      if (componentStatus) {
+        // 获取数据
+        this.activityInfo = activityInfo;
+        this.userInfo = userInfo;
+        this.resources = resources;
+
+        // 绑定函数
+        buildSocketChannel(
+          this.getSocketOperation,
+          this.getSocketData,
+          this.getSocketComputation
+        );
+      } else {
+        let _this = this;
+        setTimeout(function () {
+          _this.getStepInfo();
+        }, 1000);
+      }
+    },
+    getSocketComputation(data) {},
+    getSocketOperation(data) {},
+    getSocketData(data) {},
     add() {
       this.speciesValidate = {
         name: "",
@@ -472,8 +511,7 @@ export default {
             break;
           }
         }
-      }
-      
+      }      
     },
     submit() {},
     select(selection) {
