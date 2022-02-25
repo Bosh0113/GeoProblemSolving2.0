@@ -353,6 +353,11 @@ const routes = [
     name: "climateConfig",
     component: resolve => require(["@/components/tools/entity/LandisII-tools/climateConfig"], resolve)
   },
+  {
+    path: "/landisii/dynamicInputData",
+    name: "dynamicInputData",
+    component: resolve => require(["@/components/tools/entity/LandisII-tools/dynamicInputData"], resolve)
+  },
 ];
 
 export default new Router({

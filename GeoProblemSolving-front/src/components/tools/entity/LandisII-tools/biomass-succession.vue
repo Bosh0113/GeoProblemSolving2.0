@@ -100,7 +100,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection0"
             :columns="shadeClasses"
             :data="ecoregionsMRB"
             @on-selection-change="selectMRB"
@@ -111,7 +111,9 @@
           </Table>
           <div style="margin-top: 5px">
             <Button @click="handleSelectAllMRB(true)">Set all selected</Button>
-            <Button @click="handleSelectAllMRB(false)">Cancel all selected</Button>
+            <Button @click="handleSelectAllMRB(false)"
+              >Cancel all selected</Button
+            >
           </div>
         </div>
         <!-- SufficientLight -->
@@ -126,7 +128,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection1"
             :columns="lightConditions"
             :data="SEP"
             @on-selection-change="selectSL"
@@ -144,7 +146,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection2"
             :columns="speciesInfo"
             :data="speciesSP"
             @on-selection-change="selectSP"
@@ -152,7 +154,9 @@
           </Table>
           <div style="margin-top: 5px">
             <Button @click="handleSelectAllSP(true)">Set all selected</Button>
-            <Button @click="handleSelectAllSP(false)">Cancel all selected</Button>
+            <Button @click="handleSelectAllSP(false)"
+              >Cancel all selected</Button
+            >
           </div>
         </div>
         <!-- EcoregionParameters -->
@@ -166,7 +170,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection3"
             :columns="ecoregionParameters"
             :data="AET"
             @on-selection-change="selectEP"
@@ -174,7 +178,9 @@
           </Table>
           <div style="margin-top: 5px">
             <Button @click="handleSelectAllEP(true)">Set all selected</Button>
-            <Button @click="handleSelectAllEP(false)">Cancel all selected</Button>
+            <Button @click="handleSelectAllEP(false)"
+              >Cancel all selected</Button
+            >
           </div>
         </div>
         <!-- DynamicInputFile   -->
@@ -207,7 +213,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection4"
             :columns="fireReductionParams"
             :data="fireRows"
             @on-selection-change="selectFRP"
@@ -225,7 +231,7 @@
           </div>
           <Table
             border
-            ref="selection"
+            ref="selection5"
             :columns="harvestReductionParams"
             :data="harvestRows"
             @on-selection-change="selectHRP"
@@ -233,7 +239,9 @@
           </Table>
           <div style="margin-top: 5px">
             <Button @click="handleSelectAllHRP(true)">Set all selected</Button>
-            <Button @click="handleSelectAllHRP(false)">Cancel all selected</Button>
+            <Button @click="handleSelectAllHRP(false)"
+              >Cancel all selected</Button
+            >
           </div>
         </div>
         <Divider></Divider>
@@ -470,6 +478,150 @@
           >
           <Button
             @click="handleReset('speciesParametersVal')"
+            style="margin-left: 8px"
+            >Reset</Button
+          >
+        </div>
+      </Modal>
+      <!-- EcoregionParameters -->
+      <Modal
+        v-model="addEcoregionParametersModal"
+        width="600"
+        title="Add the ecoregion parameters"
+      >
+        <Form
+          ref="ecoregionParametersVal"
+          :model="ecoregionParametersVal"
+          :rules="ruleValidate4"
+          :label-width="100"
+        >
+          <div style="display: flex">
+            <FormItem label="Ecoregions" prop="ecoregion">
+              <Input
+                v-model="ecoregionParametersVal.ecoregion"
+                placeholder="Enter the ecoregion name"
+              ></Input>
+            </FormItem>
+            <FormItem label="AET" prop="aet" style="margin-left: 20px">
+              <Input
+                v-model="ecoregionParametersVal.aet"
+                placeholder="Enter the actual evapotranspiration (AET)"
+              ></Input>
+            </FormItem>
+          </div>
+        </Form>
+        <div slot="footer">
+          <Button
+            type="primary"
+            @click="handleSubmitEP('ecoregionParametersVal')"
+            >Submit</Button
+          >
+          <Button
+            @click="handleReset('ecoregionParametersVal')"
+            style="margin-left: 8px"
+            >Reset</Button
+          >
+        </div>
+      </Modal>
+      <!-- FireReductionParameters -->
+      <Modal
+        v-model="editFireReductionParametersModal"
+        width="750"
+        title="Edit the fire reduction parameters"
+      >
+        <Form
+          ref="fireReductionParametersVal"
+          :model="fireReductionParametersVal"
+          :rules="ruleValidate5"
+          :label-width="150"
+        >
+          <div style="display: flex">
+            <FormItem label="Fire severity" prop="severity">
+              <Input v-model="fireReductionParametersVal.severity" readonly></Input>
+            </FormItem>
+          </div>
+          <div style="display: flex">
+            <FormItem label="Wood reduction" prop="wood_reduction">
+              <Input
+                v-model="fireReductionParametersVal.wood_reduction"
+                placeholder="Enter the wood reduction"
+              ></Input>
+            </FormItem>
+            <FormItem
+              label="Litter reduction"
+              prop="litter_reduction"
+              style="margin-left: 20px"
+            >
+              <Input
+                v-model="fireReductionParametersVal.litter_reduction"
+                placeholder="Enter the litter reduction"
+              ></Input>
+            </FormItem>
+          </div>          
+        </Form>
+        <div slot="footer">
+          <Button type="primary" @click="handleSubmitFRP('fireReductionParametersVal')"
+            >Submit</Button
+          >
+        </div>
+      </Modal>
+      <!-- HarvestReductionParameters -->
+      <Modal
+        v-model="addHarvestReductionParametersModal"
+        width="800"
+        title="Add the harvest reduction parameters"
+      >
+        <Form
+          ref="harvestReductionParametersVal"
+          :model="harvestReductionParametersVal"
+          :rules="ruleValidate6"
+          :label-width="150"
+        >
+          <div style="display: flex">
+            <FormItem label="Prescription name" prop="name">
+              <Input
+                v-model="harvestReductionParametersVal.name"
+                placeholder="Enter the prescription name"
+              ></Input>
+            </FormItem>
+            <FormItem label="Dead wood reduction" prop="wood_reduction" style="margin-left: 20px">
+              <Input
+                v-model="harvestReductionParametersVal.wood_reduction"
+                placeholder="Enter the proportion (0.0 – 1.0) of removed dead wood biomass"
+              ></Input>
+            </FormItem>
+          </div>
+          <div style="display: flex">
+            <FormItem label="Dead litter reduction" prop="litter_reduction">
+              <Input
+                v-model="harvestReductionParametersVal.litter_reduction"
+                placeholder="Enter the proportion (0.0 – 1.0) of removed dead litter biomass"
+              ></Input>
+            </FormItem>
+            <FormItem label="Cohort wood removal" prop="wood_removal" style="margin-left: 20px">
+              <Input
+                v-model="harvestReductionParametersVal.wood_removal"
+                placeholder="Enter the the proportion (0.0 – 1.0) of harvested cohort live wood biomass"
+              ></Input>
+            </FormItem>
+          </div>
+          <div style="display: flex">
+            <FormItem label="Cohort leaf removal" prop="leaf_removal">
+              <Input
+                v-model="harvestReductionParametersVal.leaf_removal"
+                placeholder="Enter the proportion (0.0 – 1.0) of harvested cohort live leaf biomass"
+              ></Input>
+            </FormItem>
+          </div>
+        </Form>
+        <div slot="footer">
+          <Button
+            type="primary"
+            @click="handleSubmitHRP('harvestReductionParametersVal')"
+            >Submit</Button
+          >
+          <Button
+            @click="handleReset('harvestReductionParametersVal')"
             style="margin-left: 8px"
             >Reset</Button
           >
@@ -837,15 +989,36 @@ export default {
         },
         {
           title: "Ecoregions\\AET",
-          key: "shadeclass",
+          key: "ecoregion",
         },
         {
           title: "AET",
-          key: "light0",
+          key: "aet",
         },
       ],
       AET: [],
+      ecoregionParametersVal: {
+        ecoregion: "",
+        aet: 0,
+      },
+      ruleValidate4: {
+        ecoregion: [
+          {
+            required: true,
+            message: "The ecoregion name cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        aet: [
+          {
+            required: true,
+            message: "The AET cannot be empty",
+            trigger: "blur",
+          },
+        ],
+      },
       selectedEP: [],
+      addEcoregionParametersModal: false,
       //
       boolDynamicInputFile: false,
       dynamicInputFile: {},
@@ -885,7 +1058,38 @@ export default {
           wood_reduction: 0.0,
           litter_reduction: 0.0,
         },
+        {
+          severity: 4,
+          wood_reduction: 0.0,
+          litter_reduction: 0.0,
+        },
+        {
+          severity: 5,
+          wood_reduction: 0.0,
+          litter_reduction: 0.0,
+        },
       ],
+      fireReductionParametersVal: {
+        severity: 0,
+        wood_reduction: 0.0,
+        litter_reduction: 0.0,
+      },
+      ruleValidate5: {
+        wood_reduction: [
+          {
+            required: true,
+            message: "The wood reduction cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        litter_reduction: [
+          {
+            required: true,
+            message: "The litter reduction cannot be empty",
+            trigger: "blur",
+          },
+        ],
+      },
       selectedFRP: {},
       editFireReductionParametersModal: false,
       // HarvestReductionParameters data
@@ -913,10 +1117,54 @@ export default {
         },
         {
           title: "Cohort Leaf Removal",
-          key: "leaf_romval",
+          key: "leaf_removal",
         },
       ],
       harvestRows: [],
+      harvestReductionParametersVal: {
+        name: "",
+        wood_reduction: 0,
+        litter_reduction: 0,
+        wood_removal: 0,
+        leaf_removal: 0,
+      },
+      ruleValidate6: {
+        name: [
+          {
+            required: true,
+            message: "The prescription name cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        wood_reduction: [
+          {
+            required: true,
+            message: "The dead wood reduction cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        litter_reduction: [
+          {
+            required: true,
+            message: "The dead litter reduction cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        wood_removal: [
+          {
+            required: true,
+            message: "The cohort wood removal cannot be empty",
+            trigger: "blur",
+          },
+        ],
+        leaf_removal: [
+          {
+            required: true,
+            message: "The cohort leaf removal cannot be empty",
+            trigger: "blur",
+          },
+        ],
+      },
       selectedHRP: [],
       addHarvestReductionParametersModal: false,
     };
@@ -957,13 +1205,13 @@ export default {
         if (this.boolInitialCommunities) {
           this.initialCommunities = resList[0];
           this.initialCommunitiesMap = resList[1];
-          this.boolInitialCommunities = true;
+          this.boolInitialCommunities = false;
         } else if (this.boolClimateConfigFile) {
           this.climateConfigFile = resList[0];
-          this.boolClimateConfigFile = true;
+          this.boolClimateConfigFile = false;
         } else if (this.boolDynamicInputFile) {
           this.dynamicInputFile = resList[0];
-          this.boolDynamicInputFile = true;
+          this.boolDynamicInputFile = false;
         }
         //
 
@@ -1025,15 +1273,7 @@ export default {
       this.selectedMRB = Object.assign([], selection);
     },
     handleSelectAllMRB(status) {
-      this.$refs.selection.selectAll(status);
-      if (status) {
-        this.selectedMRB = Object.assign([], this.ecoregionsMRB);
-      } else {
-        this.selectedMRB = [];
-      }
-    },
-    handleSelectAllMRB(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection0.selectAll(status);
       if (status) {
         this.selectedMRB = Object.assign([], this.ecoregionsMRB);
       } else {
@@ -1073,7 +1313,7 @@ export default {
       this.selectedSL = Object.assign([], selection);
     },
     handleSelectAllSL(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection1.selectAll(status);
       if (status) {
         this.selectedSL = Object.assign([], this.SEP);
       } else {
@@ -1125,15 +1365,7 @@ export default {
       this.selectedSP = Object.assign([], selection);
     },
     handleSelectAllSP(status) {
-      this.$refs.selection.selectAll(status);
-      if (status) {
-        this.selectedSP = Object.assign([], this.speciesSP);
-      } else {
-        this.selectedSP = [];
-      }
-    },
-    handleSelectAllSP(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection2.selectAll(status);
       if (status) {
         this.selectedSP = Object.assign([], this.speciesSP);
       } else {
@@ -1155,59 +1387,139 @@ export default {
             _this.addSpeciesParametersModal = false;
           }
         } else {
-          this.$Message.error(
-            "Please provide complete the minimum relative biomass for shade classes 1 - 5."
-          );
+          this.$Message.error("Please provide complete the form.");
         }
       });
     },
 
     // EcoregionParameters method
-    addEP() {},
+    addEP() {
+      this.ecoregionParametersVal = {
+        ecoregion: "",
+        aet: 0,
+      };
+      this.addEcoregionParametersModal = true;
+    },
     removeEP() {
-      this.AET.splice(index, 1);
+      for (let i = 0; i < this.selectedEP.length; i++) {
+        for (let j = 0; j < this.AET.length; j++) {
+          if (this.selectedEP[i].name === this.AET[j].name) {
+            this.AET.splice(j, 1);
+            break;
+          }
+        }
+      }
     },
     selectEP(selection) {
       this.selectedEP = Object.assign([], selection);
     },
     handleSelectAllEP(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection3.selectAll(status);
       if (status) {
         this.selectedEP = Object.assign([], this.AET);
       } else {
         this.selectedEP = [];
       }
     },
+    handleSubmitEP(name) {
+      let _this = this;
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let row = this.arrayContains(_this.AET, _this.ecoregionParametersVal);
+          if (row >= 0) {
+            this.$Message.error("Duplicate ecoregion information!");
+          } else {
+            _this.AET.push(_this.ecoregionParametersVal);
+            _this.addEcoregionParametersModal = false;
+          }
+        } else {
+          this.$Message.error("Please provide complete the form.");
+        }
+      });
+    },
 
     // FireReductionParameters method
-    editFRP() {},
+    editFRP() {
+      this.fireReductionParametersVal = this.selectedFRP[0];
+      this.editFireReductionParametersModal = true
+    },
     selectFRP(selection) {
       this.selectedFRP = Object.assign([], selection);
     },
     handleSelectAllFRP(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection4.selectAll(status);
       if (status) {
         this.selectedFRP = Object.assign([], this.fireRows);
       } else {
         this.selectedFRP = [];
       }
     },
+    handleSubmitFRP(name) {
+      let _this = this;
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let row = this.arrayContains(_this.fireRows, _this.fireReductionParametersVal);
+          if (row >= 0) {
+            _this.fireRows.splice(row, 1, _this.fireReductionParametersVal);
+            _this.editFireReductionParametersModal = false;
+          } else {
+            this.$Message.error("Information error!");
+          }
+        } else {
+          this.$Message.error(
+            "Please provide complete the form."
+          );
+        }
+      });
+    },
 
     // HarvestReductionParameters method
-    addHRP() {},
+    addHRP() {
+      this.harvestReductionParametersVal = {
+        name: "",
+        wood_reduction: 0,
+        litter_reduction: 0,
+        wood_removal: 0,
+        leaf_removal: 0,
+      };
+      this.addHarvestReductionParametersModal = true;
+    },
     removeHRP() {
-      this.harvestRows.splice(index, 1);
+      for (let i = 0; i < this.selectedHRP.length; i++) {
+        for (let j = 0; j < this.harvestRows.length; j++) {
+          if (this.selectedHRP[i].name === this.harvestRows[j].name) {
+            this.harvestRows.splice(j, 1);
+            break;
+          }
+        }
+      }
     },
     handleSelectAllHRP(status) {
-      this.$refs.selection.selectAll(status);
+      this.$refs.selection5.selectAll(status);
       if (status) {
-        this.selectedMRB = Object.assign([], this.harvestRows);
+        this.selectedHRP = Object.assign([], this.harvestRows);
       } else {
-        this.selectedMRB = [];
+        this.selectedHRP = [];
       }
     },
     selectHRP(selection) {
       this.selectedHRP = Object.assign([], selection);
+    },
+    handleSubmitHRP(name) {
+      let _this = this;
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let row = this.arrayContains(_this.harvestRows, _this.harvestReductionParametersVal);
+          if (row >= 0) {
+            this.$Message.error("Duplicate prescription information!");
+          } else {
+            _this.harvestRows.push(_this.harvestReductionParametersVal);
+            _this.addHarvestReductionParametersModal = false;
+          }
+        } else {
+          this.$Message.error("Please provide complete the form.");
+        }
+      });
     },
 
     //common
@@ -1222,7 +1534,11 @@ export default {
             array[i].shadeclass === data.shadeclass) ||
           (array[i].ecoregionName != undefined &&
             array[i].ecoregionName === data.ecoregionName) ||
-          (array[i].name != undefined && array[i].name === data.name)
+          (array[i].name != undefined && array[i].name === data.name) ||
+          (array[i].ecoregion != undefined &&
+            array[i].ecoregion === data.ecoregion) ||
+          (array[i].severity != undefined &&
+            array[i].severity === data.severity)
         ) {
           return i;
         }
