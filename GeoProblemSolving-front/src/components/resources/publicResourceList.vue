@@ -321,12 +321,15 @@ export default {
         let url = "";
         if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
-        } else if(res.address.indexOf("/GeoProblemSolving/resource") != -1){
-          url = "https://geomodeling.njnu.edu.cn" + res.address;
+        } else if(res.address.indexOf("/PExploration/resource") != -1){
+          url = this.$store.getters.resProxy + res.address;
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
         }
-        let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
+        // let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
+        console.log(url);
+        let Base64 = require('js-base64').Base64;
+        let finalUrl = "https://geomodeling.njnu.edu.cn/dataTransferServer/onlinePreview?url=" + encodeURIComponent(Base64.encode(url)); //Base64.encode(url)
         var toolURL =
           "<iframe src=" +
           finalUrl +
