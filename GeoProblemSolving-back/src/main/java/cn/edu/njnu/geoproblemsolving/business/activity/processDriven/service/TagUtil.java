@@ -180,6 +180,7 @@ public class TagUtil {
      * @return
      */
     public static boolean checkTagContain(HashSet source, HashSet target){
+        if (source == null) return false;
         int oriSize = source.size();
         //若 source 中包含 target 中内容会被移除
         source.removeAll(target);

@@ -1014,6 +1014,7 @@
         // 关于单选多选的按钮
         indeterminate: true,
         checkAll: false,
+        oldType: '',
         shareModal: false,
         editFileModel: false,
         userResourceList: [],
@@ -1707,7 +1708,6 @@
       },
       fileEditModelShow(fileInfo) {
         let metadata = {};
-        console.log(fileInfo);
         this.putFileInfo = fileInfo;
         this.editFileValidate.privacy = fileInfo.privacy;
         this.editFileValidate.name = fileInfo.name;
@@ -1715,7 +1715,6 @@
         this.editFileValidate.description = fileInfo.description;
         if (this.editFileValidate.type == "data") {
           metadata = this.operationApi.getResInfo(fileInfo.uid);
-          console.log(metadata);
           if(metadata == undefined || metadata == null || metadata == ""){
             this.oldMetadata = {};
             this.editFileValidate.format = "";
@@ -1750,6 +1749,7 @@
               temp = ["0"];
             }
             formData.append("resInfo", JSON.stringify(putResInfo));
+            formData.append("graphicId", this.activityInfo.parent);
             this.axios
               .put(
                 "/GeoProblemSolving/rip/file/" +
@@ -1794,9 +1794,14 @@
                     this.putFileInfo,
                     metadata,
                   );
+                  let metadataChanged = false;
+                  let typeChanged = false;
+                  let type = this.editFileValidate.type;
+                  if(type != null && type != this.oldType){
+                    typeChanged = true;
+                  }
                   if (this.editFileValidate.type == "data") {
                     // 检查元数据发生修改
-                    let metadataChanged = false;
                     if (
                       this.oldMetadata.format != metadata.format ||
                       this.oldMetadata.scale != metadata.scale ||
@@ -1806,18 +1811,15 @@
                     ) {
                       metadataChanged = true;
                     }
-                    if (metadataChanged) {
-                      this.axios
-                        .put(
-                          "/GeoProblemSolving/activityDoc/meta/${this.$route.params.projectId}/${this.activityInfo.aid}/${this.selectFileInfo.uid}"
-                        )
-                        .then((res) => {
-                          console.log(res.data.data);
-                        })
-                        .catch((err) => {
-                          console.log(err.data);
-                        });
-                    }
+                  }
+                  if(typeChanged || metadataChanged){
+                    this.axios
+                    .put(`/GeoProblemSolving/activityDoc/typeOrMeta/${this.activityInfo.parent}/${this.activityInfo.aid}/${this.putFileInfo.uid}`)
+                    .then(res=>{
+                      console.log(res.data.data)
+                    }).catch(err=>{
+                      console.log(err.data)
+                    })
                   }
                   // 生成临时操作记录
                   let resOperation = {

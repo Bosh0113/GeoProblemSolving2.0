@@ -780,19 +780,6 @@ export default {
                 this.$store.commit("userLogout");
                 this.tempLoginModal = true;
               } else if (res.data.code == 0) {
-                //多活动依赖
-                // this.operationApi.activityRecord(
-                //   "",
-                //   "create",
-                //   this.userInfo.userId,
-                //   res.data.data
-                // );
-                //初始化文档
-                // this.operationApi.activityDocInit(
-                //   res.data.data,
-                //   this.userInfo
-                // );
-
                 this.$emit("enterActivity", res.data.data);
               } else {
                 console.log(res.data.msg);
@@ -1146,7 +1133,7 @@ export default {
               "role",
               member.userId,
               member.name,
-              member.role,
+              role,
               member.domain
             );
             this.getParticipants();

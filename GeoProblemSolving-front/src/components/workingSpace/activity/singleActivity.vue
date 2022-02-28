@@ -423,7 +423,7 @@ export default {
               "role",
               member.userId,
               member.name,
-              member.role,
+              role,
               user.domain
             );
             this.getParticipants();

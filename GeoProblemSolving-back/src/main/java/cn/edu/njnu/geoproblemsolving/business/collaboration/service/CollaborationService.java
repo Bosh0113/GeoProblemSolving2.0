@@ -1,8 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
@@ -74,6 +74,9 @@ public class CollaborationService {
 
     @Autowired
     ActivityDocParser docParser;
+
+    @Autowired
+    DocParseServe docParseServe;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -651,7 +654,8 @@ public class CollaborationService {
                     }
 
                     //更新文档
-                    String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    // String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    String oid = docParseServe.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
                     computeMsg.setOid(oid);
 
                     //更新当前节点
@@ -731,7 +735,7 @@ public class CollaborationService {
                 if (communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0) {
                     MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
                     //聊天记录存入文档
-                    String oid = docParser.storeMessageRecord(null, msgRecords);
+                    String oid = docParseServe.messageRecord(null, msgRecords);
 
                     //将 oid 发送给前端
                     collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), oid);

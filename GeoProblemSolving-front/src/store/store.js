@@ -131,6 +131,7 @@ export default new Vuex.Store({
     clearActivityTasks: (state) => {
       Vue.set(state, "activityTaskChange", []);
     },
+    //临时操作交换
     updateTempOperations: (state, data) => {
       state.tempOperationChange.push(data);
     },

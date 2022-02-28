@@ -2,14 +2,12 @@ package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Building.C
 
 //import cn.edu.njnu.trafficNoiseCaculating.UserData.Domain.EDataType;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
-import cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Dao.fileUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +45,7 @@ public class exportBuildingServlet extends HttpServlet {
     GeoAnalysisProcess geoAnalysisProcess;
 
     @Autowired
-    ActivityDocParser docParser;
+    DocParseServe docParseServe;
 
     @Autowired
     NodeService nodeService;
@@ -125,7 +123,8 @@ public class exportBuildingServlet extends HttpServlet {
                     JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
                     userIds.add(userInfo.getString("userId"));
                 }
-                String oid = docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
+                // String oid = docParser.geoAnalysis(aid, toolId, userIds, "Data processing", input, outputEntity);
+                String oid = docParseServe.geoAnalysisRLS90(aid, toolId, userIds, "Data processing", input, outputEntity);
                 // 更新节点
                 nodeService.addResToNode(aid, uid);
                 //资源自动更新

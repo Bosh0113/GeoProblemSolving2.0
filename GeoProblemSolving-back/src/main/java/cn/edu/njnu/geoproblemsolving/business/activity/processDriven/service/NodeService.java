@@ -31,6 +31,12 @@ public interface NodeService {
 
     String getUserTag(String userId, String role);
 
+    HashMap<String, String> getActivityUserTag(String aid, Integer level);
+
+    String updateNodeUserTag(String aid, String userId);
+
+
+
 
     //活动与节点之间同步的内容，只关心节点层的内容
 
@@ -77,7 +83,8 @@ public interface NodeService {
 
     void putResInNode(String aid, ResourceEntity res);
 
-    void putResMeta(String graphicId, String aid, String uid);
+    void putResMetaOrType(String graphicId, String aid, String uid);
+
 
 
     //资源的更新

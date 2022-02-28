@@ -9,13 +9,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/*
+
+ */
 @Service
 public interface DocParseServe {
+    void deleteDoc(String aid);
+
+    void deleteDoc(String aid, String parentId);
+
     void initActivityDoc(Activity activity);
 
     Object changeActivityType(String aid, Activity activity);
 
-    Object userJoin(String aid, String userId);
+    void userJoin(String aid, String userId);
+
+    void userOut(String aid, String userId);
 
     Object userJoin(String aid, HashSet<String> userIds);
 
@@ -24,7 +33,13 @@ public interface DocParseServe {
 
     ArrayList<HashMap<String, String>> uploadResource(String aid, ArrayList<ResourceEntity> resourceEntities);
 
-    Object resFlow(String fromAid, String endAid, HashSet<String> uids);
+    ArrayList<HashMap<String, String>> uploadResource(String aid, ArrayList<ResourceEntity> res, HashMap<String, String> meta);
+
+    void removeResource(String aid, String uid);
+
+    void removeResource(String aid, HashSet<String> uids);
+
+    void resFlow(String fromAid, String endAid, HashSet<String> uids);
 
     HashMap<String, String> resFlow(String formAid, String endAid, String uid);
 
@@ -36,7 +51,15 @@ public interface DocParseServe {
 
     void appendChildActivity(String aid, String childId, String name, String creator);
 
+    void initSubActivityDoc(Activity activity);
+
     Object addTool(String aid, List<Tool> tools);
+
+    void refreshTool(String aid, List<Tool> tools);
+
+    void updateChild(String aid, String childId, String name);
+
+    void updateRoot(String aid, HashMap<String, String> updateInfo);
 
     Object removeTool(String aid, String tid);
 
@@ -44,6 +67,7 @@ public interface DocParseServe {
 
     String messageRecord(String tid, MsgRecords msgRecords);
 
+    //可供外部调用
     String geoAnalysis(String aid, String toolId,
                        HashSet<String> inResId,
                        ArrayList<ResourceEntity> outRes,

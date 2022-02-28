@@ -1216,6 +1216,7 @@ export default {
       userResourceList: [],
       selectedFilesToShare: [],
       //编辑
+      oldType: '',
       resEdit: false,
       editFileModel: false,
       oldMetadata: {},
@@ -2297,6 +2298,7 @@ export default {
       this.editFileValidate.privacy = fileInfo.privacy;
       this.editFileValidate.name = fileInfo.name;
       this.editFileValidate.type = fileInfo.type;
+      this.oldType = fileInfo.type;
       this.editFileValidate.description = fileInfo.description;
       if(this.editFileValidate.type =="data"){
         metadata = this.operationApi.getResInfo(fileInfo.uid);
@@ -2380,9 +2382,14 @@ export default {
                   this.selectFileInfo,
                   metadata,
                 );
+                let metadataChanged = false;
+                let typeChanged = false;
+                let type = this.editFileValidate.type;
+                if(type != null && type != this.oldType){
+                  typeChanged = true
+                }
                 if(this.editFileValidate.type == "data"){
                   // 检查元数据发生修改
-                  let metadataChanged = false;
                   if(
                     this.oldMetadata.format != metadata.format ||
                     this.oldMetadata.scale != metadata.scale ||
@@ -2390,16 +2397,15 @@ export default {
                     this.oldMetadata.unit != metadata.unit ||
                     this.oldMetadata.concept != metadata.concept
                   ){ metadataChanged = true; }
-                  if(metadataChanged){
-                    this.axios
-                      .put(`/GeoProblemSolving/activityDoc/meta/${this.activityInfo.parent}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
-                      .then((res) => {
-                        console.log(res.data.data);
-                      })
-                      .catch((err) => {
-                        console.log(err.data);
-                      });
                 }
+                if(metadataChanged || typeChanged){
+                  this.axios
+                  .put(`/GeoProblemSolving/activityDoc/typeOrMeta/${this.activityInfo.parent}/${this.activityInfo.aid}/${this.selectFileInfo.uid}`)
+                  .then(res=>{
+                    console.log(res.data.data)
+                  }).catch(err=>{
+                    console.log(err.data)
+                  })
                 }
                 // 生成临时操作记录
                 let resOperation = {

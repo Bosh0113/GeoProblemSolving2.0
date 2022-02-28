@@ -137,6 +137,7 @@ public class UserDispatchImpl implements UserDispatch {
 
     @Override
     public boolean checkUserIsApproved(String graphId, String nodeId, String userId) {
+        //更新节点中的用户信息
         String flowId = geoAnalysisProcess.checkUserIsApprovedService(graphId, nodeId, userId);
         return flowId != null;
     }

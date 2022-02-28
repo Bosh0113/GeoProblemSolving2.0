@@ -1162,10 +1162,7 @@ public class DocInterpret implements ActivityDocParser {
     @Override
     public Object userJoin(String aid, String userId) {
         try {
-            // JSONObject userTag = userDispatch.getUserTag(userId);
-            // if (userTag == null) return null;
-            // JSONArray domains = userTag.getJSONArray("domain");
-            // JSONArray organizations = userTag.getJSONArray("organization");
+            //有个特殊情况，退了又加
             UserEntity user = userDao.findUserByIdOrEmail(userId);
             ArrayList<String> domains = user.getDomain();
             ArrayList<String> organizations = user.getOrganizations();
@@ -1203,6 +1200,7 @@ public class DocInterpret implements ActivityDocParser {
     public Object userJoin(String aid, HashSet<String> userIds) {
         // syncGlobalVariables(aid);
         loadXML(aid);
+
         if (operatingDoc == null) return null;
         if (userIds == null || userIds.isEmpty()) return null;
         // JSONObject usersTag = userDispatch.getUsersTag(userIds);

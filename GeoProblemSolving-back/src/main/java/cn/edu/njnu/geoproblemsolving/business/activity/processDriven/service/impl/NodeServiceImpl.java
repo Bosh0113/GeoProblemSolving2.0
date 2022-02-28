@@ -94,7 +94,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public HashMap<String, String> getActivityResourceTag(String aid){
+    public HashMap<String, String> getActivityResourceTag(String aid) {
         HashMap<String, String> filesTagMap = new HashMap<>();
         //All resources can flow
         ArrayList<HashMap<String, String>> resInfoList = docParser.getAllResInfo(aid);
@@ -109,7 +109,7 @@ public class NodeServiceImpl implements NodeService {
     public String getUserTag(String userId, String role) {
         // HashMap<String, JSONArray> userTagMap = getUserTagFromUserServer(userId);
         UserEntity user = userDao.findUserByIdOrEmail(userId);
-        if (user == null){
+        if (user == null) {
             LOGGER.warn("No such user: " + userId);
             return null;
         }
@@ -117,13 +117,13 @@ public class NodeServiceImpl implements NodeService {
         ArrayList<String> organizations = user.getOrganizations();
         JSONArray domainArr = new JSONArray();
         JSONArray orgArr = new JSONArray();
-        if (domain != null && !domain.isEmpty()){
-            for (String item : domain){
+        if (domain != null && !domain.isEmpty()) {
+            for (String item : domain) {
                 domainArr.add(item);
             }
         }
-        if (organizations != null && !organizations.isEmpty()){
-            for (String item : organizations){
+        if (organizations != null && !organizations.isEmpty()) {
+            for (String item : organizations) {
                 orgArr.add(item);
             }
         }
@@ -153,7 +153,7 @@ public class NodeServiceImpl implements NodeService {
     // }
 
 
-
+    @Override
     public HashMap<String, String> getActivityUserTag(String aid, Integer level) {
         Activity activity;
         if (level == 0) {
@@ -172,23 +172,65 @@ public class NodeServiceImpl implements NodeService {
         return getUsersTag(idRoleMap);
     }
 
-    public HashMap<String, String> getUsersTag(HashMap<String, String> idRoleMap){
+
+    @Override
+    public String updateNodeUserTag(String aid, String userId) {
+        //只能在同一层次进行流动
+        Activity activity;
+        activity = activityRepository.findById(aid).get();
+        if (activity == null) activity = subprojectRepository.findById(aid).get();
+        JSONArray members = activity.getMembers();
+        for (int i = 0; i < members.size(); i++) {
+            JSONObject member = members.getJSONObject(i);
+            if (member.getString("userId").equals(userId)) {
+                UserEntity user = userDao.findUserByIdOrEmail(userId);
+                if (user != null) {
+                    String role = member.getString("role");
+                    ArrayList<String> domain = user.getDomain();
+                    ArrayList<String> organizations = user.getOrganizations();
+                    JSONArray domainArr = new JSONArray();
+                    JSONArray orgArr = new JSONArray();
+                    if (domain != null && !domain.isEmpty()) {
+                        for (String item : domain) {
+                            domainArr.add(item);
+                        }
+                    }
+                    if (organizations != null && !organizations.isEmpty()) {
+                        for (String item : organizations) {
+                            orgArr.add(item);
+                        }
+                    }
+                    String userTag = TagUtil.setUserTag(role, domainArr, orgArr);
+                    //更新节点
+                    ActivityNode node = nodeRepository.findById(aid).get();
+                    if (node == null) break;
+                    node.getMembers().put(userId, userTag);
+                    nodeRepository.save(node);
+                    return userTag;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public HashMap<String, String> getUsersTag(HashMap<String, String> idRoleMap) {
         //userId
         Set<String> userIds = idRoleMap.keySet();
         List<UserEntity> users = userDao.findUsers(userIds);
         HashMap<String, String> userTagMap = new HashMap<>();
-        for (UserEntity user : users){
+        for (UserEntity user : users) {
             ArrayList<String> domain = user.getDomain();
             ArrayList<String> organizations = user.getOrganizations();
             JSONArray domainArr = new JSONArray();
             JSONArray orgArr = new JSONArray();
-            if (domain != null && !domain.isEmpty()){
-                for (String item : domain){
+            if (domain != null && !domain.isEmpty()) {
+                for (String item : domain) {
                     domainArr.add(item);
                 }
             }
-            if (organizations != null && !organizations.isEmpty()){
-                for (String item : organizations){
+            if (organizations != null && !organizations.isEmpty()) {
+                for (String item : organizations) {
                     orgArr.add(item);
                 }
             }
@@ -309,7 +351,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void delResInNodeBatch(String aid, HashSet<String> uid)  {
+    public void delResInNodeBatch(String aid, HashSet<String> uid) {
         putNodeResource(aid, uid, "delBatch");
     }
 
@@ -319,7 +361,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void putResMeta(String graphicId, String aid, String uid) {
+    public void putResMetaOrType(String graphicId, String aid, String uid) {
         //文档更新已经完成，这是第二步: 更新节点
         putNodeResource(aid, uid, "put");
         //第三步，资源流动

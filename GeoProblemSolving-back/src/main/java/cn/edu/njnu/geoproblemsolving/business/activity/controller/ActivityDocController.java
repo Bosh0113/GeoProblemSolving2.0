@@ -48,7 +48,7 @@ public class ActivityDocController {
      * update activity document
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public JsonResult updateAcitivityDoc(@RequestBody  ActivityDoc activityDoc)
+    public JsonResult updateActivityDoc(@RequestBody  ActivityDoc activityDoc)
     {
         return activityDocService.updateDocument(activityDoc.getAid(), activityDoc.getDocument());
     }
@@ -59,9 +59,9 @@ public class ActivityDocController {
     }
 
     //资源元数据发生修改
-    @RequestMapping(value = "/meta/{graphicId}/{aid}/{uid}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/typeOrMeta/{graphicId}/{aid}/{uid}", method = RequestMethod.PUT)
     public void putDataMeta(@PathVariable String graphicId, @PathVariable String aid, @PathVariable String uid){
         if (graphicId == null) return;
-        nodeService.putResMeta(graphicId, aid, uid);
+        nodeService.putResMetaOrType(graphicId, aid, uid);
     }
 }

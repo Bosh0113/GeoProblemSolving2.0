@@ -3,6 +3,8 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocInterpret;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -42,8 +44,9 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ToolService toolService;
     private final NodeService nodeService;
     private final ActivityDocParser docParser;
+    private final DocParseServiceImpl docParseService;
 
-    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, ActivityDocParser docParser) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, ActivityDocParser docParser, DocParseServiceImpl docParseService) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
@@ -53,6 +56,7 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.toolService = toolService;
         this.nodeService = nodeService;
         this.docParser = docParser;
+        this.docParseService = docParseService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -101,8 +105,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             // set type
             subproject.setType(subproject.getType());
-            // 初始化文档
-            docParser.initActivityDoc(subproject);
+            // 1-初始化文档
+            docParseService.initActivityDoc(subproject);
+            // docParser.initActivityDoc(subproject);
             if (subproject.getType().equals(ActivityType.Activity_Group)) {
                 subproject.setChildren(new ArrayList<>());
             }else if (subproject.getType().equals(ActivityType.Activity_Unit)){
@@ -118,7 +123,9 @@ public class SubprojectServiceImpl implements SubprojectService {
                 }
 
                 //若是 Activity_Unit, 则绑定工具
-                docParser.addTools(subprojectId, relevantPurposeTool);
+                //2-绑定工具
+                docParseService.refreshTool(subprojectId, relevantPurposeTool);
+                // docParser.addTools(subprojectId, relevantPurposeTool);
             }
 
             // folder
@@ -145,8 +152,9 @@ public class SubprojectServiceImpl implements SubprojectService {
             2. append child activity
             3. add tool, if need
              */
-            //添加依赖
-            docParser.appendChildActivity(projectId, subprojectId, subproject.getName(), creatorId);
+            //3-添加依赖
+            docParseService.appendChildActivity(projectId, subprojectId, subproject.getName(), creatorId);
+            // docParser.appendChildActivity(projectId, subprojectId, subproject.getName(), creatorId);
 
 
             return ResultUtils.success(subproject);
@@ -200,17 +208,41 @@ public class SubprojectServiceImpl implements SubprojectService {
             }
 
             ActivityType oldType = subproject.getType();
+            String oldName = subproject.getName();
+            String oldDesc = subproject.getDescription();
             update.updateTo(subproject);
 
             //activityType 发生改变
             if (update.getType() != null && !oldType.equals(update.getType())){
-                docParser.changeActivityType(aid, subproject);
+                // docParser.changeActivityType(aid, subproject);
+                docParseService.changeActivityType(aid, subproject);
             }
 
             if (!relevantPurposeTool.isEmpty()){
                 //更新内容
-                docParser.putTools(aid, relevantPurposeTool);
+                docParseService.refreshTool(aid, relevantPurposeTool);
+                // docParser.putTools(aid, relevantPurposeTool);
             }
+
+            if (update.getName() != null && !oldName.equals(update.getName())){
+                HashMap<String, String> updateInfo = new HashMap<>();
+                updateInfo.put("name", update.getName());
+                docParseService.updateRoot(aid, updateInfo);
+                //name 改变, 需要改变 父级的child标签
+                docParseService.updateChild(subproject.getParent(), aid, update.getName());
+            }
+            if (update.getDescription() != null && !oldDesc.equals(update.getDescription())){
+                HashMap<String, String> updateInfo = new HashMap<>();
+                updateInfo.put("description", update.getDescription());
+                docParseService.updateRoot(aid, updateInfo);
+            }
+            /*
+            文档更新分为三块
+            1. 类型改变
+            2. purpose 改变
+            3. 文档名字发生改变就更改父文档
+             */
+
 
             // Update active time
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -243,6 +275,9 @@ public class SubprojectServiceImpl implements SubprojectService {
 
             projectRepository.save(project);
             subprojectRepository.deleteById(aid);
+
+            //文档删除
+            docParseService.deleteDoc(aid, subproject.getParent());
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -424,7 +459,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subprojectRepository.save(subproject);
 
             //更新文档
-            docParser.userJoin(aid, userId);
+            docParseService.userJoin(aid, userId);
             //update node
             nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
 
@@ -468,7 +503,7 @@ public class SubprojectServiceImpl implements SubprojectService {
             subprojectRepository.save(subproject);
 
             //update doc
-            docParser.userJoin(aid, userIds);
+            docParseService.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 

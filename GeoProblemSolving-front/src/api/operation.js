@@ -884,6 +884,7 @@ export function taskDependencyRecord(aid, behavior, last, next) {
 }
 
 export function participantUpdate(aid, behavior, userId, name, role, domains) {
+  getActivityDoc(aid)
   if (xmlDoc === null) {
     alert("Failed to record operation. Please try it again!");
     return;

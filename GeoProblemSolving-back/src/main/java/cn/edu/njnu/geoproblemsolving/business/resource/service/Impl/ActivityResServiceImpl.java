@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
@@ -61,6 +62,9 @@ public class ActivityResServiceImpl implements ActivityResService {
 
     @Autowired
     ActivityDocParser docParser;
+
+    @Autowired
+    DocParseServiceImpl docParseService;
 
 
     @Value("${dataContainer}")
@@ -274,14 +278,13 @@ public class ActivityResServiceImpl implements ActivityResService {
                 }
             }
             //更新文档
-            uploadInfos.uploadedOperation = docParser.uploadResources(aid, uploadInfos.uploaded, meta);
+            uploadInfos.uploadedOperation = docParseService.uploadResource(aid, uploadInfos.uploaded, meta);
             //更新当前节点
             nodeService.addResToNodeBatch(aid, uploadUids);
             /*
-            资源自动更新
+            资源流动
              */
             String graphId = req.getParameter("graphId");
-            //update
             geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uploadUids);
             return uploadInfos;
 
@@ -324,6 +327,8 @@ public class ActivityResServiceImpl implements ActivityResService {
             for (String uid : uids) {
                 activityResDao.delResource(uid);
             }
+            //update document
+            docParseService.removeResource(aid, new HashSet<>(uids));
             //update node
             nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
             return "suc";
@@ -594,6 +599,7 @@ public class ActivityResServiceImpl implements ActivityResService {
                     BeanUtils.copyProperties(putRes, res, nullPropertyNames);
                     rootResList.remove(i);
                     rootResList.add(i, res);
+                    break;
                 }
             }
         } else {

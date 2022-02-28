@@ -903,7 +903,7 @@ export default {
               }
             }
             // update activity doc
-            this.operationApi.activityUpdate("type", this.editActivityForm);
+            // this.operationApi.activityUpdate("type", this.editActivityForm);
             this.updatePathway("type", this.editActivityForm.purpose);
           } else if (
             this.editActivityForm.purpose != this.slctActivity.purpose
@@ -911,7 +911,7 @@ export default {
             this.updatePathway("type", this.editActivityForm.purpose);
           } else {
             // update activity doc
-            this.operationApi.activityUpdate("other", this.editActivityForm);
+            // this.operationApi.activityUpdate("other", this.editActivityForm);
           }
 
           // Update the activity name
@@ -1230,13 +1230,13 @@ export default {
           } else if (res.data.code == 0) {
             this.$Notice.info({ title: "Delete", desc: "Success!" });
             // activity document
-            this.operationApi.activityRecord(
-              "",
-              "remove",
-              this.userInfo.userId,
-              this.slctActivity
-            );
-            this.operationApi.deleteActivityDoc(this.slctActivity.aid);
+            // this.operationApi.activityRecord(
+            //   "",
+            //   "remove",
+            //   this.userInfo.userId,
+            //   this.slctActivity
+            // );
+            // this.operationApi.deleteActivityDoc(this.slctActivity.aid);
             // update pathway
             this.updatePathway("delete", aid);
             this.activityDeleteModal = false;
