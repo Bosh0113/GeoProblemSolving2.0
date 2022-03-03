@@ -98,7 +98,7 @@
                   style="text-align: center; cursor: pointer"
                   @click="expandTool(tool)"
                 >
-                  <Tooltip placement="bottom" max-width="400" :transfer="true">
+                  <Tooltip placement="bottom" max-width="400" :transfer="true" content=tool.toolName>
                     <img
                       :src="tool.toolImg"
                       v-if="tool.toolImg != ''"

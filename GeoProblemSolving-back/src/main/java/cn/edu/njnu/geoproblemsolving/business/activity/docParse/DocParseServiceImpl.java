@@ -436,6 +436,13 @@ public class DocParseServiceImpl implements DocParseServe {
     }
 
     @Override
+    public String geoAnalysis(String aid, String toolId, HashSet<String> inResId, ResourceEntity outRes, HashSet<String> participants) {
+        ArrayList<ResourceEntity> resList = new ArrayList<>();
+        resList.add(outRes);
+        return geoAnalysis(aid, toolId, inResId, resList, participants);
+    }
+
+    @Override
     public String geoAnalysisRLS90(String aid,
                                    String toolId,
                                    HashSet<String> onlineMembers,

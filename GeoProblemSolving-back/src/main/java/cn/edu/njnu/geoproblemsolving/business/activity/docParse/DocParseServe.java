@@ -73,6 +73,8 @@ public interface DocParseServe {
                        ArrayList<ResourceEntity> outRes,
                        HashSet<String> participants);
 
+    String geoAnalysis(String aid, String toolId, HashSet<String> inResId, ResourceEntity outRes, HashSet<String> participants);
+
 
     String geoAnalysisRLS90(String aid, String toolId,
                             HashSet<String> onlineMembers,
