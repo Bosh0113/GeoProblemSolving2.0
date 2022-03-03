@@ -926,12 +926,14 @@ export default {
     },
     submit() {
       let aid = this.activityInfo.aid;
+      let graphId = this.activityInfo.parent;
       let toolId = this.toolId;
       let participant = this.participants;
       let species = this.species;
 
       let submitInfo = {};
       submitInfo.aid = aid;
+      submitInfo.graphId = graphId;
       submitInfo.toolId = toolId;
       submitInfo.participant = participant;
       submitInfo.species = species;

@@ -1903,10 +1903,12 @@ export default {
     },
     submit(){
       let aid = this.activityInfo.aid;
+      let graphId = this.activityInfo.parent;
       let toolId = this.toolId;
       let participant = this.participants;
       let requiredInput = {};
       let lifeParameter = {};
+      let biomassSuccession = {};
 
       requiredInput.timeStep = this.timeStep;
       requiredInput.seedingAlgorithm = this.seedingAlgorithm;
@@ -1925,13 +1927,32 @@ export default {
       lifeParameter.harvestReductionParametersVal = this.harvestRows;
 
       let submitInfo = {};
+      biomassSuccession.requiredInput = requiredInput;
+      biomassSuccession.lifeParameter = lifeParameter;
       submitInfo.aid = aid;
+      submitInfo.graphId = graphId;
       submitInfo.toolId = toolId;
       submitInfo.participant = participant;
-      submitInfo.requiredInput = requiredInput;
-      submitInfo.lifeParameter = lifeParameter;
+      submitInfo.biomassSuccession = biomassSuccession;
 
       console.log(submitInfo);
+      this.axios
+        .post("/GeoProblemSolving/landis/biomass",submitInfo)
+        .then((res) => {
+          console.log(res);
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+            // this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
+            // success
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
 
     },
     beforeResetAll(){

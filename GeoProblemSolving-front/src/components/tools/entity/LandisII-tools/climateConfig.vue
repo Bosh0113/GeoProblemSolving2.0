@@ -294,8 +294,10 @@ export default {
     },
     submit() {
       let aid = this.activityInfo.aid;
+      let graphId = this.activityInfo.parent;
       let toolId = this.toolId;
       let participant = this.participants;
+      let submitInfo = {};
       let climateConfig = {};
       climateConfig.climateTimeSeries = this.climateTimeSeries;
       climateConfig.climateFile = this.climateFile.address;
@@ -303,10 +305,28 @@ export default {
       climateConfig.spinUpClimateTimeSeries = this.spinUpClimateTimeSeries;
       climateConfig.spinUpClimateFile = this.spinUpClimateFile.address;
       climateConfig.spinUpClimateFileFormat = this.spinUpClimateFileFormat;
-      climateConfig.aid = aid;
-      climateConfig.toolId = toolId;
-      climateConfig.participant = participant;
-      console.log(climateConfig);
+      submitInfo.aid = aid;
+      submitInfo.graphId = graphId;
+      submitInfo.toolId = toolId;
+      submitInfo.participant = participant;
+      submitInfo.climateConfig = climateConfig;
+      this.axios
+        .post("/GeoProblemSolving/landis/climateConfig",submitInfo)
+        .then((res) => {
+          console.log(res);
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+            // this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
+            // success
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
     },
     climateTimeSeriesChange(value){
       // websocket

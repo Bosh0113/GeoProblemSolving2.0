@@ -664,17 +664,36 @@ export default {
     },
     submit() {
       let aid = this.activityInfo.aid;
+      let graphId = this.activityInfo.parent;
       let toolId = this.toolId;
       let participant = this.participants;
-      let species = this.species;
+      let dynamicInput = this.species;
 
       let submitInfo = {};
       submitInfo.aid = aid;
+      submitInfo.graphId = graphId;
       submitInfo.toolId = toolId;
       submitInfo.participant = participant;
-      submitInfo.species = species;
+      submitInfo.dynamicInput = dynamicInput;
 
       console.log(submitInfo);
+      this.axios
+        .post("/GeoProblemSolving/landis/dynamicInput",submitInfo)
+        .then((res) => {
+          console.log(res);
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+            // this.tempLoginModal = true;
+          } else if (res.data.code == 0) {
+            // success
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err.data);
+        });
     },
     beforeSelect(selection){
       this.select(selection);
