@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * @ClassName OperationRes
- * @Description Todo
+ * @Description 操作中资源的信息
  * @Author zhngzhng
  * @Date 2021/12/9
  **/

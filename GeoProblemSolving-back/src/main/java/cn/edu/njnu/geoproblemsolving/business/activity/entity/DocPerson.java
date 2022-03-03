@@ -14,6 +14,7 @@ import java.util.HashSet;
 @Data
 public class DocPerson {
     private String userId;
+    //在活动中的角色
     private String role;
     private String email;
     private String name;

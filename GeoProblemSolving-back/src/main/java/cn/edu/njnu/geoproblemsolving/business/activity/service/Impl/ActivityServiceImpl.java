@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
@@ -44,6 +45,8 @@ public class ActivityServiceImpl implements ActivityService {
     private final ToolService toolService;
     private final NodeService nodeService;
     private final ActivityDocParser docParser;
+    @Autowired
+    DocParseServiceImpl docParseService;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -163,14 +166,15 @@ public class ActivityServiceImpl implements ActivityService {
 
             // set type
             activity.setType(activity.getType());
-            docParser.initActivityDoc(activity);
+            // docParser.initActivityDoc(activity);
+            docParseService.initActivityDoc(activity);
             if (activity.getType().equals(ActivityType.Activity_Group)) {
                 activity.setChildren(new ArrayList<>());
             } else if (activity.getType().equals(ActivityType.Activity_Unit)) {
                 String purpose = activity.getPurpose();
                 List<Tool> relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()){
+                if (relevantPurposeTool != null && !relevantPurposeTool.isEmpty()) {
                     for (Tool tool : relevantPurposeTool) {
                         toolSet.add(tool.getTid());
                     }
@@ -178,7 +182,9 @@ public class ActivityServiceImpl implements ActivityService {
                 }
 
                 //更新文档
-                docParser.addTools(aid, relevantPurposeTool);
+                // docParser.addTools(aid, relevantPurposeTool);
+                docParseService.refreshTool(aid, relevantPurposeTool);
+
             }
 
             // tools and toolsets
@@ -238,7 +244,8 @@ public class ActivityServiceImpl implements ActivityService {
             //save
             activityRepository.save(activity);
 
-            docParser.appendChildActivity(activity.getParent(), aid, activity.getName(), creatorId);
+            docParseService.appendChildActivity(activity.getParent(), aid, activity.getName(), creatorId);
+            // docParser.appendChildActivity(activity.getParent(), aid, activity.getName(), creatorId);
 
             return ResultUtils.success(activity);
         } catch (Exception ex) {
@@ -258,12 +265,12 @@ public class ActivityServiceImpl implements ActivityService {
             List<Tool> relevantPurposeTool = new ArrayList<>();
             if (
                     update.getType() != null && update.getPurpose() != null &&
-                    (update.getType().equals(ActivityType.Activity_Unit) &&
-                    !activity.getType().equals(ActivityType.Activity_Unit) ||
-                    !activity.getPurpose().equals(purpose))) {
+                            (update.getType().equals(ActivityType.Activity_Unit) &&
+                                    !activity.getType().equals(ActivityType.Activity_Unit) ||
+                                    !activity.getPurpose().equals(purpose))) {
                 relevantPurposeTool = toolService.getRelevantPurposeTool(purpose);
                 HashSet<String> toolSet = new HashSet<>();
-                if (!relevantPurposeTool.isEmpty()){
+                if (!relevantPurposeTool.isEmpty()) {
                     for (Tool tool : relevantPurposeTool) {
                         toolSet.add(tool.getTid());
                     }
@@ -275,13 +282,18 @@ public class ActivityServiceImpl implements ActivityService {
             update.updateTo(activity);
 
             //activityType 发生改变
-            if (update.getType() != null && !oldType.equals(update.getType())){
-                docParser.changeActivityType(aid, activity);
+            if (update.getType() != null && !oldType.equals(update.getType())) {
+                docParseService.changeActivityType(aid, activity);
+                // docParser.changeActivityType(aid, activity);
             }
 
-            if (!relevantPurposeTool.isEmpty()){
-                //更新工具箱内容
-                docParser.putTools(aid, relevantPurposeTool);
+            //更新工具箱内容
+            if (!relevantPurposeTool.isEmpty()) {
+                docParseService.refreshTool(aid, relevantPurposeTool);
+            }
+            //名字发生改变，更新父文档
+            if (update.getName() != null && !activity.getName().equals(update.getName())) {
+                docParseService.updateChild(activity.getParent(), activity.getAid(), update.getName());
             }
 
             // Update active time
@@ -327,6 +339,10 @@ public class ActivityServiceImpl implements ActivityService {
             }
 
             activityRepository.deleteById(aid);
+
+            //文档删除
+            docParseService.deleteDoc(aid, activity.getParent());
+
             return ResultUtils.success("Success");
         } catch (Exception ex) {
             return ResultUtils.error(-2, ex.toString());
@@ -637,9 +653,9 @@ public class ActivityServiceImpl implements ActivityService {
 
 
             //update doc
-            docParser.userJoin(aid, userId);
+            docParseService.userJoin(aid, userId);
             //update node
-            nodeService.addOrPutUserToNode(aid, userId,"ordinary-member");
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
             return ResultUtils.success("Success");
         } catch (Exception ex) {
@@ -655,16 +671,16 @@ public class ActivityServiceImpl implements ActivityService {
         if (members == null) members = new JSONArray();
         try {
             //Do not process if the user exists.
-            for (Object member : members){
-                String userId =  (String)((HashMap) member).get("userId");
-                for (Iterator<String> it = userIds.iterator(); it.hasNext();){
+            for (Object member : members) {
+                String userId = (String) ((HashMap) member).get("userId");
+                for (Iterator<String> it = userIds.iterator(); it.hasNext(); ) {
                     String uid = it.next();
-                    if (uid.equals(userId)){
+                    if (uid.equals(userId)) {
                         it.remove();
                     }
                 }
             }
-            for (String uid : userIds){
+            for (String uid : userIds) {
                 Optional<UserEntity> byId = userRepository.findById(uid);
                 if (!byId.isPresent()) continue;
                 JSONObject newMember = new JSONObject();
@@ -678,11 +694,11 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity);
 
             //update doc
-            docParser.userJoin(aid, userIds);
+            docParseService.userJoin(aid, userIds);
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
             return ResultUtils.success(members);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResultUtils.error(-2, e.toString());
         }
     }
@@ -709,7 +725,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityRepository.save(activity);
 
             //删除临时用户
-            if (userId.length() > 40){
+            if (userId.length() > 40) {
                 userRepository.deleteById(userId);
             }
 

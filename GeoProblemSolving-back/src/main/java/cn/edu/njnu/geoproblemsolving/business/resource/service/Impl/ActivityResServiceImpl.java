@@ -1,5 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 
+import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
@@ -23,12 +25,17 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +44,8 @@ import javax.servlet.http.Part;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -46,7 +55,7 @@ import java.util.*;
  * @Date 2021/4/20
  **/
 @Service
-public class ActivityResServiceImpl<num> implements ActivityResService {
+public class ActivityResServiceImpl implements ActivityResService {
     @Autowired
     UserDaoImpl userDao;
 
@@ -61,6 +70,9 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
 
     @Autowired
     ActivityDocParser docParser;
+
+    @Autowired
+    DocParseServiceImpl docParseService;
 
 
     @Value("${dataContainer}")
@@ -132,7 +144,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             String type = req.getParameter("type");
             //添加数据元数据相关操作
             HashMap<String, String> meta = null;
-            if (type.equals("data")){
+            if (type.equals("data")) {
                 meta = new HashMap<>();
                 meta.put("format", req.getParameter("format"));
                 meta.put("scale", req.getParameter("scale"));
@@ -175,10 +187,10 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             String fileName = temp[0];
                             String suffix = "." + temp[1];
 
-                            File fileTemp = File.createTempFile(UUID.randomUUID().toString(), suffix);//创建临时文件
-                            FileUtils.copyInputStreamToFile(part.getInputStream(), fileTemp);
+                            File tempFile = File.createTempFile(UUID.randomUUID().toString(), suffix);//创建临时文件
+                            FileUtils.copyInputStreamToFile(part.getInputStream(), tempFile);
                             // MultipartFile multipartFile = new MockMultipartFile(ContentType.APPLICATION_OCTET_STREAM.toString(), part.getInputStream());
-                            FileSystemResource multipartFile = new FileSystemResource(fileTemp);      //临时文件
+                            FileSystemResource multipartFile = new FileSystemResource(tempFile);      //临时文件
 
                             valueMap.add("datafile", multipartFile);
                             valueMap.add("name", fileName);
@@ -231,7 +243,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                             uploadInfos.uploaded.add(res);
                             //======活动链接相关操作======================================
                             //资源自动更新内容, public can auto update
-                            if (nodeService.nodeIsPresent(aid) != null){
+                            if (nodeService.nodeIsPresent(aid) != null) {
                                 uploadUids.add(uid);
                             }
                             //===================================================
@@ -274,14 +286,13 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                 }
             }
             //更新文档
-            uploadInfos.uploadedOperation = docParser.uploadResources(aid, uploadInfos.uploaded, meta);
+            uploadInfos.uploadedOperation = docParseService.uploadResource(aid, uploadInfos.uploaded, meta);
             //更新当前节点
             nodeService.addResToNodeBatch(aid, uploadUids);
             /*
-            资源自动更新
+            资源流动
              */
             String graphId = req.getParameter("graphId");
-            //update
             geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, uploadUids);
             return uploadInfos;
 
@@ -317,6 +328,29 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
         return resList;
     }
 
+    //将单个资源存入
+    private List<ResourceEntity> aRes(List<ResourceEntity> resList, ArrayList<String> paths, ResourceEntity res, String parent) {
+        if (paths.size() == 0 || paths.get(0).equals("0")) {
+            res.setParent(parent);
+            resList.add(res);
+        } else {
+            String path = paths.remove(paths.size() - 1);
+            for (int i = 0; i < resList.size(); i++) {
+                if (res.getFolder()) {
+                    if (res.getUid().equals(path)) {
+                        aRes(res.getChildren(), paths, res, path);
+                        resList.set(i, res);
+                        break;
+                    }
+                } else {
+                    //不是文件夹，无 children 一说，直接跳过
+                    continue;
+                }
+            }
+        }
+        return resList;
+    }
+
     @Override
     public String delResource(String aid, ArrayList<String> uids, ArrayList<String> paths) {
         //批量删除也只能删除一个文件夹内容的
@@ -324,6 +358,8 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             for (String uid : uids) {
                 activityResDao.delResource(uid);
             }
+            //update document
+            docParseService.removeResource(aid, new HashSet<>(uids));
             //update node
             nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
             return "suc";
@@ -594,6 +630,7 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
                     BeanUtils.copyProperties(putRes, res, nullPropertyNames);
                     rootResList.remove(i);
                     rootResList.add(i, res);
+                    break;
                 }
             }
         } else {
@@ -911,6 +948,218 @@ public class ActivityResServiceImpl<num> implements ActivityResService {
             return null;
         }
 
+    }
+
+
+//    ===============================更新一些内容(重新组织一下代码) 使得资源模块更加独立,模块化一些, 仅处理与资源有关的内容=============================
+//
+//     @Override
+//     public ResourceEntity uploadRes(Part filePart, String userId, String aid, String path) throws IOException {
+//         if (filePart == null) return null;
+//         InputStreamResource isResource = new InputStreamResource(filePart.getInputStream()) {
+//             @Override
+//             public long contentLength() {
+//                 return filePart.getSize();
+//             }
+//
+//             @Override
+//             public String getFilename() {
+//                 return filePart.getSubmittedFileName();
+//             }
+//         };
+//         LinkedMultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+//         String fileFullName = filePart.getSubmittedFileName();
+//         String fileName;
+//         try {
+//             fileName = fileFullName.split("\\.")[0];
+//         } catch (IndexOutOfBoundsException e) {
+//             fileName = fileFullName;
+//         }
+//         multiValueMap.add("datafile", isResource);
+//         multiValueMap.add("name", fileName);
+//         RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+//         String uploadRemoteUrl = "http://" + dataContainerIp + ":8082/data";
+//         //向dataContainer传输数据
+//         JSONObject uploadRemoteResult = restTemplateUtil.postRequestMap(uploadRemoteUrl, multiValueMap).getBody();
+//         Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
+//         String dataIdInContainer = uploadRemoteResult.getJSONObject("data").getString("id");
+//
+//         //上传失败
+//         if (!uploadResultInfo.equals(1)) return null;
+//
+//         //成功将资源上传到数据容器中,将资源存入数据库
+//         ResourceEntity res = new ResourceEntity();
+//         String uid = UUID.randomUUID().toString();
+//         res.setUid(uid);
+//         res.setName(fileName);
+//         res.setSuffix(suffix);
+//         res.setUploadTime(new Date());
+//         res.setFileSize(part.getSize());
+//         res.setPrivacy(req.getParameter("privacy"));
+//         res.setType(req.getParameter("type"));
+//         res.setDescription(req.getParameter("description"));
+//         res.setFolder(false);
+//         res.setUserUpload(true);
+//         String address = "http://" + dataContainerIp + ":8082" + "/data/" + dataIdInContainer;
+//         res.setAddress(address);
+//         res.setUploaderId(userId);
+//         res.setUploaderName(uploadName);
+//         res.setActivityId(aid);
+//         try {
+//             String thumbnail = req.getParameter("thumbnail");
+//             String editToolInfo = req.getParameter("editToolInfo");
+//             res.setThumbnail(thumbnail);
+//             res.setEditToolInfo(editToolInfo);
+//         } catch (Exception ex) {
+//
+//         }
+//
+//         uploadInfos.uploaded.add(res);
+//         //======活动链接相关操作======================================
+//         //资源自动更新内容, public can auto update
+//         if (nodeService.nodeIsPresent(aid) != null) {
+//             uploadUids.add(uid);
+//         }
+//         //===================================================
+//         //如果不是最后一个，则进入下一次循环
+//         if (fileNum != 0) {
+//             continue;
+//         }
+//         //批量上传至于最后一个资源，开始将资源存入字段中
+//         String rootResUid = paths.get(paths.size() - 1);
+//         //如果为根目录直接存入表中
+//         if (rootResUid.equals("0") && paths.size() == 1) {
+//             for (ResourceEntity resItem : uploadInfos.uploaded) {
+//                 activityResDao.addResource(resItem);
+//             }
+//             break;
+//         }
+//         //将上传的资源存入文件夹中
+//         List<ResourceEntity> putResList = aRes(resourceList, paths, uploadInfos.uploaded, "0");
+//         int index = 0;
+//         for (int i = 0; i < putResList.size(); i++) {
+//             ResourceEntity item = putResList.get(i);
+//             if (item.getUid().equals(rootResUid)) {
+//                 index = i;
+//                 break;
+//             }
+//         }
+//
+//         Query query = new Query(Criteria.where("uid").is(rootResUid));
+//         Update update = new Update();
+//         update.set("children", putResList.get(index).getChildren());
+//         //将所上传的资源存入当前活动中
+//         activityResDao.updateRes(query, update);
+//
+//         return null;
+//     }
+//
+//     @Override
+//     public ResourceEntity uploadRes(MultipartFile filePart) throws IOException {
+//         if (filePart == null) return null;
+//         ByteArrayResource byteArrayResource = new ByteArrayResource(filePart.getBytes()) {
+//             @Override
+//             public long contentLength() {
+//                 return filePart.getSize();
+//             }
+//
+//             @Override
+//             public String getFilename() {
+//                 return filePart.getOriginalFilename();
+//             }
+//         };
+//         return null;
+//     }
+//
+//     //上传本地资源
+//     @Override
+//     public ResourceEntity uploadRes(String path) {
+//         FileSystemResource fileSystemResource = new FileSystemResource(path);
+//
+//         return null;
+//     }
+//
+//
+//     private boolean setResourceToDB(HashSet<ResourceEntity> resList, ArrayList<String> paths) {
+//         //批量上传至于最后一个资源，开始将资源存入字段中
+//         String rootResUid = paths.get(paths.size() - 1);
+//         //如果为根目录直接存入表中
+//         if (rootResUid.equals("0") && paths.size() == 1) {
+//             for (ResourceEntity resItem : uploadInfos.uploaded) {
+//                 activityResDao.addResource(resItem);
+//             }
+//             break;
+//         }
+//         //将上传的资源存入文件夹中
+//         List<ResourceEntity> putResList = aRes(resourceList, paths, uploadInfos.uploaded, "0");
+//         int index = 0;
+//         for (int i = 0; i < putResList.size(); i++) {
+//             ResourceEntity item = putResList.get(i);
+//             if (item.getUid().equals(rootResUid)) {
+//                 index = i;
+//                 break;
+//             }
+//         }
+//
+//         Query query = new Query(Criteria.where("uid").is(rootResUid));
+//         Update update = new Update();
+//         update.set("children", putResList.get(index).getChildren());
+//         //将所上传的资源存入当前活动中
+//         activityResDao.updateRes(query, update);
+//     }
+
+    @Override
+    public ResourceEntity uploadRes(File file, Object res, String aid, ArrayList<String> paths) {
+        FileSystemResource fileSystemResource = new FileSystemResource(file);
+        String fileFullName = file.getName();
+        String fileName;
+        try {
+            fileName = fileFullName.split("\\.")[0];
+        } catch (IndexOutOfBoundsException e) {
+            fileName = fileFullName;
+        }
+        LinkedMultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("datafile", fileSystemResource);
+        multiValueMap.add("name", fileName);
+        RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+        String uploadRemoteUrl = "http://" + dataContainerIp + ":8082/data";
+        //向dataContainer传输数据
+        JSONObject uploadRemoteResult = restTemplateUtil.postRequestMap(uploadRemoteUrl, multiValueMap).getBody();
+        Integer uploadResultInfo = uploadRemoteResult.getInteger("code");
+        String dataIdInContainer = uploadRemoteResult.getJSONObject("data").getString("id");
+        String address = "/data/" + dataIdInContainer;
+        //上传失败
+        if (!uploadResultInfo.equals(1)) return null;
+        String[] nullPropertyNames = CommonUtil.getNullPropertyNames(res);
+        ResourceEntity localRes = new ResourceEntity();
+        BeanUtils.copyProperties(res, localRes, nullPropertyNames);
+        localRes.setAddress(address);
+
+        //存入数据库
+        String rootResUid = paths.get(paths.size() - 1);
+        //如果为根目录直接存入表中
+        if (rootResUid.equals("0") && paths.size() == 1) {
+            activityResDao.addResource(localRes);
+        }else {
+            List<ResourceEntity> resourceList = activityResDao.queryByAid(aid);
+            //将上传的资源存入文件夹中
+            List<ResourceEntity> putResList = aRes(resourceList, paths, localRes, "0");
+            //获取需要更新的资源
+            int index = 0;
+            for (int i = 0; i < putResList.size(); i++) {
+                ResourceEntity item = putResList.get(i);
+                if (item.getUid().equals(rootResUid)) {
+                    index = i;
+                    break;
+                }
+            }
+            Query query = new Query(Criteria.where("uid").is(rootResUid));
+            Update update = new Update();
+            update.set("children", putResList.get(index).getChildren());
+            //将所上传的资源存入当前活动中
+            activityResDao.updateRes(query, update);
+        }
+        return localRes;
     }
 }
 

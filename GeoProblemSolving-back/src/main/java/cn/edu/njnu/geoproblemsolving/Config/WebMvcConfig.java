@@ -34,7 +34,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/rip/file/allPublic",
                         "/user/changePwd/**",
                         "/token/*",
-                        "/token/all/**"
+                        "/token/all/**",
+                        "/landis"
                 );//不拦截的请求
     }
     /*

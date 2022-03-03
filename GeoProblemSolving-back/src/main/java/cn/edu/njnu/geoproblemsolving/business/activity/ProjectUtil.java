@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
@@ -43,6 +44,9 @@ public class ProjectUtil {
 
     @Autowired
     NodeService nodeService;
+
+    @Autowired
+    DocParseServiceImpl docParseService;
 
     @Value("${client_id}")
     String clientId;
@@ -90,6 +94,8 @@ public class ProjectUtil {
      */
     public void quitSubProject(String aid, String userId, Integer level) {
         ArrayList<String> childIds;
+        //quit current level
+        docParseService.userOut(aid,userId);
         if (level == 0) {
             Project project = projectRepository.findById(aid).get();
             childIds = project.getChildren();
@@ -107,12 +113,10 @@ public class ProjectUtil {
         if (childIds == null || childIds.size() <= 0) {
             return;
         }
-        ArrayList<Subproject> subprojects = new ArrayList<>();
-        ArrayList<Activity> activities = new ArrayList<>();
-        gSubProject(childIds,userId, level, subprojects, activities);
+        gSubProject(childIds,userId, level);
     }
 
-    private void gSubProject(ArrayList<String> childIds, String userId, Integer level, ArrayList<Subproject> subprojects, ArrayList<Activity> activities) {
+    private void gSubProject(ArrayList<String> childIds, String userId, Integer level) {
         if (level == 1) {
             for (int i = 0; i < childIds.size(); i++) {
                 String aid = childIds.get(i);
@@ -124,6 +128,8 @@ public class ProjectUtil {
                     if (userId.equals(memberId)) {
                         members.remove(item);
                         subprojectRepository.save(subproject);
+                        //update document
+                        docParseService.userOut(aid, userId);
                         //update node
                         nodeService.userExitActivity(aid, userId);
                     }
@@ -132,7 +138,7 @@ public class ProjectUtil {
                 ArrayList<String> children = subproject.getChildren();
                 if (children != null && children.size() > 0) {
                     level++;
-                    gSubProject(children, userId, level, subprojects, activities);
+                    gSubProject(children, userId, level);
                 }
             }
         } else {
@@ -146,12 +152,15 @@ public class ProjectUtil {
                     if (userId.equals(memberId)) {
                         members.remove(item);
                         activityRepository.save(activity);
+                        docParseService.userOut(aid, userId);
+                        //update node
+                        nodeService.userExitActivity(aid, userId);
                     }
                 });
                 ArrayList<String> children = activity.getChildren();
                 if (children != null && children.size() > 0) {
                     level++;
-                    gSubProject(children, userId, level, subprojects, activities);
+                    gSubProject(children, userId, level);
                 }
             }
         }

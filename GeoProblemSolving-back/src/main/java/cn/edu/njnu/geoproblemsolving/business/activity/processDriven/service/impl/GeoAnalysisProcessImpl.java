@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.dao.Impl.ActivityLinkProtocolDaoImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ResProtocol;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.RoleProtocol;
@@ -71,6 +72,9 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Autowired
     ActivityDocParser docParser;
+
+    @Autowired
+    DocParseServe docParseServe;
 
     @Value("${userServerLocation}")
     String userServer;
@@ -629,7 +633,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             // 默认是无法流动的
             boolean flag = false;
             if (types != null && !type.equals("data") && types.contains(type)) flag = true;
-            //判断 data 类型数据
+            //判断 data 类型数据,全都满足才能通过
             if (type.equals("data") && types.contains(type)){
                 HashSet<String> formats = linkRestriction.getFormats();
                 String format = resTagMap.get("format");
@@ -787,7 +791,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
     @Override
     public void batchResFlowAutoUpdate(String graphId, String nodeId, HashMap<String, String> resTag) {
         if (graphId == null || graphId.equals("") || graphId.equals("null")) return;
-        //Get the connection point with this node.
+        //Get the connection node with this node.
         Stack<Stack<HashMap<String, LinkRestriction>>> relevantNodeRoute = getRelevantNodeRoute(graphId, nodeId);
         //Get the point where resources can flow to.
         HashMap<String, HashSet<String>> flowNode = getFlowNode(relevantNodeRoute, resTag);
@@ -1116,7 +1120,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         flowFolder.setChildren(flowFolderChildren);
         activityResDao.addResource(flowFolder);
         //第二步：更新文档
-        HashMap<String, String> resInfo = docParser.resFlow(startAid, endAid, uid);
+        HashMap<String, String> resInfo = docParseServe.resFlow(startAid, endAid, uid);
         if (resInfo == null) return null;
         //第三步：更新节点
         return nodeService.addResToNodeBatch(endAid, resInfo);
@@ -1173,7 +1177,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
             节约一个循环
             在这里获取用户资源的 resourceTagMap
              */
-            HashMap<String, String> resInfo = docParser.getResInfo(startAid, uid);
+            HashMap<String, String> resInfo = docParseServe.getResInfo(startAid, uid);
             if (resInfo != null){
                 String resTag = TagUtil.setResTag(resInfo);
                 flowResourceTagMap.put(uid, resTag);
@@ -1195,7 +1199,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
         activityResDao.addResource(flowFolder);
 
         //更新文档
-        docParser.resFlow(startAid, endAid, uids);
+        docParseServe.resFlow(startAid, endAid, uids);
         //putAll 同 key 去掉重复的
         endNodeResourcesTagMap.putAll(flowResourceTagMap);
         return endNodeResourcesTagMap;
@@ -1608,7 +1612,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
      * @return 为 null 则无法通过 有值则是最近可以流动过来的节点
      */
     public String cUserIsApprovedUsingWFS(Stack<Stack<HashMap<String, LinkRestriction>>> upperPath, String userId) {
-        Iterator<Stack<HashMap<String, LinkRestriction>>> pathIterator = upperPath.iterator();
         if (upperPath.size() == 0) return null;
         int longestPath = 0;
         //用于标记深度
@@ -1642,7 +1645,10 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
                 if (members == null || !members.containsKey(userId)) continue;
                 //该节点有此用户，则切一下路径 tips: depthIndex = 0 的情况
                 //能通过此路径则说明能行，不单单返回内容，将节点一并返回好了
-                if (cUserIsApprovedInPath(path.subList(0, depthIndex + 1), members.get(userId))) {
+                String userTag = members.get(userId);
+                String latestUserTag = nodeService.updateNodeUserTag(node.getId(), userId);
+                if (latestUserTag != null) userTag = latestUserTag;
+                if (cUserIsApprovedInPath(path.subList(0, depthIndex + 1), userTag)) {
                     return startId;
                 }
             }
@@ -1683,6 +1689,7 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
          */
         Stack<Stack<HashMap<String, LinkRestriction>>> upperPath = getUpperNodePath(graphId, nodeId);
         if (upperPath == null) return null;
+        //最近的可流动过来的点
         String flowId = cUserIsApprovedUsingWFS(upperPath, userId);
         return flowId;
     }

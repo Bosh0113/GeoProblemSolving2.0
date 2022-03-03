@@ -56,9 +56,11 @@
   </div>
 </template>
 <script>
+// drowflow 内容,所有操作都需要响应到此组件中
 import Vue from "vue";
 import TaskNode from "./taskNode";
 import OperationNode from "./operationNode";
+
 export default {
   props: ["activityInfo"],
   components: {},
@@ -501,6 +503,7 @@ export default {
         this.activityInfo.aid,
         this.selcetedOid
       );
+
       this.refreshTempOperations();
     },
     refreshTempOperations() {

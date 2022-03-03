@@ -1,8 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
@@ -74,6 +74,9 @@ public class CollaborationService {
 
     @Autowired
     ActivityDocParser docParser;
+
+    @Autowired
+    DocParseServe docParseServe;
 
     @Value("${managerServerIpAndPort}")
     String mangeServiceLocation;
@@ -470,14 +473,17 @@ public class CollaborationService {
                         /*
                         新开 Callable 线程轮询获取模型运行状态
                         数据方法的话，新开线程阻塞等待计算结果即可
+                        维护一个线程池，避免频繁的创建、删除线程
                          */
                         Callable<JSONObject> callable = new Callable<JSONObject>() {
                             //一个线程执行完毕之后会自动结束，如果在运行过程中发生异常也会提前结束。
                             //保证线程读取时标志位是最新数据
                             private volatile int index = 0;
+                            //带返回值的 call 方法
                             @Override
                             public JSONObject call() throws Exception {
-                                int refreshStatus = 0;
+                                //default value = 0
+                                int refreshStatus;
                                 JSONObject resJson = new JSONObject();
                                 RestTemplate restTemplate = new RestTemplate();
                                 JSONObject dataJson;
@@ -514,6 +520,8 @@ public class CollaborationService {
                         Thread thread = new Thread(ft);
                         thread.start();
                         JSONObject resJson = ft.get();
+                        //外部为线程 A,Callable 为线程 B
+                        // thread.interrupt();
                         /*
                         每个 websocket 对应一个主线程
                         每个主线程再对应多个子线程，子线程是在主线程下开的
@@ -646,7 +654,8 @@ public class CollaborationService {
                     }
 
                     //更新文档
-                    String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    // String oid = docParser.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
+                    String oid = docParseServe.geoAnalysis(aid, toolId, inResIds, outputRes, computeMsg.getParticipants());
                     computeMsg.setOid(oid);
 
                     //更新当前节点
@@ -726,7 +735,7 @@ public class CollaborationService {
                 if (communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0) {
                     MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
                     //聊天记录存入文档
-                    String oid = docParser.storeMessageRecord(null, msgRecords);
+                    String oid = docParseServe.messageRecord(null, msgRecords);
 
                     //将 oid 发送给前端
                     collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), oid);

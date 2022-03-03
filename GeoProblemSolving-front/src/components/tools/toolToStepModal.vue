@@ -850,6 +850,7 @@ export default {
             toolRef: this.stepToolsetsShow[i].tid,
             operator: this.userInfo.userId,
           };
+          // 将 operation 添加到 workspace 中
           this.$store.commit("updateTempOperations", {
             behavior: "add",
             operation: toolOperation,

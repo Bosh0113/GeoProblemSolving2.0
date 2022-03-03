@@ -662,13 +662,12 @@ export default {
             this.slctRoleMember = role;
             this.$Notice.info({ desc: "Change the member role successfully" });
             // update activity doc
-            this.operationApi.getActivityDoc(activity.aid);
             this.operationApi.participantUpdate(
               activity.aid,
               "role",
               member.userId,
               member.name,
-              member.role,
+              role,
               member.domain
             );
             this.getParticipants();

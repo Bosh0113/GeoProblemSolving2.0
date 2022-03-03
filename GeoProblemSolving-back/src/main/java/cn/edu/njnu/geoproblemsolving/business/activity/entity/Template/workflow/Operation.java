@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 /**
  * @ClassName Operation
- * @Description Todo
+ * @Description 操作实体，用于描述操作的基本信息
  * @Author zhngzhng
  * @Date 2021/12/9
  **/
@@ -15,6 +15,8 @@ public class Operation {
     String oid;
     String toolId;
     String description;
+    //与活动文档中的步骤对应起来
+    String purpose;
     HashSet<OperationRes> input;
     HashSet<OperationRes> output;
 }

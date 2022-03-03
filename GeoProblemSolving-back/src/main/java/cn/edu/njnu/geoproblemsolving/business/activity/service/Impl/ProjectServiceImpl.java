@@ -4,6 +4,7 @@ import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
@@ -50,9 +51,11 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
+    //
     private final ActivityDocParser docParser;
+    private final DocParseServiceImpl docParseService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, ActivityDocParser docParser) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, ActivityDocParser docParser, DocParseServiceImpl docParseService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -62,6 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.toolService = toolService;
         this.nodeService = nodeService;
         this.docParser = docParser;
+        this.docParseService = docParseService;
     }
 
     private UserEntity findByUserId(String userId) {
@@ -259,17 +263,25 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             ActivityType oldType = project.getType();
+            String oldName = project.getName();
+            String oldDesc = project.getDescription();
             update.updateTo(project);
             projectRepository.save(project);
 
             //activityType 发生改变
             if (update.getType() != null && !oldType.equals(update.getType())){
-                docParser.changeActivityType(aid, project);
+                docParseService.changeActivityType(aid, project);
             }
 
             if (!relevantPurposeTool.isEmpty()){
-                //更新内容
-                docParser.putTools(aid, relevantPurposeTool);
+                //单活动类型发生变化,需要文档中工具部分内容
+                docParseService.refreshTool(aid, relevantPurposeTool);
+            }
+            if ((update.getName() != null && !oldName.equals(update.getName())) || (update.getDescription() != null && !oldDesc.equals(update.getDescription()))){
+                HashMap<String, String> updateInfo = new HashMap<>();
+                updateInfo.put("name", update.getName());
+                updateInfo.put("description", update.getDescription());
+                docParseService.updateRoot(aid, updateInfo);
             }
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
@@ -336,6 +348,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             // delete project
             projectRepository.deleteById(aid);
+            docParseService.deleteDoc(aid);
 
             return ResultUtils.success("Success");
 
@@ -470,13 +483,15 @@ public class ProjectServiceImpl implements ProjectService {
             userRepository.save(user);
 
 
-            //更新文档
-            docParser.userJoin(aid, userId);
-            //update node
-            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
             StaticPagesBuilder staticPagesBuilder = new StaticPagesBuilder();
             staticPagesBuilder.projectDetailPageBuilder(project);
+
+            //更新文档
+            docParseService.userJoin(aid, userId);
+            // docParser.userJoin(aid, userId);
+            //update node
+            nodeService.addOrPutUserToNode(aid, userId, "ordinary-member");
 
             return ResultUtils.success(project);
         } catch (Exception ex) {

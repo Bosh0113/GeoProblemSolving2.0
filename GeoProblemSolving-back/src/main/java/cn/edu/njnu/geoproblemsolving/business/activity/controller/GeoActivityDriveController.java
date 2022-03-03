@@ -109,7 +109,7 @@ public class GeoActivityDriveController {
      * @return
      */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public JsonResult setActivityRelation(@RequestBody JSONObject protocolJson) throws DocumentException {
+    public JsonResult setActivityRelation(@RequestBody JSONObject protocolJson) {
         JSONObject relation = protocolJson.getJSONObject("relation");
         JSONObject restriction = protocolJson.getJSONObject("restriction");
         Integer level = protocolJson.getInteger("level");
