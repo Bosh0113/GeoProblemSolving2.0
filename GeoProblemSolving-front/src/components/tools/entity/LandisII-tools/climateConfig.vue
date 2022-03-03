@@ -11,7 +11,11 @@
         <!-- ClimateTimeSeries -->
         <div style="margin: 30px 20px">
           <Label class="labelTile">ClimateTimeSeries:</Label>
-          <Select v-model="climateTimeSeries" style="width: 200px">
+          <Select 
+            v-model="climateTimeSeries" 
+            style="width: 200px" 
+            @on-change="climateTimeSeriesChange"
+          >
             <Option value="Monthly_AverageAllYears">Monthly_AverageAllYears</Option>
             <Option value="Monthly_RandomYears">Monthly_RandomYears</Option>
             <Option value="Monthly_SequencedYears">Monthly_SequencedYears</Option>
@@ -43,7 +47,7 @@
         <!-- ClimateFileFormat -->
         <div style="margin: 30px 20px">
           <Label class="labelTile">ClimateFileFormat:</Label>
-          <Select v-model="climateFileFormat" style="width: 200px">
+          <Select v-model="climateFileFormat" style="width: 200px" @on-change="climateFileFormatChange">
             <Option value="Monthly_Temp-C_Precip-mmMonth">Monthly_Temp-C_Precip-mmMonth</Option>
             <Option value="Monthly_Temp-K_Precip-kgm2Sec">Monthly_Temp-K_Precip-kgm2Sec</Option>
             <Option value="Monthly_Temp-K_Precip-mmMonth">Monthly_Temp-K_Precip-mmMonth</Option>
@@ -56,7 +60,7 @@
         <!-- SpinUpClimateTimeSeries -->
         <div style="margin: 30px 20px">
           <Label class="labelTile">SpinUpClimateTimeSeries:</Label>
-          <Select v-model="spinUpClimateTimeSeries" style="width: 200px">
+          <Select v-model="spinUpClimateTimeSeries" style="width: 200px" @on-change="spinUpClimateTimeSeriesChange">
             <Option value="Monthly_AverageAllYears">Monthly_AverageAllYears</Option>
             <Option value="Monthly_RandomYears">Monthly_RandomYears</Option>
             <Option value="Monthly_SequencedYears">Monthly_SequencedYears</Option>
@@ -88,7 +92,7 @@
         <!-- SpinUpClimateFileFormat -->
         <div style="margin: 30px 20px">
           <Label class="labelTile">SpinUpClimateFileFormat:</Label>
-          <Select v-model="spinUpClimateFileFormat" style="width: 200px">
+          <Select v-model="spinUpClimateFileFormat" style="width: 200px" @on-change="spinUpClimateFileFormatChange">
             <Option value="Monthly_Temp-C_Precip-mmMonth">Monthly_Temp-C_Precip-mmMonth</Option>
             <Option value="Monthly_Temp-K_Precip-kgm2Sec">Monthly_Temp-K_Precip-kgm2Sec</Option>
             <Option value="Monthly_Temp-K_Precip-mmMonth">Monthly_Temp-K_Precip-mmMonth</Option>
@@ -99,13 +103,13 @@
         </div>
         <Divider></Divider>
         <Button
-          @click="submit()"
+          @click="beforeSubmit()"
           type="success"
           style="margin: 0 20px 20px; width: 200px"
           >Submit</Button
         >
         <Button
-          @click="resetAll()"
+          @click="beforeResetAll()"
           type="warning"
           style="margin: 0 20px 20px; width: 200px"
           >Clear All</Button
@@ -126,8 +130,11 @@ export default {
       },
       // basic info
       activityInfo: {},
+      toolId: "",
+      participants: [],
       userInfo: {},
       resources: [],
+      selectData: {},
       //
       boolClimateFile: false,
       boolSpinUpClimateFile: false,
@@ -150,6 +157,8 @@ export default {
       if (componentStatus) {
         // 获取数据
         this.activityInfo = activityInfo;
+        this.toolId = toolId;
+        this.participants = onlineMembers;
         this.userInfo = userInfo;
         this.resources = resources;
 
@@ -175,31 +184,185 @@ export default {
       this.boolClimateFile = false;
       this.boolSpinUpClimateFile = !this.boolSpinUpClimateFile;
     },
-    getSocketComputation(data) {},
+    getSocketOperation(data) {
+      // 接受socket指令、进行相应操作
+      let behavior = data.behavior;
+      let content = JSON.parse(data.content);
+      let sender = data.sender;
+      if (behavior == "select"){
+        this[content.type] = content.value;
+      } else if (behavior == "reset"){
+        this.resetAll();
+      } else if (behavior == "final-submit"){
+        this.submit();
+        this.$Notice.success({
+              title: 'Operation notice',
+              duration: 10,
+              render: h => {
+                return h('span', [
+                  'The member ',
+                  h('a', sender.name),
+                  ' has submit the list of selected tree species information '
+                ])
+              }
+          });
+      }
+
+    },
+    getSocketComputation(data) {
+
+    },
     getClimateConfigFile(data) {},
-    getSocketData(data) {},
+    getSocketData(data) {
+      // socket数据操作
+      let behavior = data.behavior;
+      let content = JSON.parse(data.content);
+      let sender = data.sender;
+      if (behavior == "select"){
+        // console.log(content);
+        // this.selectData = content;
+        // console.log(this.selectData);
+      } else if(behavior == "file") {
+        if(content.type != "" && content.type == "climateFile"){
+          this.climateFile = content.data;
+          this.boolClimateFile = false;
+        } else if (content.type != "" && content.type == "spinUpClimateFile") {
+          this.spinUpClimateFile = content.data;
+          this.boolSpinUpClimateFile = false;
+        }
+      }
+    },
     loadResources(resList) {
+      let type = "";
       for (let i = 0; i < resList.length; i++) {
         // your function
         if (this.boolClimateFile) {
+          type = "climateFile";
+          this.selectData = resList[0];
           this.climateFile = resList[0];
           this.boolClimateFile = false;
         } else if (this.boolSpinUpClimateFile) {
+          type = "spinUpClimateFile";
+          this.selectData = resList[0];
           this.spinUpClimateFile = resList[0];
           this.boolSpinUpClimateFile = false;
         }
-        //
-
-        let send_content = {
-          type: "resource",
-          sender: this.userInfo.userId,
-          behavior: "select",
-          content: this.selectData,
-        };
-        sendCustomOperation(send_content);
       }
+      let send_content = {
+        type: "resource",
+        sender: this.userInfo.userId,
+        behavior: "file",
+        content: {
+          type: type,
+          data: this.selectData,
+        }
+      };
+      sendCustomOperation(send_content);
     },
-    submit() {},
+    beforeResetAll(){
+      this.resetAll();
+
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "reset",
+        content: {
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    resetAll(){
+      this.climateTimeSeries = "";
+      this.climateFile = {};
+      this.climateFileFormat = "";
+      this.spinUpClimateTimeSeries = "";
+      this.spinUpClimateFile = {};
+      this.spinUpClimateFileFormat = "";
+    },
+    beforeSubmit(){
+      this.submit();
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "final-submit",
+        content: {
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    submit() {
+      let aid = this.activityInfo.aid;
+      let toolId = this.toolId;
+      let participant = this.participants;
+      let climateConfig = {};
+      climateConfig.climateTimeSeries = this.climateTimeSeries;
+      climateConfig.climateFile = this.climateFile.address;
+      climateConfig.climateFileFormat = this.climateFileFormat;
+      climateConfig.spinUpClimateTimeSeries = this.spinUpClimateTimeSeries;
+      climateConfig.spinUpClimateFile = this.spinUpClimateFile.address;
+      climateConfig.spinUpClimateFileFormat = this.spinUpClimateFileFormat;
+      climateConfig.aid = aid;
+      climateConfig.toolId = toolId;
+      climateConfig.participant = participant;
+      console.log(climateConfig);
+    },
+    climateTimeSeriesChange(value){
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "select",
+        content: {
+          type: "climateTimeSeries",
+          value: value,
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    climateFileFormatChange(value){
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "select",
+        content: {
+          type: "climateFileFormat",
+          value: value,
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    spinUpClimateTimeSeriesChange(value){
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "select",
+        content: {
+          type: "spinUpClimateTimeSeries",
+          value: value,
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    spinUpClimateFileFormatChange(value){
+      // websocket
+      let paramsMsg = {
+        type: "operation",
+        behavior: "select",
+        content: {
+          type: "spinUpClimateFileFormat",
+          value: value,
+        },
+        sender: this.userInfo.userId,
+      };
+      sendCustomOperation(paramsMsg);
+    },
+    sendInputTyping: function (index, inOrOut) {
+      sendTypingInfo(index, inOrOut);
+    },
   },
 };
 </script>
