@@ -11,9 +11,9 @@
         <!-- ClimateTimeSeries -->
         <div style="margin: 30px 20px">
           <Label class="labelTile">ClimateTimeSeries:</Label>
-          <Select 
-            v-model="climateTimeSeries" 
-            style="width: 200px" 
+          <Select
+            v-model="climateTimeSeries"
+            style="width: 200px"
             @on-change="climateTimeSeriesChange"
           >
             <Option value="Monthly_AverageAllYears">Monthly_AverageAllYears</Option>
@@ -194,7 +194,7 @@ export default {
       } else if (behavior == "reset"){
         this.resetAll();
       } else if (behavior == "final-submit"){
-        this.submit();
+        // this.submit();
         this.$Notice.success({
               title: 'Operation notice',
               duration: 10,
@@ -206,6 +206,11 @@ export default {
                 ])
               }
           });
+      } else if (behavior == "success"){
+        // success
+        this.$Notice.success({
+          title: 'Submit successfully',
+          duration: 10,});
       }
 
     },
@@ -320,8 +325,20 @@ export default {
             // this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // success
-            let oprationResult = res.data.data;
-            let oid = oprationResult.operationId
+            this.$Notice.success({
+              title: 'Submit successfully',
+              duration: 10,});
+            // websocket
+            let paramsMsg = {
+              type: "operation",
+              behavior: "success",
+              content: {
+              },
+              sender: this.userInfo.userId,
+            };
+            sendCustomOperation(paramsMsg);
+            let operationResult = res.data.data;
+            let oid = operationResult.operationId
             loadingBackendOperation(oid)
           } else {
             console.log(res.data.msg);

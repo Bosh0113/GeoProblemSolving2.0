@@ -148,14 +148,12 @@
                     >
                       <Card>
                         <!--                  <h4 style="font-size: 13px">{{item.content.title}}</h4>-->
-                        <Badge dot>
-                          <h4
-                            style="font-size: 15px"
-                            @click="getReadNoticeInfo(item)"
-                          >
-                            {{ item.content.title }}
-                          </h4>
-                        </Badge>
+                        <h4
+                          style="font-size: 15px"
+                          @click="getReadNoticeInfo(item)"
+                        >
+                          {{ item.content.title }}
+                        </h4>
                         <br />
                         <p style="font-weight: 400; font-size: 17px">
                           {{ item.content.description }}

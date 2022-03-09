@@ -1767,7 +1767,7 @@ export default {
               }
           });
       } else if (behavior == "final-submit"){
-        this.submit();
+        // this.submit();
         this.$Notice.success({
               title: 'Operation notice',
               duration: 10,
@@ -1792,6 +1792,11 @@ export default {
                 ])
               }
           });
+      } else if (behavior == "success"){
+        // success
+        this.$Notice.success({
+          title: 'Submit successfully',
+          duration: 10,});
       }
     },
     getSocketComputation(data) {},
@@ -1920,7 +1925,10 @@ export default {
       //
       lifeParameter.minRelativeBiomassVal = this.ecoregionsMRB;
       lifeParameter.sufficientLightVal = this.SEP;
-      lifeParameter.speciesParametersVal = this.speciesSP;
+      lifeParameter.speciesParametersVal = [];
+      for( let i = 1 ; i< this.speciesSP.length ; i++){
+        lifeParameter.speciesParametersVal.push(this.speciesSP[i]);
+      }
       lifeParameter.ecoregionParametersVal = this.AET;
       lifeParameter.dynamicInputFile = this.dynamicInputFile.address;
       lifeParameter.fireReductionParametersVal = this.fireRows;
@@ -1946,6 +1954,18 @@ export default {
             // this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // success
+            this.$Notice.success({
+              title: 'Submit successfully',
+              duration: 10,});
+            // websocket
+            let paramsMsg = {
+              type: "operation",
+              behavior: "success",
+              content: {
+              },
+              sender: this.userInfo.userId,
+            };
+            sendCustomOperation(paramsMsg);
           } else {
             console.log(res.data.msg);
           }

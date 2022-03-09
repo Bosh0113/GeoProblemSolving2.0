@@ -5,7 +5,7 @@
     <div id="collab-tool-content">
       <div id="edit-mask" title="The other participant is operating."></div>
 
-      <!-- coding for your tools // begin-->      
+      <!-- coding for your tools // begin-->
       <vue-scroll :ops="ops" style="height: calc(100vh - 40px)">
       <div style="padding: 10px">
         <div style="margin-bottom: 5px">
@@ -696,7 +696,7 @@ export default {
       }
     },
     getSocketComputation(data) {
-      
+
     },
     getSocketOperation(data) {
       // 接受socket指令、进行相应操作
@@ -746,7 +746,7 @@ export default {
               }
           });
         }
-        
+
       } else if (behavior == "message"){
         //编辑信息协同1 add-input  获取和失去焦点
         let index = content.inputNum;
@@ -796,7 +796,7 @@ export default {
               }
           });
       } else if (behavior == "select") {
-        // 选择协同 type: selectChange、selectAll、cancelSelect 
+        // 选择协同 type: selectChange、selectAll、cancelSelect
         if (content.type == "select-change"){
           let selection = content.data;
           // this.selectSpecies = Object.assign([], selection);
@@ -830,8 +830,8 @@ export default {
                 ])
               }
           });
-      }else if (behavior == "final-submit"){
-        this.submit();
+      } else if (behavior == "final-submit"){
+        // this.submit();
         this.$Notice.success({
               title: 'Operation notice',
               duration: 10,
@@ -843,6 +843,11 @@ export default {
                 ])
               }
           });
+      } else if (behavior == "success"){
+        // success
+        this.$Notice.success({
+          title: 'Submit successfully',
+          duration: 10,});
       }
     },
     getSocketData(data) {},
@@ -910,7 +915,7 @@ export default {
             break;
           }
         }
-      }      
+      }
     },
     beforeSubmit(){
       this.submit();
@@ -936,9 +941,12 @@ export default {
       submitInfo.graphId = graphId;
       submitInfo.toolId = toolId;
       submitInfo.participant = participant;
-      submitInfo.species = species;
+      submitInfo.species = [];
 
-      console.log(submitInfo);
+      for( let i = 1 ; i < species.length; i++) {
+        submitInfo.species.push(species[i]);
+      }
+
       this.axios
         .post("/GeoProblemSolving/landis/species",submitInfo)
         .then((res) => {
@@ -949,8 +957,20 @@ export default {
             // this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // success
-            let oprationResult = res.data.data;
-            let oid = oprationResult.operationId
+            this.$Notice.success({
+              title: 'Submit successfully',
+              duration: 10,});
+            // websocket
+            let paramsMsg = {
+              type: "operation",
+              behavior: "success",
+              content: {
+              },
+              sender: this.userInfo.userId,
+            };
+            sendCustomOperation(paramsMsg);
+            let operationResult = res.data.data;
+            let oid = operationResult.operationId
             loadingBackendOperation(oid)
           } else {
             console.log(res.data.msg);
