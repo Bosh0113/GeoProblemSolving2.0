@@ -161,7 +161,6 @@ export default {
       let behavior = data.behavior;
       let content = JSON.parse(data.content);
       let sender = data.sender;
-      console.log(data);
       if (behavior == "visualize") {
         // this.chooseType = content.chartType;
         this.DataX = content.dataX;
@@ -199,7 +198,6 @@ export default {
       let behavior = data.behavior;
       let content = JSON.parse(data.content);
       let sender = data.sender;
-      console.log(data);
       if (behavior == "select"){
         // console.log(content);
         // this.selectData = content;
@@ -267,12 +265,9 @@ export default {
           const workbook = XLSX.read(data, {
             type: "binary"
           });
-          console.log(workbook);
           const wsname = workbook.SheetNames[0]; //取第一张表
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]);
-          console.log(ws);
           let arr = Object.keys(ws[0]);
-          console.log(arr);
           that.columnNameList = arr;
           //生成json表格内容
           let list1 = [];
