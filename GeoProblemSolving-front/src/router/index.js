@@ -358,6 +358,11 @@ const routes = [
     name: "dynamicInputData",
     component: resolve => require(["@/components/tools/entity/LandisII-tools/dynamicInputData"], resolve)
   },
+  {
+    path: "/editor/markDown",
+    name: "markDown",
+    component: resolve => require(["@/components/tools/entity/editor/markDown"], resolve)
+  },
 ];
 
 export default new Router({
