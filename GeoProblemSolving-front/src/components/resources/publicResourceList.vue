@@ -326,10 +326,9 @@ export default {
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
         }
-        // let finalUrl = "https://ow365.cn/?i=28204&ssl=1&furl=" + url;
-        console.log(url);
         let Base64 = require('js-base64').Base64;
         let finalUrl = "https://geomodeling.njnu.edu.cn/dataTransferServer/onlinePreview?url=" + encodeURIComponent(Base64.encode(url)); //Base64.encode(url)
+        // let finalUrl = "http://221.226.60.2:8082/onlinePreview?url=" + Base64.encode(url);  // http：
         var toolURL =
           "<iframe src=" +
           finalUrl +

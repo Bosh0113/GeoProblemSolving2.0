@@ -51,7 +51,7 @@ public class LandisController {
         ResourceEntity outputEntity = new ResourceEntity();
         String[] fileName = file.getName().split("\\.");
         outputEntity.setName(fileName[0]);
-        outputEntity.setSuffix(fileName[1]);
+        outputEntity.setSuffix('.' + fileName[1]);
         outputEntity.setActivityId(aid);
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
@@ -83,7 +83,7 @@ public class LandisController {
         ResourceEntity outputEntity = new ResourceEntity();
         String[] fileName = file.getName().split("\\.");
         outputEntity.setName(fileName[0]);
-        outputEntity.setSuffix(fileName[1]);
+        outputEntity.setSuffix('.' + fileName[1]);
         outputEntity.setActivityId(aid);
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
@@ -110,7 +110,7 @@ public class LandisController {
         ResourceEntity outputEntity = new ResourceEntity();
         String[] fileName = file.getName().split("\\.");
         outputEntity.setName(fileName[0]);
-        outputEntity.setSuffix(fileName[1]);
+        outputEntity.setSuffix('.' + fileName[1]);
         outputEntity.setActivityId(aid);
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
@@ -141,7 +141,7 @@ public class LandisController {
         ResourceEntity outputEntity = new ResourceEntity();
         String[] fileName = file.getName().split("\\.");
         outputEntity.setName(fileName[0]);
-        outputEntity.setSuffix(fileName[1]);
+        outputEntity.setSuffix('.' + fileName[1]);
         outputEntity.setActivityId(aid);
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());

@@ -288,6 +288,12 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <!-- markdown解析 -->
+        <dependency>
+            <groupId>org.pegdown</groupId>
+            <artifactId>pegdown</artifactId>
+            <version>1.6.0</version>
+        </dependency>
 
     </dependencies>
 
