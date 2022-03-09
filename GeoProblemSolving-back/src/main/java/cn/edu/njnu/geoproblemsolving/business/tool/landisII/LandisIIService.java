@@ -41,8 +41,7 @@ public class LandisIIService {
         String fileHeader = "LandisData  Species\n>>                      Sexual    Shade  Fire  Seed Disperal Dist  Vegetative   Sprout Age  Post-Fire\n>> Name      Longevity  Maturity  Tol.   Tol.  Effective  Maximum  Reprod Prob  Min   Max   Regen\n>> ----      ---------  --------  -----  ----  ---------  -------  -----------  ----------  --------\n";
         PrintStream printStream = null;
         try {
-            int rs = (int) ((Math.random() * 9 + 1) * Math.pow(10, 4 - 1));
-            File file = File.createTempFile("climateConfig_"+rs, ".txt");
+            File file = File.createTempFile("species_", ".txt");
             printStream = new PrintStream(new FileOutputStream(file));
             printStream.write(fileHeader.getBytes());
             for (Iterator<LandisSpecies> it = speciesInfo.iterator(); it.hasNext(); ) {
@@ -68,8 +67,7 @@ public class LandisIIService {
         String fileFooter = ">> UsingClimateFire\tyes  << Optional parameter; default is no.";
         PrintStream printStream = null;
         try {
-            int rs = (int) ((Math.random() * 9 + 1) * Math.pow(10, 4 - 1));
-            File file = File.createTempFile("climateConfig_"+rs, ".txt");
+            File file = File.createTempFile("climateConfig_", ".txt");
             printStream = new PrintStream(new FileOutputStream(file));
             printStream.write(fileHeader.getBytes());
             String formatStr = "ClimateTimeSeries\t\t\t%s\nClimateFile\t\t\t\t%s\nClimateFileFormat\t\t\t%s\n\nSpinUpClimateTimeSeries\t\t\t%s\nSpinUpClimateFile\t\t\t%s\nSpinUpClimateFileFormat\t\t\t%s\n\n";
@@ -94,8 +92,7 @@ public class LandisIIService {
                 ">> -------- -------------\n";
         PrintStream printStream = null;
         try {
-            int rs = (int) ((Math.random() * 9 + 1) * Math.pow(10, 4 - 1));
-            File file = File.createTempFile("dynamicData_"+rs, ".txt");
+            File file = File.createTempFile("dynamicData_", ".txt");
             printStream = new PrintStream(new FileOutputStream(file));
             printStream.write(fileHeader.getBytes());
             for (int i = 0; i < dynamicInputList.size(); i++) {
@@ -118,8 +115,7 @@ public class LandisIIService {
         String fileHeader = "LandisData  \"Biomass Succession\"\n\n\n";
         PrintStream printStream = null;
         try {
-            int rs = (int) ((Math.random() * 9 + 1) * Math.pow(10, 4 - 1));
-            File file = File.createTempFile("biomassSuccession_"+rs, ".txt");
+            File file = File.createTempFile("biomassSuccession_", ".txt");
             printStream = new PrintStream(new FileOutputStream(file));
             printStream.write(fileHeader.getBytes());
             String partOne = ">>------------------\n>> REQUIRED INPUTS\n>>------------------\n\n";

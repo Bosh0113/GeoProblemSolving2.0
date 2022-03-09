@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.impl;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.entity.ActivityNode;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
@@ -8,25 +9,16 @@ import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.Tag
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDao;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.user.dao.UserDao;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
-import cn.hutool.http.HttpException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -34,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @ClassName NodeServiceImpl
@@ -66,7 +57,7 @@ public class NodeServiceImpl implements NodeService {
     SubprojectRepository subprojectRepository;
 
     @Autowired
-    ActivityDocParser docParser;
+    DocParseServe docParseServe;
 
     @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
@@ -97,7 +88,8 @@ public class NodeServiceImpl implements NodeService {
     public HashMap<String, String> getActivityResourceTag(String aid) {
         HashMap<String, String> filesTagMap = new HashMap<>();
         //All resources can flow
-        ArrayList<HashMap<String, String>> resInfoList = docParser.getAllResInfo(aid);
+        // ArrayList<HashMap<String, String>> resInfoList = docParser.getAllResInfo(aid);
+        ArrayList<HashMap<String, String>> resInfoList = docParseServe.getResInfo(aid);
         for (HashMap<String, String> item : resInfoList) {
             String uid = item.get("uid");
             String fileTagStr = TagUtil.setResTag(item);
@@ -302,7 +294,8 @@ public class NodeServiceImpl implements NodeService {
                 break;
             case "put":
                 String uid = (String) res;
-                HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
+                // HashMap<String, String> tagMap = docParser.getResInfo(aid, uid);
+                HashMap<String, String> tagMap = docParseServe.getResInfo(aid, uid);
                 String resourceTag = TagUtil.setResTag(tagMap);
                 resources.put(uid, resourceTag);
                 break;
@@ -325,7 +318,8 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public void addResToNodeBatch(String aid, HashSet<String> uids) {
-        ArrayList<HashMap<String, String>> resInfoList = docParser.getResInfo(aid, uids);
+        // ArrayList<HashMap<String, String>> resInfoList = docParser.getResInfo(aid, uids);
+        ArrayList<HashMap<String, String>> resInfoList = docParseServe.getResInfo(aid, uids);
         if (resInfoList == null || resInfoList.size() == 0) return;
         HashMap<String, String> resMap = new HashMap<>();
         for (HashMap<String, String> item : resInfoList) {
@@ -337,7 +331,8 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public void addResToNode(String aid, String uid) {
-        HashMap<String, String> resInfo = docParser.getResInfo(aid, uid);
+        // HashMap<String, String> resInfo = docParser.getResInfo(aid, uid);
+        HashMap<String, String> resInfo = docParseServe.getResInfo(aid, uid);
         if (resInfo == null) return;
         String tagStr = TagUtil.setResTag(resInfo);
         HashMap<String, String> tagMap = new HashMap<>();

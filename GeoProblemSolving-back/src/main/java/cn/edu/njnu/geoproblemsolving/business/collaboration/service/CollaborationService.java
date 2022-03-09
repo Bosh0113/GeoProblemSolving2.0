@@ -3,7 +3,6 @@ package cn.edu.njnu.geoproblemsolving.business.collaboration.service;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.CommunicationCache;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.ComputeTasks;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.cache.OperationQueue;
@@ -72,8 +71,6 @@ public class CollaborationService {
     @Autowired
     NodeService nodeService;
 
-    @Autowired
-    ActivityDocParser docParser;
 
     @Autowired
     DocParseServe docParseServe;

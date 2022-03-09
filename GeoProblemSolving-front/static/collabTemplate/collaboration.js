@@ -1689,6 +1689,7 @@ var taskList = [];
   }
 
 
+  // 后台生成的操作,实时刷新 actionContainer
   function loadingBackendOperation(oid) {
     refreshOperation(oid)
   }

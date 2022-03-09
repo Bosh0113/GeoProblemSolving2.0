@@ -1,10 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service;
 
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import com.alibaba.fastjson.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -15,8 +12,6 @@ import java.util.*;
  * @Date 2021/8/19
  **/
 public class TagUtil {
-    @Autowired
-    ActivityDocParser docParser;
 
     public static HashMap<String, String> recoveryResTag(String tagStr){
         HashMap<String, String> resInfo = new HashMap<>();

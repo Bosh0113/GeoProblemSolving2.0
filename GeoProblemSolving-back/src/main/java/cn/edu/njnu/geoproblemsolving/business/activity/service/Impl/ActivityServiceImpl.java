@@ -3,12 +3,10 @@ package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
-import cn.edu.njnu.geoproblemsolving.business.activity.entity.ActivityDoc;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ProjectRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -44,9 +41,7 @@ public class ActivityServiceImpl implements ActivityService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
-    private final ActivityDocParser docParser;
-    @Autowired
-    DocParseServiceImpl docParseService;
+    private final DocParseServiceImpl docParseService;
 
     @Autowired
     public ActivityServiceImpl(ActivityRepository activityRepository,
@@ -57,17 +52,16 @@ public class ActivityServiceImpl implements ActivityService {
                                ProjectRepository projectRepository,
                                ProjectUtil httpUtil,
                                ToolService toolService,
-                               NodeService nodeService, ActivityDocParser docParser) {
+                               NodeService nodeService, DocParseServiceImpl docParseService) {
         this.activityRepository = activityRepository;
         this.userRepository = userRepository;
-//        this.mongoTemplate = mongoTemplate;
         this.folderDao = folderDao;
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.projectUtil = httpUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
-        this.docParser = docParser;
+        this.docParseService = docParseService;
     }
 
     private UserEntity findByUserId(String userId) {

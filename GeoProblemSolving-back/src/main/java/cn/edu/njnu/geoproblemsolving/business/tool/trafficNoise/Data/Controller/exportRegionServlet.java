@@ -2,10 +2,9 @@ package cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Data.Controller
 
 //import cn.edu.njnu.trafficNoiseCaculating.UserData.Domain.EDataType;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServe;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.util.RestTemplateUtil;
@@ -27,12 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
 import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.genBoundBoxUdxData;
-import static cn.edu.njnu.geoproblemsolving.business.tool.trafficNoise.Model.Service.runModelService.genShpZipFile;
 
 
 @RestController
@@ -49,7 +46,7 @@ public class exportRegionServlet extends HttpServlet {
     String dataContainerIp;
 
     @Autowired
-    ActivityDocParser docParser;
+    DocParseServe docParseServe;
 
     @Autowired
     NodeService nodeService;
@@ -126,7 +123,8 @@ public class exportRegionServlet extends HttpServlet {
                     JSONObject userInfo = JSONObject.parseObject(JSONObject.toJSONString(item));
                     userIds.add(userInfo.getString("userId"));
                 }
-                String oid = docParser.geoAnalysisNoInput(aid, toolId, userIds, "Data processing", outputEntity);
+                // String oid = docParser.geoAnalysisNoInput(aid, toolId, userIds, "Data processing", outputEntity);
+                String oid = docParseServe.geoAnalysisRLS90(aid, toolId, userIds, "Data processing", null, outputEntity);
                 //保存到节点中
                 nodeService.addResToNode(aid, uid);
 

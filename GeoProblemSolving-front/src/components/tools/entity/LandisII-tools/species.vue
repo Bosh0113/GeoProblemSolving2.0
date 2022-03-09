@@ -949,6 +949,9 @@ export default {
             // this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // success
+            let oprationResult = res.data.data;
+            let oid = oprationResult.operationId
+            loadingBackendOperation(oid)
           } else {
             console.log(res.data.msg);
           }

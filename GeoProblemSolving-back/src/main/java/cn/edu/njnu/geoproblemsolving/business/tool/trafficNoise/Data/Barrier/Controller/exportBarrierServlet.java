@@ -46,6 +46,7 @@ public class exportBarrierServlet extends HttpServlet {
     @Autowired
     DocParseServe docParseServe;
 
+
     @Autowired
     NodeService nodeService;
 

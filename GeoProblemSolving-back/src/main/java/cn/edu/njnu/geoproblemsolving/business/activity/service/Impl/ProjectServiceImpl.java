@@ -5,12 +5,10 @@ import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
 import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
-import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateProjectDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -27,8 +25,6 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -51,11 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
-    //
-    private final ActivityDocParser docParser;
     private final DocParseServiceImpl docParseService;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, ActivityDocParser docParser, DocParseServiceImpl docParseService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, SubprojectRepository subprojectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, ToolService toolService, NodeService nodeService, DocParseServiceImpl docParseService) {
         this.projectRepository = projectRepository;
         this.subprojectRepository = subprojectRepository;
         this.activityRepository = activityRepository;
@@ -64,7 +57,6 @@ public class ProjectServiceImpl implements ProjectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
-        this.docParser = docParser;
         this.docParseService = docParseService;
     }
 
@@ -538,7 +530,9 @@ public class ProjectServiceImpl implements ProjectService {
 
 
             //更新文档
-            docParser.userJoin(aid, userIds);
+            docParseService.userJoin(aid, userIds);
+            // docParser.userJoin(aid, userIds);
+
             //update node
             nodeService.addUserToNodeBatch(aid, userIds);
 

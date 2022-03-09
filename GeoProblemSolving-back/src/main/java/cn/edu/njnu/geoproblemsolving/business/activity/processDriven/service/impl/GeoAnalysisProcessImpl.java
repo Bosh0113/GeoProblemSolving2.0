@@ -16,7 +16,6 @@ import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityGraphR
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityLinkProtocolRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityNodeRepository;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.resource.service.Impl.ActivityResServiceImpl;
@@ -26,7 +25,6 @@ import com.google.common.collect.Lists;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -69,9 +67,6 @@ public class GeoAnalysisProcessImpl implements GeoAnalysisProcess {
 
     @Autowired
     NodeService nodeService;
-
-    @Autowired
-    ActivityDocParser docParser;
 
     @Autowired
     DocParseServe docParseServe;

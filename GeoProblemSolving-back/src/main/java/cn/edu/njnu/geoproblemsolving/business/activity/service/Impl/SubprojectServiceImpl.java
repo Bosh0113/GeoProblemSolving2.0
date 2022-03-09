@@ -1,16 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Folder.FolderDaoImpl;
-import cn.edu.njnu.geoproblemsolving.View.StaticPagesBuilder;
 import cn.edu.njnu.geoproblemsolving.business.activity.ProjectUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocInterpret;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.dto.UpdateActivityDTO;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
 import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.entity.Tool;
 import cn.edu.njnu.geoproblemsolving.business.tool.generalTool.service.ToolService;
 import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
@@ -43,10 +40,9 @@ public class SubprojectServiceImpl implements SubprojectService {
     private final ProjectUtil projectUtil;
     private final ToolService toolService;
     private final NodeService nodeService;
-    private final ActivityDocParser docParser;
     private final DocParseServiceImpl docParseService;
 
-    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, ActivityDocParser docParser, DocParseServiceImpl docParseService) {
+    public SubprojectServiceImpl(ToolService toolService, SubprojectRepository subprojectRepository, ProjectRepository projectRepository, ActivityRepository activityRepository, UserRepository userRepository, FolderDaoImpl folderDao, ProjectUtil projectUtil, NodeService nodeService, DocParseServiceImpl docParseService) {
         this.subprojectRepository = subprojectRepository;
         this.projectRepository = projectRepository;
         this.activityRepository = activityRepository;
@@ -55,7 +51,6 @@ public class SubprojectServiceImpl implements SubprojectService {
         this.projectUtil = projectUtil;
         this.toolService = toolService;
         this.nodeService = nodeService;
-        this.docParser = docParser;
         this.docParseService = docParseService;
     }
 

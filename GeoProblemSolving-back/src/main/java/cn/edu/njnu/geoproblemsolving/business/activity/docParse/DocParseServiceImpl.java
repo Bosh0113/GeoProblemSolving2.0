@@ -307,7 +307,14 @@ public class DocParseServiceImpl implements DocParseServe {
         Document endDocXml = loadXML(endAid);
         try {
             List<Element> resElementList = DocInterpret.getResElement(fromDocXml, uids);
-            DocInterpret.appendResource(endDocXml, resElementList);
+            if (resElementList == null || resElementList.isEmpty()) return;
+            List<Element> copiedResEles = Lists.newArrayList();
+            for (Iterator<Element> it = resElementList.iterator(); it.hasNext();){
+                Element item = it.next();
+                copiedResEles.add(item.createCopy());
+            }
+            DocInterpret.appendResource(endDocXml, copiedResEles);
+            saveXml(endDocXml.asXML());
         }catch (Exception e){
             log.warn("Failed to write document when resource is flowing.");
             return;
@@ -345,6 +352,11 @@ public class DocParseServiceImpl implements DocParseServe {
         return DocInterpret.getResInfo(docXml, uid);
     }
 
+    /**
+     * 获取该活动文档中的所有 Resource
+     * @param aid
+     * @return all resource info
+     */
     @Override
     public ArrayList<HashMap<String, String>> getResInfo(String aid) {
         Document docXml = loadXML(aid);
@@ -453,8 +465,8 @@ public class DocParseServiceImpl implements DocParseServe {
         DocInterpret.appendResource(docXml, output, null);
         HashSet<String> inResId = new HashSet<>();
         HashSet<String> outResId = new HashSet<>();
-        inResId.add(input.getUid());
-        outResId.add(output.getUid());
+        if (input != null) inResId.add(input.getUid());
+        if (output != null) outResId.add(output.getUid());
         DocInterpret.appendGeoAnalysisOperation(docXml, toolId, onlineMembers, purpose, inResId, outResId);
         saveXml(docXml.asXML());
         return null;

@@ -4,8 +4,6 @@ import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
-import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.TagUtil;
-import cn.edu.njnu.geoproblemsolving.business.activity.service.ActivityDocParser;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
@@ -25,17 +23,12 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +37,6 @@ import javax.servlet.http.Part;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -67,9 +58,6 @@ public class ActivityResServiceImpl implements ActivityResService {
 
     @Autowired
     NodeService nodeService;
-
-    @Autowired
-    ActivityDocParser docParser;
 
     @Autowired
     DocParseServiceImpl docParseService;
