@@ -1010,7 +1010,7 @@
 					"role",
 					member.userId,
 					member.name,
-					member.role,
+					role,
 					member.domain
 					);
 					this.getParticipants();
