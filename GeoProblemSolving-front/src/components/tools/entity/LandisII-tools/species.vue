@@ -830,8 +830,8 @@ export default {
                 ])
               }
           });
-      }else if (behavior == "final-submit"){
-        this.submit();
+      } else if (behavior == "final-submit"){
+        // this.submit();
         this.$Notice.success({
               title: 'Operation notice',
               duration: 10,
@@ -843,6 +843,11 @@ export default {
                 ])
               }
           });
+      } else if (behavior == "success"){
+        // success
+        this.$Notice.success({
+          title: 'Submit successfully',
+          duration: 10,});
       }
     },
     getSocketData(data) {},
@@ -936,9 +941,12 @@ export default {
       submitInfo.graphId = graphId;
       submitInfo.toolId = toolId;
       submitInfo.participant = participant;
-      submitInfo.species = species;
+      submitInfo.species = [];
 
-      console.log(submitInfo);
+      for( let i = 1 ; i < species.length; i++) {
+        submitInfo.species.push(species[i]);
+      }
+
       this.axios
         .post("/GeoProblemSolving/landis/species",submitInfo)
         .then((res) => {
@@ -949,6 +957,18 @@ export default {
             // this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             // success
+            this.$Notice.success({
+              title: 'Submit successfully',
+              duration: 10,});
+            // websocket
+            let paramsMsg = {
+              type: "operation",
+              behavior: "success",
+              content: {
+              },
+              sender: this.userInfo.userId,
+            };
+            sendCustomOperation(paramsMsg);
           } else {
             console.log(res.data.msg);
           }
