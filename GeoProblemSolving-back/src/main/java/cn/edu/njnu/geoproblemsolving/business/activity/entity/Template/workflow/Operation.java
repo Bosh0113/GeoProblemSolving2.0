@@ -15,6 +15,7 @@ public class Operation {
     String oid;
     String toolId;
     String description;
+    String time;
     //与活动文档中的步骤对应起来
     String purpose;
     HashSet<OperationRes> input;

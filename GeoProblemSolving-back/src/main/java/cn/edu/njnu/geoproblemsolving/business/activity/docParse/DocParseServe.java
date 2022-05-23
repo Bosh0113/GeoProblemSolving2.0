@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.business.activity.docParse;
 
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Template.workflow.Operation;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.collaboration.entity.MsgRecords;
@@ -66,6 +67,9 @@ public interface DocParseServe {
     Object removeTool(String aid, HashSet<String> tids);
 
     String messageRecord(String tid, MsgRecords msgRecords);
+
+    // zhaoym
+    HashSet<Operation> getGeoAnalysisInTool(String aid, String tid);
 
     //可供外部调用
     String geoAnalysis(String aid, String toolId,
