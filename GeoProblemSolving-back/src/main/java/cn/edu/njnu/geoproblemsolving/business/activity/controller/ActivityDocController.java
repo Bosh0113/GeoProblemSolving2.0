@@ -64,4 +64,12 @@ public class ActivityDocController {
         if (graphicId == null) return;
         nodeService.putResMetaOrType(graphicId, aid, uid);
     }
+
+    /**
+     *  查询一个工具的操作记录
+     */
+    @RequestMapping(value = "/getGeoAnalysisInTool/{aid}/{tid}",method = RequestMethod.GET)
+    public JsonResult inquiryGeoAnalysisOperation(@PathVariable("aid") String aid, @PathVariable("tid") String tid){
+        return activityDocService.findGeoAnalysisOperation(aid, tid);
+    }
 }

@@ -262,6 +262,7 @@
 import file from "./File";
 import resourceList from "../common/resource/UserAndActivityResourceList";
 import { get, del, post, put, patch } from "@/axios";
+// import func from 'vue-editor-bridge';
 
 export default {
   components: {
@@ -361,9 +362,10 @@ export default {
         // 绑定函数
         buildSocketChannel(
           this.getSocketOperation,
-          null,
+          this.getSocketData,
           this.getSocketComputation
         );
+        loadVersionChannel = this.loadVersionInfo;
       } else {
         //避免this指向问题
         let _this = this;
@@ -431,6 +433,20 @@ export default {
       } else if (behavior == "run") {
         this.loading();
       }
+    },
+
+    getSocketData: function(data) {
+      // socket数据操作
+      let behavior = data.behavior;
+      let content = JSON.parse(data.content);
+      let sender = data.sender;
+      if(behavior == "load-version"){
+        console.log(content);
+      }
+    },
+
+    loadVersionInfo(version) {
+      console.log(version);
     },
 
     initLoading: function () {
@@ -599,7 +615,8 @@ export default {
       //   onlineMembers
       // );
 
-      // console.log(this.invokeInfo.inputs)
+      // console.log(this.invokeInfo.inputs);
+      // console.log(this.invokeInfo.outputs);
       sendModelOperation(
         this.aid,
         this.invokeInfo.serviceId,
@@ -764,6 +781,7 @@ export default {
 
     inEventList(state) {
       return state.Event.filter((value) => {
+        // console.log(value);
         return value.type === "response";
       });
     },

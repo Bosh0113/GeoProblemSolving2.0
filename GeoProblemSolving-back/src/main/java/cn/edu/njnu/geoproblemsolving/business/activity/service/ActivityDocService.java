@@ -12,6 +12,8 @@ public interface ActivityDocService {
 
     JsonResult findDocument(String aid);
 
+    JsonResult findGeoAnalysisOperation(String aid, String tid);
+
     JsonResult deleteDocument(String aid);
 
     JsonResult updateDocument(String aid, String document);

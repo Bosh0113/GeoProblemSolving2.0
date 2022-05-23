@@ -22,6 +22,7 @@ import cn.edu.njnu.geoproblemsolving.business.user.entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -519,6 +520,49 @@ public class DocParseServiceImpl implements DocParseServe {
      * @param participants
      * @return
      */
+    @Override
+    public HashSet<Operation> getGeoAnalysisInTool(String aid, String tid){
+        // 1.根据aid拿到活动文档
+        // 2.根据tid筛选geo—analysis记录
+        HashSet<Operation> operations = new HashSet<>();
+        Document docXml = loadXML(aid);
+        //获取 geoAnalysis 节点
+        List<Node> geoAnalysisOperations = DocInterpret.getGeoAnalysisOperation(docXml);
+        if (geoAnalysisOperations == null || geoAnalysisOperations.size() == 0) return operations;
+        for (Node operationNode : geoAnalysisOperations) {
+            Element operationEle = (Element) operationNode;
+            String oid = operationEle.attributeValue("id");
+            String toolRef = operationEle.attributeValue("toolRef");
+            String description = operationEle.attributeValue("purpose");
+            String time = operationEle.attributeValue("time");
+
+            if(toolRef.equals(tid)){
+                // 判断geo-analysis操作
+                // 获取 geoAnalysis 的 input 信息
+                List<Node> inputResRefs = operationEle.selectNodes(".//ResRef[@type= 'input']");
+                HashSet<OperationRes> inputRes = operationRes2Entity(inputResRefs, docXml, "file");
+                List<Node> outputResRefs = operationEle.selectNodes(".//ResRef[@type = 'output']");
+                HashSet<OperationRes> outputRes = operationRes2Entity(outputResRefs, docXml, "file");
+                // 输入中会有类型为参数的部分
+                List<Node> paramRefs = operationEle.selectNodes(".//ResRef[@type = 'param']");
+                HashSet<OperationRes> inParam = operationRes2Entity(paramRefs, docXml, "param");
+                // throw nullPointException,将参数信息加入输入
+                inputRes.addAll(inParam);
+
+                Operation operation = new Operation();
+                operation.setInput(inputRes);
+                operation.setOutput(outputRes);
+                operation.setOid(oid);
+                operation.setToolId(toolRef);
+                operation.setDescription(description);
+                operation.setTime(time);
+                operations.add(operation);
+            }
+
+        }
+        return operations;
+    }
+
     @Override
     public String geoAnalysis(String aid, String toolId,
                               HashSet<String> inResId, ArrayList<ResourceEntity> outRes,
