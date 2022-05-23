@@ -217,7 +217,7 @@ public class CollaborationService {
                     String text = messageObject.getString("content");
                     collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, text, time);
 
-                    Boolean concepts = messageObject.getBoolean("geoConcepts");
+                    Boolean concepts = messageObject.getBooleanValue("geoConcepts");
                     String relateConceptSet = "";
                     if (concepts != null && concepts) {
                         String result = ansjSegService.processInfo(text);
@@ -385,7 +385,7 @@ public class CollaborationService {
                     HashMap<String, ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
                     if (computeRecords == null) computeRecords = new HashMap<>();
 
-                    Boolean isComputeModel = messageObject.getBoolean("computeAbleModel");
+                    Boolean isComputeModel = messageObject.getBooleanValue("computeAbleModel");
                     // computeMsg.setOutputs(outputs);
 
                     computeMsg.setAid(aid);
