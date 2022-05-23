@@ -123,7 +123,7 @@ public class ToolServiceImpl implements ToolService {
         JSONObject getResult = restTemplate.exchange(userDataMethodUrl, HttpMethod.GET, httpEntity, JSONObject.class).getBody();
         // JSONObject getResult = restTemplate.getForEntity(userDataMethodUrl, JSONObject.class).getBody();
         JSONObject publicModelJson = getResult.getJSONObject("data");
-        if (publicModelJson.getBoolean("empty")) {
+        if (publicModelJson.getBooleanValue("empty")) {
             return null;
         }
         List<JSONObject> userDataMethodList = publicModelJson.getJSONArray("content").toJavaList(JSONObject.class);
