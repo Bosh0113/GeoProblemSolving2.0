@@ -35,13 +35,23 @@ public interface DocParseServe {
 
     ArrayList<HashMap<String, String>> uploadResource(String aid, ArrayList<ResourceEntity> res, HashMap<String, String> meta);
 
+    void shareResource(String fromAid, String toAid, HashMap<String, String> idMap);
+
+    ArrayList<HashMap<String, String>> shareResource(String aid, ArrayList<ResourceEntity> resList);
+
     void removeResource(String aid, String uid);
 
     void removeResource(String aid, HashSet<String> uids);
 
     void resFlow(String fromAid, String endAid, HashSet<String> uids);
 
-    HashMap<String, String> resFlow(String formAid, String endAid, String uid);
+    HashMap<String, String> resFlow(String fromAid, String endAid, String uid);
+
+    // void resFlow(String fromAid, String endAid, HashMap<String, String> idMap);
+
+    // HashMap<String, String> resFlow(String fromAid, String endAid, String oldUid, String newUid);
+
+
 
     ArrayList<HashMap<String, String>> getResInfo(String aid, HashSet<String> uids);
 

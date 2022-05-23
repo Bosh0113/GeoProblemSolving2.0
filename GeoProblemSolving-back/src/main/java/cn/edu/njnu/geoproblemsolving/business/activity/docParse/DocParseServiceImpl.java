@@ -234,6 +234,7 @@ public class DocParseServiceImpl implements DocParseServe {
     @Override
     public Object userJoin(String aid, HashSet<String> userIds) {
         if (userIds == null || userIds.isEmpty()) return null;
+        //增加对临时用户的处理 todo
         JSONObject usersTag = userDispatch.getUsersTag(userIds);
         HashSet<DocPerson> docPeoples = new HashSet<>();
         for (String userId : userIds) {
@@ -246,8 +247,8 @@ public class DocParseServiceImpl implements DocParseServe {
             docPerson.setRole("ordinary-member");
 
             JSONObject userTag = usersTag.getJSONObject(userId);
-            HashSet<String> domains = userTag.getObject("domain", HashSet.class);
-            HashSet<String> organizations = userTag.getObject("organization", HashSet.class);
+            HashSet<String> domains = JSONObject.parseObject(JSONObject.toJSONString(userTag.get("domain")), HashSet.class);
+            HashSet<String> organizations = JSONObject.parseObject(JSONObject.toJSONString(userTag.get("domain")), HashSet.class);
 
             docPerson.setDomain(domains);
             docPerson.setOrganization(organizations);
@@ -271,7 +272,7 @@ public class DocParseServiceImpl implements DocParseServe {
     public ArrayList<HashMap<String, String>> uploadResource(String aid,
                                                              ArrayList<ResourceEntity> resList) {
         Document docXml = loadXML(aid);
-        ArrayList<HashMap<String, String>> uploadResInfo = DocInterpret.appendResource(docXml, resList, null);
+        ArrayList<HashMap<String, String>> uploadResInfo = DocInterpret.appendResource(docXml, resList, null, "upload");
         saveXml(docXml.asXML());
         return uploadResInfo;
     }
@@ -281,9 +282,49 @@ public class DocParseServiceImpl implements DocParseServe {
                                                              ArrayList<ResourceEntity> res,
                                                              HashMap<String, String> meta) {
         Document docXml = loadXML(aid);
-        ArrayList<HashMap<String, String>> uploadResInfo = DocInterpret.appendResource(docXml, res, meta);
+        ArrayList<HashMap<String, String>> uploadResInfo = DocInterpret.appendResource(docXml, res, meta, "upload");
         saveXml(docXml.asXML());
         return uploadResInfo;
+    }
+
+    /**
+     * 分享资源
+     * 从文档中读取被分享资源节点,修改 id后,存入被分享的文档中
+     * @param fromAid
+     * @param toAid
+     * @param idMap 存储资源新旧id的映射关系
+     */
+    @Override
+    public void shareResource(String fromAid, String toAid, HashMap<String, String> idMap) {
+        HashSet<String> idSet = (HashSet)idMap.keySet();
+        Document docXml = loadXML(fromAid);
+        List<Element> resElement = DocInterpret.getResElement(docXml, idSet);
+        ArrayList<Element> copyResEle = Lists.newArrayList();
+        for (Element item : resElement){
+            Element newEle = item.createCopy();
+            String id = newEle.attributeValue("id");
+            String newUid = idMap.get(id);
+            newEle.addAttribute("id", newUid);
+            copyResEle.add(newEle);
+        }
+        Document toDocXml = loadXML(toAid);
+        DocInterpret.appendResource(toDocXml, copyResEle);
+        saveXml(toDocXml.asXML());
+    }
+
+    /**
+     * 从个人空间拉取资源到活动
+     * 全都是 data 类型
+     * @param aid
+     * @param resList
+     */
+    @Override
+    public ArrayList<HashMap<String, String>> shareResource(String aid, ArrayList<ResourceEntity> resList) {
+        if (resList == null || resList.isEmpty()) return null;
+        Document docXml = loadXML(aid);
+        ArrayList<HashMap<String, String>> sharedDocResult = DocInterpret.appendResource(docXml, resList, "shared");
+        saveXml(docXml.asXML());
+        return sharedDocResult;
     }
 
     @Override
@@ -314,6 +355,7 @@ public class DocParseServiceImpl implements DocParseServe {
                 copiedResEles.add(item.createCopy());
             }
             DocInterpret.appendResource(endDocXml, copiedResEles);
+
             saveXml(endDocXml.asXML());
         }catch (Exception e){
             log.warn("Failed to write document when resource is flowing.");
@@ -333,6 +375,43 @@ public class DocParseServiceImpl implements DocParseServe {
         saveXml(endDocXml.asXML());
         return DocInterpret.resNode2Map(resEle);
     }
+
+    // @Override
+    // public void resFlow(String fromAid, String endAid, HashMap<String, String> idMap) {
+    //     try {
+    //         Document fromDocXml = loadXML(fromAid);
+    //         Document endDocXml = loadXML(endAid);
+    //         if (idMap == null || fromDocXml == null || endDocXml == null) return;
+    //         Set<String> oldUidSet = idMap.keySet();
+    //         if (oldUidSet == null) return;
+    //         List<Element> resEleList = DocInterpret.getResElement(fromDocXml, (HashSet<String>) oldUidSet);
+    //         List<Element> copiedResEleList = Lists.newArrayList();
+    //         for (Element item : resEleList){
+    //             Element copiedEle = item.createCopy();
+    //             String oldId = item.attributeValue("id");
+    //             copiedEle.attribute("id").setValue(idMap.get(oldId));
+    //             copiedResEleList.add(copiedEle);
+    //         }
+    //         DocInterpret.appendResource(endDocXml, copiedResEleList);
+    //         saveXml(endDocXml.asXML());
+    //     }catch (Exception e){
+    //         log.warn("Failed to write document when resource is flowing.");
+    //         return;
+    //     }
+    // }
+    //
+    // @Override
+    // public HashMap<String, String> resFlow(String fromAid, String endAid, String oldUid, String newUid) {
+    //     Document fromDocXml = loadXML(fromAid);
+    //     Document endDocXml = loadXML(endAid);
+    //     Element resEle = DocInterpret.getResElement(fromDocXml, oldUid);
+    //     if (resEle == null) return null;
+    //     Element endResEle = resEle.createCopy();
+    //     endResEle.attribute("id").setValue(newUid);
+    //     DocInterpret.appendResource(endDocXml, endResEle);
+    //     saveXml(endDocXml.asXML());
+    //     return DocInterpret.resNode2Map(resEle);
+    // }
 
     @Override
     public ArrayList<HashMap<String, String>> getResInfo(String aid, HashSet<String> uids) {
@@ -426,16 +505,26 @@ public class DocParseServiceImpl implements DocParseServe {
         Document docXml = loadXML(msgRecords.getAid());
         Element communicationOperation = DocInterpret.createCommunicationOperation(tid, msgRecords);
         if (communicationOperation == null) return null;
+        DocInterpret.appendOperation(docXml, communicationOperation);
         saveXml(docXml.asXML());
         return communicationOperation.attributeValue("id");
     }
 
+    /**
+     * geoAnalysis 写文档操作
+     * @param aid
+     * @param toolId
+     * @param inResId
+     * @param outRes
+     * @param participants
+     * @return
+     */
     @Override
     public String geoAnalysis(String aid, String toolId,
                               HashSet<String> inResId, ArrayList<ResourceEntity> outRes,
                               HashSet<String> participants) {
         Document docXml = loadXML(aid);
-        DocInterpret.appendResource(docXml, outRes, null);
+        DocInterpret.appendResource(docXml, outRes, null,"generate");
         HashSet<String> outResId = new HashSet<>();
         for (ResourceEntity item : outRes) {
             outResId.add(item.getUid());
@@ -448,7 +537,9 @@ public class DocParseServiceImpl implements DocParseServe {
     }
 
     @Override
-    public String geoAnalysis(String aid, String toolId, HashSet<String> inResId, ResourceEntity outRes, HashSet<String> participants) {
+    public String geoAnalysis(String aid, String toolId,
+                              HashSet<String> inResId, ResourceEntity outRes,
+                              HashSet<String> participants) {
         ArrayList<ResourceEntity> resList = new ArrayList<>();
         resList.add(outRes);
         return geoAnalysis(aid, toolId, inResId, resList, participants);
@@ -462,7 +553,9 @@ public class DocParseServiceImpl implements DocParseServe {
                                    ResourceEntity input,
                                    ResourceEntity output) {
         Document docXml = loadXML(aid);
-        DocInterpret.appendResource(docXml, output, null);
+        ArrayList<ResourceEntity> resList = new ArrayList<>();
+        resList.add(output);
+        DocInterpret.appendResource(docXml, resList, null,"generate");
         HashSet<String> inResId = new HashSet<>();
         HashSet<String> outResId = new HashSet<>();
         if (input != null) inResId.add(input.getUid());

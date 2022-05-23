@@ -2008,6 +2008,7 @@ export default {
     filterMethod(data, query) {
       return data.type.indexOf(query) > -1;
     },
+    // 从父级活动拉取资源，属于 flow
     saveResources() {
       let selectResource = this.getTargetKeys();
       let addFileList = [];
@@ -2022,8 +2023,8 @@ export default {
       console.log(addFileList);
 
       this.axios
-        .get(
-          "/GeoProblemSolving/rip/shareToProject/" +
+        .post(
+          "/GeoProblemSolving/rip/bind/" +
             this.activityInfo.aid +
             "/" +
             addFileList.toString() +
@@ -2454,37 +2455,29 @@ export default {
           }
         }
       }
-      let suc = true;
-      for( let i =0 ; i < addFileList.length ; i++){
-        this.axios
-          .post("/GeoProblemSolving/rip/file/bind/" + this.activityInfo.parent,addFileList[i])
-          .then((res) => {
-            if (res.data == "Offline") {
-              suc = false;
-              this.$store.commit("userLogout");
-              // this.$router.push({ name: "Login" });
-              this.tempLoginModal = true;
-            } else if (res.data.code == 0) {
-              // for( let j = 0 ; j < this.fileList.length ; j++){
-              //   if(addFileList[i].uid == this.fileList[j].uid){
-              //     this.fileList.splice(j,1);
-              //   }
-              // }
-            } else {
-              suc = false;
-            }
+
+      let toAid = this.activityInfo.parent;
+      let fromAid = this.activityInfo.aid;
+      this.axios
+      .post(`/GeoProblemSolving/rip/file/bind/${fromAid}/${toAid}/0`, addFileList)
+      .then(res=>{
+        if(res.data == 'Offline'){
+          suc = false;
+          this.$store.commit('userLogout');
+        }else if(res.data.code == 0){
+          this.shareToParentModal = false;
+          this.$Notice.success({
+            title: "Sharing result",
+            desc: 'Successfully shring to parent activity.'
           })
-          .catch((err) => {
-            console.log(err.data);
-          });
-      }
-      if(suc){
-        this.shareToParentModal = false;
-        this.$Notice.success({
-          title: "Share result",
-          desc: "Share to parent activity successfully",
-        });
-      }
+        }
+      })
+      .catch(err=>{
+        this.$Notice.error({
+          title: 'Sharing failed.',
+          desc: ''
+        })
+      })
     },
     shareModalShow() {
       this.shareModal = true;
@@ -2516,6 +2509,7 @@ export default {
       }
       return result;
     },
+    // 从个人空间将数据添加到项目中
     shareResources() {
       let addFileList = this.selectedFilesToShare;
       let tempPath = this.folderIdStack;
@@ -2534,35 +2528,27 @@ export default {
         .then((res) => {
           if (res.data == "Offline") {
             this.$store.commit("userLogout");
-            // this.$router.push({ name: "Login" });
             this.tempLoginModal = true;
           } else if (res.data.code == 0) {
             this.shareModal = false;
-            let sharedFile = res.data.data;
-            console.log(res.data);
-
-            for (let i = 0; i < sharedFile.length; i++) {
-              this.activityResList.push(sharedFile[i]);
-              this.activityDataList.push(sharedFile[i]);
-
-              let metadata = {
-                format:"",
-                scale:"",
-                reference:"",
-                unit:"",
-                concept:""
-              };
-              this.operationApi.resOperationRecord(
-                this.activityInfo.aid,
-                "",
-                "",
-                "upload",
-                this.userInfo.userId,
-                sharedFile[i],
-                metadata,
-              );
+            let sharedResult = res.data.data.sharedResult;
+            // let sharedFile = res.data.data.sharedFile;
+            // let list = this.fileList;
+            // for(let j = 0; j < sharedFile.length; j++){
+            //   this.activityResList.push[sharedFile[j]];
+            //   this.activityDataList.push[sharedFile[j]];
+            //   list.push[sharedFile[j]]
+            // }
+            // this.$set(this, "fileList", list);
+            for(let i = 0; i < sharedResult.length; i++){
+              let oid = sharedResult[i].oid
+              this.operationApi.getActivityDoc(this.activityInfo.aid);
+              let operation = this.operationApi.getOperationInfo(oid);
+              this.$store.commit('updateTempOperations',{
+                behavior: 'add',
+                operation: operation
+              });
             }
-
             this.$Message.success("Shared file success!");
             this.selectedFilesToShare = [];
           } else {

@@ -137,7 +137,7 @@
                         v-if="output.hasOwnProperty('url') && output.url != ''"
                         >Download
                       </el-button>
-                      <el-button
+                      <!-- <el-button
                         plain
                         round
                         type="warning"
@@ -145,7 +145,7 @@
                         :class="{ bindClass: output.bind }"
                         v-if="output.hasOwnProperty('url') && output.url != ''"
                         >Bind
-                      </el-button>
+                      </el-button> -->
                     </div>
                     <div
                       v-else-if="

@@ -454,6 +454,13 @@ export default {
       let routerUrl = toolInfo.toolUrl;
       if (toolInfo.backendType == "webTool") {
         routerUrl = toolInfo.toolUrl;
+        if(toolInfo.toolUrl.indexOf("GeoProblemSolving") == -1 && toolInfo.toolUrl.indexOf("GeoProblemSolving") == -1){
+          if(window.location.host.indexOf("geomodeling") != -1){
+            routerUrl = "/GeoProblemSolving" + toolInfo.toolUrl
+          } else if(window.location.host.indexOf("geofuturelab") != -1){
+            routerUrl = "/GeoProblemSolving" + toolInfo.toolUrl
+          }
+        }
       } else if (toolInfo.backendType == "modelItem") {
         routerUrl = "/GeoProblemSolving/computeModel";
       } else if (toolInfo.backendType == "dataMethod") {
@@ -462,7 +469,8 @@ export default {
 
       var toolContent = `<iframe src="${routerUrl}" id="${toolInfo.tid}" style="width: 100%; height:100%;" frameborder="0"></iframe>`;
 
-      var panel = jsPanel.create({
+      try {
+        var panel = jsPanel.create({
         theme: "success",
         footerToolbar: `<p></p>`,
         contentSize: "800 400",
@@ -509,6 +517,12 @@ export default {
           "*"
         );
       };
+      }catch(err) {
+        this.$Notice.info({
+          title: "Wrong url.",
+          desc:"The tool's url is wrong. "
+        });
+      }
     },
 
     toolMsgHandle(event) {

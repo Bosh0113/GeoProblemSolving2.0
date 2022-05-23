@@ -400,7 +400,8 @@
                   <img
                     v-if="
                       participant.avatar != '' &&
-                      participant.avatar != 'undefined'
+                      participant.avatar != undefined &&
+                      participant.avatar != null
                     "
                     :src="avatarUrl(participant.avatar)"
                     style="width: 40px; height: 40px"
@@ -582,7 +583,7 @@ export default {
     },
 
     startWebSocket() {
-      this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid);
+      this.socketApi.initWebSocket("MsgServer/" + this.activityInfo.aid + this.tid);
       let send_msg = {
         type: "test",
         sender: this.$store.getters.userId,
@@ -590,7 +591,7 @@ export default {
         geoConcepts: false,
       };
       this.socketApi.sendSock(
-        "MsgServer/" + this.activityInfo.aid,
+        "MsgServer/" + this.activityInfo.aid + this.tid,
         send_msg,
         this.getSocketConnect
       );
@@ -643,11 +644,11 @@ export default {
 
       // send
       if (
-        this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid)
+        this.socketApi.getSocketInfo("MsgServer/" + this.activityInfo.aid + this.tid)
           .linked
       ) {
         this.socketApi.sendSock(
-          "MsgServer/" + this.activityInfo.aid,
+          "MsgServer/" + this.activityInfo.aid + this.tid,
           message,
           this.getSocketConnect
         ); //连接后台onopen方法

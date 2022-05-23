@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.business.resource.service;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.common.utils.JsonResult;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
@@ -11,10 +12,7 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface ActivityResService {
     Object createFolder(String folderName, String aid, ArrayList<String> paths, String userId);
@@ -22,6 +20,8 @@ public interface ActivityResService {
     Object uploadFileInProject(HttpServletRequest req);
 
     Object delResource(String aid, ArrayList<String> uids, ArrayList<String> paths);
+
+    String delActivityRes(String aid, ArrayList<String> uids, ArrayList<String> paths);
 
     Object putResourceByPath(String aid, ResourceEntity putRes, ArrayList<String> paths);
 
@@ -31,7 +31,7 @@ public interface ActivityResService {
 
     ResourceEntity getFileById(String aid, String uid);
 
-    List<ResourceEntity> resourceToProject(String userId, String aid, String uids, ArrayList<String> paths);
+    JSONObject userResourceToProject(String userId, String aid, String uids, ArrayList<String> paths);
 
     //按条件查询项目资源，在此方法进行分流
     ArrayList<ResourceEntity> searchRes(String aid, String key, String value);
@@ -39,6 +39,10 @@ public interface ActivityResService {
     // ArrayList<ResourceEntity> searchResByType(String aid, String type);
 
     Object bindResToProject(ResourceEntity res, String aid);
+
+    String selectedResFlow(String fromAid, String toAid, List<ResourceEntity> resList);
+
+    String selectedResFlow(String fromAid, String toAid, List<ResourceEntity> resList, ArrayList<String> paths);
 
     //资源权限控制
     ArrayList<ResourceEntity> getAllFileInProject(String aid);

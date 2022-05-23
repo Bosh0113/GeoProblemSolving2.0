@@ -213,7 +213,7 @@
                           "
                           >Download
                         </el-button>
-                        <el-button
+                        <!-- <el-button
                           plain
                           round
                           type="warning"
@@ -224,7 +224,7 @@
                             modelOutEvent.url != ''
                           "
                           >Bind
-                        </el-button>
+                        </el-button> -->
                       </div>
                     </el-col>
                   </el-row>

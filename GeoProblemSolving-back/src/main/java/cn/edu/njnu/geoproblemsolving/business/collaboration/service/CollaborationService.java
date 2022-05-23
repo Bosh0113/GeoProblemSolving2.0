@@ -214,7 +214,7 @@ public class CollaborationService {
                     String text = messageObject.getString("content");
                     collaborationBehavior.transferMessage(messageType, collaborationConfig.getParticipants(), sender, receivers, text, time);
 
-                    Boolean concepts = messageObject.getBoolean("geoConcepts");
+                    Boolean concepts = messageObject.getBooleanValue("geoConcepts");
                     String relateConceptSet = "";
                     if (concepts != null && concepts) {
                         String result = ansjSegService.processInfo(text);
@@ -382,7 +382,7 @@ public class CollaborationService {
                     HashMap<String, ComputeMsg> computeRecords = computeTasks.getCache(groupKey);
                     if (computeRecords == null) computeRecords = new HashMap<>();
 
-                    Boolean isComputeModel = messageObject.getBoolean("computeAbleModel");
+                    Boolean isComputeModel = messageObject.getBooleanValue("computeAbleModel");
                     // computeMsg.setOutputs(outputs);
 
                     computeMsg.setAid(aid);
@@ -546,6 +546,8 @@ public class CollaborationService {
                             String suffix = outItem.getString("suffix");
                             ResourceEntity resourceEntity = new ResourceEntity();
                             resourceEntity.setUserUpload(false);
+                            resourceEntity.setUploaderId(user);
+                            resourceEntity.setUploaderName(sender.getName());
                             resourceEntity.setSuffix("." + suffix);
                             String uid = UUID.randomUUID().toString();
                             resourceEntity.setUid(uid);
@@ -623,7 +625,6 @@ public class CollaborationService {
                                     String prefix = strings[0];
                                     String suffix = strings[1];
                                     ResourceEntity outputEntity = new ResourceEntity();
-                                    outputEntity.setUserUpload(false);
                                     String uid = UUID.randomUUID().toString();
                                     outputEntity.setUid(uid);
                                     outputEntity.setName(prefix);
@@ -634,6 +635,9 @@ public class CollaborationService {
                                     outputEntity.setUploadTime(new Date());
                                     outputEntity.setActivityId(aid);
                                     outputEntity.setFolder(false);
+                                    outputEntity.setUserUpload(false);
+                                    outputEntity.setUploaderId(user);
+                                    outputEntity.setUploaderName(sender.getName());
                                     ripDao.addResource(outputEntity);
                                     outputRes.add(outputEntity);
                                     outResIds.add(uid);
@@ -708,7 +712,7 @@ public class CollaborationService {
         }
     }
 
-    public void communicationClose(String groupKey, Session session) {
+    public void communicationClose(String groupKey, Session session, String toolId) {
         CollaborationConfig collaborationConfig;
         try {
             collaborationConfig = groups.get(groupKey);
@@ -732,7 +736,12 @@ public class CollaborationService {
                 if (communicationCache.getCache(groupKey) != null && communicationCache.getCache(groupKey).size() > 0) {
                     MsgRecords msgRecords = collaborationBehavior.msgCacheStore(groupKey, communicationCache.getCache(groupKey));
                     //聊天记录存入文档
-                    String oid = docParseServe.messageRecord(null, msgRecords);
+                    String oid = "";
+                    if (toolId != null){
+                        oid = docParseServe.messageRecord(toolId, msgRecords);
+                    }else {
+                        oid = docParseServe.messageRecord("Multi-activity", msgRecords);
+                    }
 
                     //将 oid 发送给前端
                     collaborationBehavior.sendStoredMsgRecords(collaborationConfig.getParticipants(), oid);

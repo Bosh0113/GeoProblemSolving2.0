@@ -31,6 +31,7 @@ public class MsgSocketServer {
 
     @OnOpen
     public void onOpen(@PathParam("aid") String aid, Session session, EndpointConfig config) {
+        if (aid.length() > 50) aid = aid.substring(0, 36);
         collaborationService.msgStart(aid, session, config);
         // System.out.println("----Message onopen----");
     }
@@ -43,12 +44,18 @@ public class MsgSocketServer {
      */
     @OnMessage
     public void onMessage(@PathParam("aid") String aid, String message) {
+        if (aid.length() > 50) aid = aid.substring(0, 36);
         collaborationService.msgTransfer(aid, message);
     }
 
     @OnClose
     public void onClose(@PathParam("aid") String aid, Session session) {
-        collaborationService.communicationClose(aid, session);
+        String toolId = null;
+        if (aid.length() > 50) {
+            aid = aid.substring(0, 36);
+            toolId  = aid.substring(36);
+        }
+        collaborationService.communicationClose(aid, session, toolId);
         // System.out.println("----Message Onclose----");
     }
 

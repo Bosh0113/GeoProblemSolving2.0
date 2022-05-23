@@ -2,8 +2,12 @@ package cn.edu.njnu.geoproblemsolving.business.resource.service.Impl;
 
 import cn.edu.njnu.geoproblemsolving.business.CommonUtil;
 import cn.edu.njnu.geoproblemsolving.business.activity.docParse.DocParseServiceImpl;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Subproject;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.GeoAnalysisProcess;
 import cn.edu.njnu.geoproblemsolving.business.activity.processDriven.service.NodeService;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.ActivityRepository;
+import cn.edu.njnu.geoproblemsolving.business.activity.repository.SubprojectRepository;
 import cn.edu.njnu.geoproblemsolving.business.resource.dao.ActivityResDaoImpl;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.IUploadResult;
 import cn.edu.njnu.geoproblemsolving.business.resource.entity.ResourceEntity;
@@ -16,6 +20,7 @@ import cn.edu.njnu.geoproblemsolving.common.utils.ResultUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.BeanUtils;
@@ -46,12 +51,19 @@ import java.util.*;
  * @Date 2021/4/20
  **/
 @Service
+@Slf4j
 public class ActivityResServiceImpl implements ActivityResService {
     @Autowired
     UserDaoImpl userDao;
 
     @Autowired
     ActivityResDaoImpl activityResDao;
+
+    @Autowired
+    ActivityRepository activityRepository;
+
+    @Autowired
+    SubprojectRepository subprojectRepository;
 
     @Autowired
     GeoAnalysisProcess geoAnalysisProcess;
@@ -270,12 +282,13 @@ public class ActivityResServiceImpl implements ActivityResService {
                         }
                     }
                 } catch (Exception e) {
+                    System.out.println(e.toString());
                     uploadInfos.failed.add(part.getSubmittedFileName());
                 }
             }
             //更新文档
             uploadInfos.uploadedOperation = docParseService.uploadResource(aid, uploadInfos.uploaded, meta);
-            //更新当前节点
+            //更新当前节点,有节点的时候添加,无节点的时候不管。节点在有链接的时候创建,没有连接的时候无节点
             nodeService.addResToNodeBatch(aid, uploadUids);
             /*
             资源流动
@@ -339,6 +352,7 @@ public class ActivityResServiceImpl implements ActivityResService {
         return resList;
     }
 
+    @Deprecated
     @Override
     public String delResource(String aid, ArrayList<String> uids, ArrayList<String> paths) {
         //批量删除也只能删除一个文件夹内容的
@@ -374,10 +388,57 @@ public class ActivityResServiceImpl implements ActivityResService {
         return activityResDao.updateRes(query, update);
     }
 
+    /**
+     * 删除属于活动的资源
+     * 由于资源分享的存在（可让资源在各活动之间移动,由于需要判断资源是否重复,所以并未改变资源的 Id,实际上本来就是相同资源）
+     * 当资源在根目录时候,资源实体直接是一个 document,若是直接以 uid 删除的话, 会把所有活动中的该资源都删除了
+     * 资源存于文件夹中时,因为文件夹是属于单个活动的,所以里面的资源也是和活动绑定了
+     * 支持批量删除(同一个文件夹), 仅支持同一个文件夹
+     * @param aid
+     * @param uids
+     * @param paths
+     * @return
+     */
+    @Override
+    public String delActivityRes(String aid, ArrayList<String> uids, ArrayList<String> paths) {
+        if (uids == null || uids.isEmpty()) return null;
+        try {
+            //处理根目录资源
+            if (paths.get(0).equals("0") && paths.size() == 1){
+                for(Iterator<String> it = uids.iterator(); it.hasNext();){
+                    String uid = it.next();
+                    activityResDao.delResource(uid, aid);
+                }
+            }else {
+                //非根目录情况
+                ArrayList<ResourceEntity> resInProjectList =  (ArrayList<ResourceEntity>)activityResDao.queryByAid(aid);
+                String rootFolderUid = paths.get(paths.size() - 1);
+                ArrayList<ResourceEntity> putResList = dResource(resInProjectList, uids, paths);
+                Query query = new Query(Criteria.where("uid").is(rootFolderUid));
+                Update update = new Update();
+                for (int i = 0; i < putResList.size(); i++) {
+                    ResourceEntity item = putResList.get(i);
+                    if (item.getUid().equals(rootFolderUid)){
+                        update.set("children", item.getChildren());
+                        break;
+                    }
+                }
+                activityResDao.updateRes(query, update);
+            }
+            //处理文档及节点
+            docParseService.removeResource(aid, new HashSet<>(uids));
+            nodeService.delResInNodeBatch(aid, new HashSet<>(uids));
+            return "suc";
+        }catch (Exception e){
+            log.error("Failed to remove resource in activity ---> ", e.toString());
+            return "fail";
+        }
+    }
+
     //提供批量删除功能
     private ArrayList<ResourceEntity> dResource(ArrayList<ResourceEntity> resInProjectList, ArrayList<String> uids, ArrayList<String> paths) {
         if (paths.size() == 0 || paths.get(0).equals("0")) {
-            ArrayList<Integer> delIndex = new ArrayList<Integer>();
+            ArrayList<Integer> delIndex = new ArrayList<>();
             for (int j = 0; j < resInProjectList.size(); j++) {
                 ResourceEntity res = resInProjectList.get(j);
                 for (int k = 0; k < uids.size(); k++) {
@@ -674,18 +735,12 @@ public class ActivityResServiceImpl implements ActivityResService {
         return resList;
     }
 
-    /*
-    资源直接分享到项目根文件夹中
-    * @Author zhngzhng
-    * @Description Todo 
-    * @Param [userId, aid, uids]
-    * @Date 2021/4/21
-    */
+
     @Value("${userServerLocation}")
     String userServerLocation;
 
     @Override
-    public ArrayList<ResourceEntity> resourceToProject(String userId, String aid, String uids, ArrayList<String> paths) {
+    public JSONObject userResourceToProject(String userId, String aid, String uids, ArrayList<String> paths) {
         UserEntity sharer = userDao.findUserByIdOrEmail(userId);
         String access_token = sharer.getTokenInfo().getAccess_token();
         String sharerName = sharer.getName();
@@ -699,7 +754,9 @@ public class ActivityResServiceImpl implements ActivityResService {
 
             JSONArray fileList = getResult.getJSONArray("data");
             List<ResourceEntity> rootResList = activityResDao.queryByAid(aid);
+            //用于保存传过来的资源
             ArrayList<ResourceEntity> resList = new ArrayList<>();
+            HashSet<String> resIdSet = new HashSet<>();
 
             ArrayList<String> path = new ArrayList<>();
             for (Object item : pathArray) {
@@ -714,10 +771,31 @@ public class ActivityResServiceImpl implements ActivityResService {
                 if (path.size() == 1 && path.get(0).equals("0")) {
                     activityResDao.addResource(resourceEntity);
                 }
+                resIdSet.add(resourceEntity.getUid());
                 resList.add(resourceEntity);
             }
+            JSONObject sharedResultJson = new JSONObject();
+            sharedResultJson.put("sharedFile", resList);
+
+            Activity activity = null;
+            Optional<Activity> activityOptional = activityRepository.findById(aid);
+            if (!activityOptional.isPresent()) {
+                Optional<Subproject> subprojectOptional = subprojectRepository.findById(aid);
+                if (subprojectOptional.isPresent()){
+                    //分享到活动为subProject 可能有连接
+                    activity = subprojectOptional.get();
+                }
+            }else {
+                activity = activityOptional.get();
+            }
+            String graphId = null;
+            if (activity != null) graphId = activity.getParent();
             if (path.size() == 1 && path.get(0).equals("0")) {
-                return resList;
+                ArrayList<HashMap<String, String>> sharedResult = docParseService.shareResource(aid, resList);
+                nodeService.addResToNodeBatch(aid, resIdSet);
+                sharedResultJson.put("sharedResult", sharedResult);
+                geoAnalysisProcess.batchResFlowAutoUpdate(graphId, aid, resIdSet);
+                return sharedResultJson;
             }
             String rootResUid = path.get(path.size() - 1);
             //如果不是根目录则存入对应的文件夹下
@@ -731,7 +809,13 @@ public class ActivityResServiceImpl implements ActivityResService {
                 }
             }
             activityResDao.updateRes(query, update);
-            return resList;
+
+            //添加到文档 ---> 添加到节点
+            ArrayList<HashMap<String, String>> sharedResult = docParseService.shareResource(aid, resList);
+
+            nodeService.addResToNodeBatch(aid, resIdSet);
+            sharedResultJson.put("sharedResult", sharedResult);
+            return sharedResultJson;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -813,8 +897,86 @@ public class ActivityResServiceImpl implements ActivityResService {
         if (addResource == null) {
             return "fail";
         }
-        //直接存储
+        //存储成功 ---> 修改文档 ---> 修改节点
         return "suc";
+    }
+
+
+    /**
+     * 当无路径的时候使用
+     * @param fromAid
+     * @param toAid
+     * @param resList
+     * @return
+     */
+    @Override
+    public String selectedResFlow(String fromAid, String toAid, List<ResourceEntity> resList) {
+        if (resList == null ||  resList.isEmpty()) return null;
+        HashSet<String> resIdSet = new HashSet<>();
+        resList.forEach(item->{
+            resIdSet.add(item.getUid());
+        });
+        if (activityResDao.addResource(resList) != null){
+            docParseService.resFlow(fromAid, toAid, resIdSet);
+            nodeService.addResToNodeBatch(toAid, resIdSet);
+            return "suc";
+        }
+        return null;
+    }
+
+    @Override
+    public String selectedResFlow(String fromAid, String toAid, List<ResourceEntity> resList, ArrayList<String> paths) {
+        try {
+            if (resList == null ||  resList.isEmpty()) return null;
+            HashSet<String> resIdSet = new HashSet<>();
+            resList.forEach(item->{
+                resIdSet.add(item.getUid());
+            });
+            Activity activity = null;
+            Optional<Activity> activityOptional = activityRepository.findById(toAid);
+            if (!activityOptional.isPresent()) {
+                Optional<Subproject> subprojectOptional = subprojectRepository.findById(toAid);
+                if (subprojectOptional.isPresent()){
+                    //分享到活动为subProject 可能有连接
+                    activity = subprojectOptional.get();
+                }
+            }else {
+                activity = activityOptional.get();
+            }
+            String graphId = null;
+            if (activity != null) graphId = activity.getParent();
+            if (paths.size() == 1 && paths.get(0).equals("0")) {
+                for (ResourceEntity item: resList){
+                    item.setActivityId(toAid);
+                    activityResDao.addResource(item);
+                }
+
+                docParseService.resFlow(fromAid, toAid, resIdSet);
+                nodeService.addResToNodeBatch(toAid, resIdSet);
+                geoAnalysisProcess.batchResFlowAutoUpdate(graphId, toAid, resIdSet);
+                return "suc";
+            }
+            String rootResUid = paths.get(paths.size() - 1);
+            List<ResourceEntity> rootResList = activityResDao.queryByAid(fromAid);
+            //如果不是根目录则存入对应的文件夹下
+            List<ResourceEntity> putResList = aRes(rootResList, paths, resList, "0");
+            Query query = new Query(Criteria.where("uid").is(rootResUid));
+            Update update = new Update();
+            for (ResourceEntity item : putResList) {
+                if (item.getUid().equals(rootResUid)) {
+                    update.set("children", item.getChildren());
+                    break;
+                }
+            }
+            activityResDao.updateRes(query, update);
+            docParseService.resFlow(fromAid, toAid, resIdSet);
+            nodeService.addResToNodeBatch(toAid, resIdSet);
+            geoAnalysisProcess.batchResFlowAutoUpdate(graphId, toAid, resIdSet);
+            return "suc";
+        }catch (Exception e){
+            System.out.println(e);
+            return null;
+        }
     }
 
     @Override

@@ -223,29 +223,68 @@ public class DocInterpret {
      */
     public static HashMap<String, String> appendResource(Document docXml,
                                                          ResourceEntity res,
-                                                         HashMap<String, String> meta) {
+                                                         HashMap<String, String> meta,
+                                                         String behaviorType) {
         checkNode(docXml);
         Element resourceCollectionEle = (Element) docXml.selectSingleNode("/Activity/ResourceCollection");
         Element operationRecordsEle = (Element) docXml.selectSingleNode("/Activity/OperationRecords");
-        HashMap<String, String> uploadOperation = resourceUploadBehavior(resourceCollectionEle, operationRecordsEle, meta, res);
+        HashMap<String, String> uploadOperation = resourceBehavior(resourceCollectionEle, operationRecordsEle, meta, res, behaviorType);
+
         LOGGER.info("Successfully append resource in activity document");
         return uploadOperation;
     }
 
     public static ArrayList<HashMap<String, String>> appendResource(Document docXml,
                                                                     ArrayList<ResourceEntity> uploadList,
-                                                                    HashMap<String, String> meta) {
+                                                                    HashMap<String, String> meta,
+                                                                    String behaviorType) {
         checkNode(docXml);
         Element resourceCollectionEle = (Element) docXml.selectSingleNode("/Activity/ResourceCollection");
         Element operationRecordsEle = (Element) docXml.selectSingleNode("/Activity/OperationRecords");
         ArrayList<HashMap<String, String>> uploadOperationList = new ArrayList<>();
         if (uploadList != null && !uploadList.isEmpty()) {
             for (ResourceEntity item : uploadList) {
-                HashMap<String, String> uploadOperation = resourceUploadBehavior(resourceCollectionEle, operationRecordsEle, meta, item);
+                HashMap<String, String> uploadOperation = resourceBehavior(resourceCollectionEle, operationRecordsEle, meta, item, behaviorType);
                 uploadOperationList.add(uploadOperation);
             }
         }
         return uploadOperationList;
+    }
+
+    /**
+     * 用于支持将分享的资源添加到文档中
+     *
+     * @param docXml
+     * @param resList
+     * @param behaviorType
+     * @return
+     */
+    public static ArrayList<HashMap<String, String>> appendResource(Document docXml, ArrayList<ResourceEntity> resList, String behaviorType) {
+        checkNode(docXml);
+        Element resourceCollectionEle = (Element) docXml.selectSingleNode("/Activity/ResourceCollection");
+        Element operationRecordsEle = (Element) docXml.selectSingleNode("/Activity/OperationRecords");
+        ArrayList<HashMap<String, String>> uploadOperationList = new ArrayList<>();
+        if (resList != null && !resList.isEmpty()) {
+            for (ResourceEntity item : resList) {
+                HashMap<String, String> meta = new HashMap<>();
+                String type = item.getType();
+                HashMap<String, String> uploadOperation = resourceBehavior(resourceCollectionEle, operationRecordsEle, null, item, behaviorType);
+                uploadOperationList.add(uploadOperation);
+            }
+        }
+
+        return uploadOperationList;
+    }
+
+    public static void appendResourceNoOperation(Document docXml, ArrayList<ResourceEntity> resList) {
+        checkNode(docXml);
+        Element resourceCollectionEle = (Element) docXml.selectSingleNode("/Activity/ResourceCollection");
+        if (resList != null && !resList.isEmpty()) {
+            for (ResourceEntity item : resList) {
+                Element resEle = createResourceNode(item, null);
+                resourceCollectionEle.add(resEle);
+            }
+        }
     }
 
     public static void appendResource(Document docXml, Element resEle) {
@@ -256,7 +295,7 @@ public class DocInterpret {
         resCollectionEle.add(resEle);
     }
 
-    public static void appendResource(Document docXml, List<Element> resEleList){
+    public static void appendResource(Document docXml, List<Element> resEleList) {
         if (resEleList == null || resEleList.isEmpty()) return;
         Element resCollectionEle = (Element) docXml.selectSingleNode("/Activity/ResourceCollection");
         for (int i = 0; i < resEleList.size(); i++) {
@@ -266,6 +305,7 @@ public class DocInterpret {
             resCollectionEle.add(resEle);
         }
     }
+
 
     public static void removeResource(Document docXml, String uid) {
         checkNode(docXml);
@@ -358,16 +398,20 @@ public class DocInterpret {
         return resInfoMap;
     }
 
-    private static HashMap<String, String> resourceUploadBehavior(Element resourceCollectionEle,
-                                                                  Element operationRecordsEle,
-                                                                  HashMap<String, String> meta,
-                                                                  ResourceEntity item) {
+    private static HashMap<String, String> resourceBehavior(Element resourceCollectionEle,
+                                                            Element operationRecordsEle,
+                                                            HashMap<String, String> meta,
+                                                            ResourceEntity item, String behaviorType) {
         HashMap<String, String> uploadOperation = new HashMap<>();
-        Element resourceEle = creatResourceNode(item, meta);
-        Element operationEle = createResourceOperation(item.getUid(), item.getUploaderId(), "upload");
+        Element resourceEle = createResourceNode(item, meta);
         resourceCollectionEle.add(resourceEle);
-        operationRecordsEle.add(operationEle);
-        String oid = operationEle.attributeValue("id");
+        String oid = null;
+        if (!behaviorType.equals("flow") && !behaviorType.equals("generate")) {
+            //此两种类似无需生成操作
+            Element operationEle = createResourceOperation(item.getUid(), item.getUploaderId(), behaviorType);
+            operationRecordsEle.add(operationEle);
+            oid = operationEle.attributeValue("id");
+        }
         uploadOperation.put("oid", oid);
         uploadOperation.put("resRef", item.getUid());
         return uploadOperation;
@@ -468,6 +512,12 @@ public class DocInterpret {
     /*
     Operation record
      */
+    public static void appendOperation(Document docXml, Element element) {
+        checkNode(docXml);
+        Element operationRecordEle = (Element) docXml.selectSingleNode("/Activity/OperationRecords");
+        operationRecordEle.add(element);
+    }
+
     public static Object getAllOperation(Document docXml) {
         Element operationRecordEle = (Element) docXml.selectSingleNode("/Activity/OperationRecords");
         Element rootEle = docXml.getRootElement();
@@ -678,8 +728,8 @@ public class DocInterpret {
         return personEle;
     }
 
-    private static Element creatResourceNode(ResourceEntity res,
-                                             HashMap<String, String> meta) {
+    private static Element createResourceNode(ResourceEntity res,
+                                              HashMap<String, String> meta) {
         Element resEle = DocumentHelper.createElement("Resource");
         resEle.addAttribute("id", res.getUid());
         resEle.addAttribute("name", res.getName());
@@ -698,12 +748,14 @@ public class DocInterpret {
             }
         }
         //如果元数据中没有format 则用
-        if (resEle.selectSingleNode("./Metadata[@type='format']") == null) {
-            Element formatEle = resEle.addElement("Metadata");
-            formatEle.addAttribute("type", "format");
-            String suffix = res.getSuffix();
-            int index = suffix.indexOf(".");
-            formatEle.addAttribute("description", suffix.substring(index + 1));
+        if (res.getType().equals("data")){
+            if (resEle.selectSingleNode("./Metadata[@type='format']") == null) {
+                Element formatEle = resEle.addElement("Metadata");
+                formatEle.addAttribute("type", "format");
+                String suffix = res.getSuffix();
+                int index = suffix.indexOf(".");
+                formatEle.addAttribute("description", suffix.substring(index + 1));
+            }
         }
         return resEle;
     }

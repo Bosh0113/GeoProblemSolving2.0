@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,9 +41,11 @@ public class LandisController {
     GeoAnalysisProcess geoAnalysisProcess;
 
     @PostMapping(value = "/biomass")
-    public JsonResult generateBiomassSuccession(@RequestBody JSONObject map) {
+    public JsonResult generateBiomassSuccession(@RequestBody JSONObject map, HttpServletRequest req) {
         JSONArray participant = map.getJSONArray("participant");
         LandisBiomassSuccession biomassSuccession = map.getObject("biomassSuccession", LandisBiomassSuccession.class);
+        String userId = (String)req.getSession().getAttribute("userId");
+        if (userId == null) return ResultUtils.error(-2, "Offline");
         String aid = map.getString("aid");
         String toolId = map.getString("toolId");
         String graphId = map.getString("graphId");
@@ -56,6 +59,8 @@ public class LandisController {
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
         outputEntity.setActivityId(aid);
+        outputEntity.setUserUpload(false);
+        outputEntity.setUploaderId(userId);
         outputEntity.setDescription("Species for Landis II model.");
         ArrayList<String> paths = new ArrayList<>();
         paths.add("0");
@@ -68,13 +73,15 @@ public class LandisController {
     }
 
     @PostMapping(value = "/species")
-    public JsonResult generateSpecies(@RequestBody JSONObject map) {
+    public JsonResult generateSpecies(@RequestBody JSONObject map, HttpServletRequest req) {
         JSONArray participant = map.getJSONArray("participant");
         ArrayList species = map.getObject("species", ArrayList.class);
         ArrayList<LandisSpecies> landisSpecies = new ArrayList<>();
         for (Object item : species) {
             landisSpecies.add(JSONObject.parseObject(JSONObject.toJSONString(item), LandisSpecies.class));
         }
+        String userId = (String)req.getSession().getAttribute("userId");
+        if (userId == null) return ResultUtils.error(-2, "Offline");
         String aid = map.getString("aid");
         String toolId = map.getString("toolId");
         String graphId = map.getString("graphId");
@@ -88,6 +95,8 @@ public class LandisController {
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
         outputEntity.setActivityId(aid);
+        outputEntity.setUserUpload(false);
+        outputEntity.setUploaderId(userId);
         outputEntity.setDescription("Species for Landis II model.");
         ArrayList<String> paths = new ArrayList<>();
         paths.add("0");
@@ -99,9 +108,11 @@ public class LandisController {
     }
 
     @PostMapping(value = "/climateConfig")
-    public JsonResult generateClimateConfig(@RequestBody JSONObject map) {
+    public JsonResult generateClimateConfig(@RequestBody JSONObject map, HttpServletRequest req) {
         JSONArray participant = map.getJSONArray("participant");
         LandisClimateConfig climateConfig = map.getObject("climateConfig", LandisClimateConfig.class);
+        String userId = (String)req.getSession().getAttribute("userId");
+        if (userId == null) return ResultUtils.error(-2, "Offline");
         String aid = map.getString("aid");
         String toolId = map.getString("toolId");
         String graphId = map.getString("graphId");
@@ -115,6 +126,8 @@ public class LandisController {
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
         outputEntity.setActivityId(aid);
+        outputEntity.setUserUpload(false);
+        outputEntity.setUploaderId(userId);
         outputEntity.setDescription("Climate config for Landis II model.");
         ArrayList<String> paths = new ArrayList<>();
         paths.add("0");
@@ -126,13 +139,15 @@ public class LandisController {
     }
 
     @PostMapping(value = "/dynamicInput")
-    public JsonResult generateDynamicInput(@RequestBody JSONObject map) {
+    public JsonResult generateDynamicInput(@RequestBody JSONObject map, HttpServletRequest req) {
         JSONArray participant = map.getJSONArray("participant");
         ArrayList dynamicInput = map.getObject("dynamicInput", ArrayList.class);
         ArrayList<LandisDynamicInput> dynamicInputs = new ArrayList<>();
         for (Object item : dynamicInput) {
             dynamicInputs.add(JSONObject.parseObject(JSONObject.toJSONString(item), LandisDynamicInput.class));
         }
+        String userId = (String)req.getSession().getAttribute("userId");
+        if (userId == null) return ResultUtils.error(-2, "Offline");
         String aid = map.getString("aid");
         String toolId = map.getString("toolId");
         String graphId = map.getString("graphId");
@@ -146,6 +161,8 @@ public class LandisController {
         outputEntity.setFolder(false);
         outputEntity.setFileSize(file.length());
         outputEntity.setActivityId(aid);
+        outputEntity.setUserUpload(false);
+        outputEntity.setUploaderId(userId);
         outputEntity.setDescription("Biomass succession dynamic inputs for Landis II model.");
         ArrayList<String> paths = new ArrayList<>();
         paths.add("0");

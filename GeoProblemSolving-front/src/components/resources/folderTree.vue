@@ -1658,6 +1658,7 @@
       closeshareModel() {
         this.shareModal = false;
       },
+      // 从个人空间分享
       shareFile() {
         let addFileList = this.selectedFilesToShare;
         let tempPath = this.folderIdStack;
@@ -1679,10 +1680,20 @@
               this.$store.commit("userLogout");
               this.tempLoginModal = true;
             } else if (res.data.code == 0) {
-              let sharedFile = res.data.data;
+              let sharedResult = res.data.data.sharedResult;
+              let sharedFile = res.data.data.sharedFile;
               for (let i = 0; i < sharedFile.length; i++) {
                 this.currentFolder.files.push(sharedFile[i]);
               }
+            //   for(let i = 0; i < sharedResult.length; i++){
+            //   let oid = sharedResult[i].oid
+            //   this.operationApi.getActivityDoc(this.activityInfo.aid);
+            //   let operation = this.operationApi.getOperationInfo(oid);
+            //   this.$store.commit('updateTempOperations',{
+            //     behavior: 'add',
+            //     operation: operation
+            //   });
+            // }
               this.$Message.success("Shared file success!");
               this.selectedFilesToShare = [];
             } else {

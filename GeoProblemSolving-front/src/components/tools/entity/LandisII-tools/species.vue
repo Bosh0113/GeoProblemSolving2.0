@@ -951,7 +951,7 @@ export default {
         .post("/GeoProblemSolving/landis/species",submitInfo)
         .then((res) => {
           console.log(res);
-          if (res.data == "Offline") {
+          if (res.data.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
             // this.tempLoginModal = true;

@@ -1966,6 +1966,9 @@ export default {
               sender: this.userInfo.userId,
             };
             sendCustomOperation(paramsMsg);
+            let operationResult = res.data.data;
+            let oid = operationResult.operationId
+            loadingBackendOperation(oid)
           } else {
             console.log(res.data.msg);
           }

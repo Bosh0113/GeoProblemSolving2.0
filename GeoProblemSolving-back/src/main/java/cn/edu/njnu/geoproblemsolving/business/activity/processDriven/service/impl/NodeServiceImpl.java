@@ -169,8 +169,9 @@ public class NodeServiceImpl implements NodeService {
     public String updateNodeUserTag(String aid, String userId) {
         //只能在同一层次进行流动
         Activity activity;
-        activity = activityRepository.findById(aid).get();
-        if (activity == null) activity = subprojectRepository.findById(aid).get();
+        Optional<Activity> byId = activityRepository.findById(aid);
+        if (byId.isPresent()) activity = byId.get();
+        else activity = subprojectRepository.findById(aid).get();
         JSONArray members = activity.getMembers();
         for (int i = 0; i < members.size(); i++) {
             JSONObject member = members.getJSONObject(i);
@@ -316,9 +317,15 @@ public class NodeServiceImpl implements NodeService {
         return putNodeResource(aid, resTagMap, "addBatch");
     }
 
+    /**
+     * 从文档中将资源写入节点中
+     * @param aid
+     * @param uids
+     */
     @Override
     public void addResToNodeBatch(String aid, HashSet<String> uids) {
-        // ArrayList<HashMap<String, String>> resInfoList = docParser.getResInfo(aid, uids);
+        Optional<ActivityNode> byId = nodeRepository.findById(aid);
+        if (!byId.isPresent()) return;
         ArrayList<HashMap<String, String>> resInfoList = docParseServe.getResInfo(aid, uids);
         if (resInfoList == null || resInfoList.size() == 0) return;
         HashMap<String, String> resMap = new HashMap<>();

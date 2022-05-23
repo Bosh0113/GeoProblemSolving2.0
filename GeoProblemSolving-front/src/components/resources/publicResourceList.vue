@@ -321,7 +321,7 @@ export default {
         let url = "";
         if(res.address.indexOf("http://221.226.60.2:8082") != -1){
           url = this.$store.getters.resProxy + this.showList[index].address.split("http://221.226.60.2:8082")[1];
-        } else if(res.address.indexOf("/PExploration/resource") != -1){
+        } else if(res.address.indexOf("/GeoProblemSolving/resource") != -1){
           url = this.$store.getters.resProxy + res.address;
         } else {
           url = this.$store.getters.resProxy + this.showList[index].address;
