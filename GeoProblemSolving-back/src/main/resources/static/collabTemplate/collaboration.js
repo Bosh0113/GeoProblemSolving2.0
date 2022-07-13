@@ -345,7 +345,7 @@ var taskList = [];
     var onlineMembers = [];
     let UserServer = "/userServer";
     if (window.location.hostname == "localhost") {
-        UserServer = "http://172.21.212.103:8088/userServer";
+        UserServer = "http://172.21.213.245:8088/userServer";
     }
 
     // data

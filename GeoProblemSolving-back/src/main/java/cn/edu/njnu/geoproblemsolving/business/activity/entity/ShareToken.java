@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @ClassName ShareToken
- * @Description Todo
+ * @Description 活动共享的对象
  * @Author zhngzhng
  * @Date 2021/12/14
  **/

@@ -35,11 +35,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/user/changePwd/**",
                         "/token/*",
                         "/token/all/**",
-                        "/landis"
+                        "/landis",
+                        "/ts/**"
                 );//不拦截的请求
     }
     /*
     project 不用拦截，projectList 页面已经能读取到 project 相关信息
     activity 是下层的肯定要登陆才能获取
+    /ts/** 交互行为测试接口
      */
 }
