@@ -4,6 +4,9 @@ import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.behaviorTrack.entity.BehaviorDoc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * @ClassName BehaviorTrackService
  * @Description 提供交互行为组织与追溯接口
@@ -13,18 +16,33 @@ import cn.edu.njnu.geoproblemsolving.business.behaviorTrack.entity.BehaviorDoc;
 public interface BehaviorTrackService {
     BehaviorDoc tryAcquireLock(String bid);
 
-    void tryReleaseLock(String bid);
+    void tryReleaseLock(String bid, String doc);
 
     void tryRefreshLock(String bid, long expirationTime);
 
-    void initBehaviorDoc(String pid);
+    //===========活动构建=====================
+    void initBehaviorDoc(String pid, String userId, Project project);
 
-    void initBehaviorDoc(String pid, Activity activity, String userId);
+    void delActivity(String pid, String userId, String aid);
 
-    /*
-    活动构建
-     */
-    void appendAcv(String pid, Activity activity, String userId);
+    void editActivity(String pid, String userId, HashMap<String, String> attrs);
+
+    void editActivity(String pid, String userId, String attrKey, String attrValue);
+
+    void userJoin(String pid, String userId, String aid);
+
+    void userExit(String pid, String userId, String aid);
+
+    void userRoleChange(String pid, String userId, String subjectId, String role);
+
+    void toolAdd(String pid, String userId, String tid, String aid);
+
+    void toolDel(String pid, String userId, String tid, String aid);
+
+    void toolEdit(String pid, String userId, HashMap<String, String> attrs);
+
+
+
 
     /*
     过程组织

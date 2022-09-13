@@ -1,11 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.business.behaviorTrack.enums;
-
+//一级情景，用于限制
 public enum Scene {
     problemDefinition,
     studyAreaCognition,
-    modelCognition,
-    taskAssignment,
-    resourceShare,
+    // modelCognition,
+    // taskAssignment,
+    // resourceShare,
     autoDataProcessing,
     semiAutoDataProcessing,
     manualDataProcessing,
@@ -16,7 +16,24 @@ public enum Scene {
     modelInvoke,
     resultCompare,
     resultAssessment,
-    decisionSupport,
+    // decisionSupport,
     activityStructure,
-    processOrganization
+    processOrganization,
+
+
+
+//    新的情景
+    problemAndStudyAreaCognition,
+    modelCognition,
+    //模型配置:包含建模与模型输入配置
+    modelConfiguration,
+    resultAssessmentAndCompare,
+    decisionSupport,
+    dataProcessing,
+    //一下是通用情景，贯穿整个流程
+    resourceShare,
+    dataVisualization,
+    taskAssignment,
+    activityStructureAndOrganization
+
 }

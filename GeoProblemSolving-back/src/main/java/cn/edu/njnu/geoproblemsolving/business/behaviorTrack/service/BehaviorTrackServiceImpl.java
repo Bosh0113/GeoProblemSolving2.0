@@ -1,7 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.business.behaviorTrack.service;
 
 import cn.edu.njnu.geoproblemsolving.business.activity.entity.Activity;
-import cn.edu.njnu.geoproblemsolving.business.activity.enums.ActivityType;
+import cn.edu.njnu.geoproblemsolving.business.activity.entity.Project;
 import cn.edu.njnu.geoproblemsolving.business.behaviorTrack.entity.BehaviorDoc;
 import cn.edu.njnu.geoproblemsolving.business.behaviorTrack.enums.InteractiveBehavior;
 import cn.edu.njnu.geoproblemsolving.business.behaviorTrack.enums.Scene;
@@ -16,32 +16,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 /**
  * @ClassName BehaviorTrackServiceImpl
- * @Description 交互行为组织及追溯的具体实现
+ * @Description 交互行为追溯的实现
+ * 交互行为：主体的
  * @Author zhngzhng
- * @Date 2022/7/6
+ * @Date 2022/7/13
  **/
 @Service
 @Slf4j
-public class BehaviorTrackServiceImpl implements BehaviorTrackService {
-    private final BDLockServiceImpl bdLockService;
+public class BehaviorTrackServiceImpl implements BehaviorTrackService{
+    private final BDLockService bdLockService;
+
     private final BehaviorDocRepository docRepository;
 
-    public BehaviorTrackServiceImpl(BDLockServiceImpl bdLockService, BehaviorDocRepository docRepository) {
+    private final long LOCK_EXPIRATION = 2000;
+
+    public BehaviorTrackServiceImpl(BDLockService bdLockService, BehaviorDocRepository docRepository) {
         this.bdLockService = bdLockService;
         this.docRepository = docRepository;
     }
 
-    private final long LOCK_EXPIRATION = 2000;
-
     /**
-     * 尝试获取该文档的锁
-     * @param bid 交互行为文档的id
-     * @return 行为文档/null
+     * 尝试获取锁
+     * @param bid
+     * @return
      */
     @Override
     public BehaviorDoc tryAcquireLock(String bid) {
@@ -50,16 +54,22 @@ public class BehaviorTrackServiceImpl implements BehaviorTrackService {
             //拿到锁，可对文档进行操作
             if (behaviorDoc != null) return behaviorDoc;
             try {
+                //等待固定时间间隔后再次尝试获取
                 Thread.sleep(LOCK_EXPIRATION);
-            }catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 log.error("Acquire lock failed: {}", e.toString());
             }
         }
     }
 
+    /**
+     * 释放锁的同时将更新好的文档存入
+     * @param bid
+     * @param doc
+     */
     @Override
-    public void tryReleaseLock(String bid) {
-        bdLockService.release(bid);
+    public void tryReleaseLock(String bid, String doc) {
+        bdLockService.release(bid, doc);
     }
 
     @Override
@@ -67,56 +77,117 @@ public class BehaviorTrackServiceImpl implements BehaviorTrackService {
         bdLockService.refresh(bid, expirationTime);
     }
 
+
     /**
-     *
-     * @param pid
+     * str ---> xml
+     * @param xmlStr
+     * @return
+     */
+    private Document parseText(String xmlStr) {
+        try {
+            return DocumentHelper.parseText(xmlStr);
+        }catch (DocumentException e) {
+            log.warn("The document could not be parsed.");
+            return null;
+        }
+    }
+
+
+    /**
+     * 初始化交互行为文档
+     * 在活动创建时初始化
+     * 包括一个活动创建行为
+     * 协作式而不是协同，包含小范围的协同
+     * @param pid 项目id
+     * @param userId 创建者 id
+     * @param project
      */
     @Override
-    public void initBehaviorDoc(String pid) {
-        Document behaviorDoc = BDHelper.createBehaviorDoc(pid);
-        BehaviorDoc docEntity = new BehaviorDoc();
-        docEntity.setBid(pid);
-        docEntity.setDocument(behaviorDoc.asXML());
-        docRepository.save(docEntity);
-    }
-
-    @Override
-    public void initBehaviorDoc(String pid, Activity activity, String userId) {
-
-    }
-
-    @Override
-    public void appendAcv(String pid, Activity activity, String userId) {
-        BehaviorDoc behaviorDoc = tryAcquireLock(pid);
-        String docStr = behaviorDoc.getDocument();
-        Element behaviorEle = BDHelper.createBehaviorEle(activity.getAid(), Scene.activityStructure, InteractiveBehavior.createActivity);
-        String name = activity.getName();
-        String type = activity.getType().toString();
-        String description = activity.getDescription();
-        LinkedHashSet<String> attrs = new LinkedHashSet<>();
-        attrs.add("Name");
-        attrs.add("Type");
-        attrs.add("Description");
+    public void initBehaviorDoc(String pid, String userId, Project project) {
+        //初始化文档
+        Document behaviorDocXml = BDHelper.createBehaviorDoc(pid);
+        //生成创建活动的交互行为
+        //1. 创建交互行为节点、主体节点、客体节点、操作节点
+        //2. 将主体、客体、操作放入交互节点，并将其放入
+        Element behaviorEle = BDHelper.createBehaviorEle(pid, Scene.activityStructure, InteractiveBehavior.createActivity);
         BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
-
-
-        LinkedMultiValueMap<String, String> infoMap = new LinkedMultiValueMap<>();
-        infoMap.add("Text", name);
-        infoMap.add("Text", type);
-        infoMap.add("Text", description);
-
-        Element ele = BDHelper.createOperationEle("input", infoMap);
-        behaviorEle.add(ele);
-
-        BDHelper.appendObjectAndAttrs(behaviorEle, SupportElement.activity, activity.getAid(), attrs);
-        try {
-            Document doxXML = DocumentHelper.parseText(docStr);
-            Element rootElement = doxXML.getRootElement();
-            rootElement.add(behaviorEle);
-            behaviorDoc.setDocument(doxXML.asXML());
-            docRepository.save(behaviorDoc);
-        } catch (DocumentException e) {
-            throw new RuntimeException(e);
+        ArrayList<String> attrs = new ArrayList<>(Arrays.asList("Name","Category", "Description", "Privacy"));
+        ArrayList<String> attrsValue = new ArrayList<>(Arrays.asList(project.getName(),project.getCategory().toString(), project.getDescription(), project.getPrivacy().toString()));
+        String tag = project.getTag();
+        if (tag != null) {
+            attrs.add("Tag");
+            attrsValue.add(tag);
         }
+        if (project.getPicture() != null) {
+            attrs.add("Picture");
+            attrsValue.add(project.getPicture());
+        }
+        BDHelper.appendObjectSimple(behaviorEle, project.getAid(), SupportElement.activity, attrs);
+        //操作节点
+        LinkedMultiValueMap<String, String> info = new LinkedMultiValueMap<>();
+        info.put("Text", attrsValue);
+        LinkedHashMap<String, LinkedMultiValueMap<String, String>> objectIdAndAttrs = new LinkedHashMap<>();
+        objectIdAndAttrs.put(project.getAid(), info);
+        //将信息添加到交互行为文档中
+        BDHelper.appendOperation(behaviorEle, "input", objectIdAndAttrs);
+        behaviorDocXml.getRootElement().add(behaviorEle);
+        BehaviorDoc behaviorDocEntity = new BehaviorDoc();
+        behaviorDocEntity.setBid(project.getAid());
+        behaviorDocEntity.setDocument(behaviorDocXml.asXML());
+        docRepository.save(behaviorDocEntity);
+    }
+
+    @Override
+    public void delActivity(String pid, String userId, String aid) {
+        BehaviorDoc behaviorDoc = tryAcquireLock(pid);
+        Document docXml = parseText(behaviorDoc.getDocument());
+        Element behaviorEle = BDHelper.createBehaviorEle(aid, Scene.activityStructure, InteractiveBehavior.delActivity);
+        BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
+        BDHelper.appendObjectSimple(behaviorEle, aid, SupportElement.activity, new ArrayList<>(Arrays.asList("State")));
+        LinkedMultiValueMap<String, String> attrs = new LinkedMultiValueMap<>();
+        attrs.add("Text", "Off");
+        BDHelper.appendOperation(behaviorEle, "delete", aid, attrs);
+        docXml.getRootElement().add(behaviorEle);
+        tryReleaseLock(pid, docXml.asXML());
+    }
+
+    @Override
+    public void editActivity(String pid, String userId, HashMap<String, String> attrs) {
+
+    }
+
+    @Override
+    public void editActivity(String pid, String userId, String attrKey, String attrValue) {
+
+    }
+
+    @Override
+    public void userJoin(String pid, String userId, String aid) {
+
+    }
+
+    @Override
+    public void userExit(String pid, String userId, String aid) {
+
+    }
+
+    @Override
+    public void userRoleChange(String pid, String userId, String subjectId, String role) {
+
+    }
+
+    @Override
+    public void toolAdd(String pid, String userId, String tid, String aid) {
+
+    }
+
+    @Override
+    public void toolDel(String pid, String userId, String tid, String aid) {
+
+    }
+
+    @Override
+    public void toolEdit(String pid, String userId, HashMap<String, String> attrs) {
+
     }
 }

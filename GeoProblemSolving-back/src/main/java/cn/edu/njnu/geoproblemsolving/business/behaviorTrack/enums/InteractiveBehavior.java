@@ -1,8 +1,13 @@
 package cn.edu.njnu.geoproblemsolving.business.behaviorTrack.enums;
 
 /*
-交互行为类型枚举
+第二级：两个级别共同确定一个交互行为
+交互行为类型的枚举，具体的交互行为
  */
 public enum InteractiveBehavior {
-    createActivity
+    createActivity,
+    editActivity,
+    delActivity,
+    paramInput,
+    dataInput
 }

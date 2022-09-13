@@ -17,7 +17,7 @@ public interface BDLockService {
     /*
     写完成后释放锁，过期时间修改为当前
      */
-    boolean release(String pid);
+    boolean release(String bid, String doc);
 
     /*
     延长锁的时间
