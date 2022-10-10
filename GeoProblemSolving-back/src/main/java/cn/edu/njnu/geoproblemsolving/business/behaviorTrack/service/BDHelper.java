@@ -60,11 +60,11 @@ public class BDHelper {
      */
     private static Element createSupEleByType(SupportElement seType, String id) {
         Element element;
-        if (seType.equals(SupportElement.activity)) {
+        if (seType.equals(SupportElement.Activity)) {
             element = DocumentHelper.createElement("Activity");
-        } else if (seType.equals(SupportElement.person)) {
+        } else if (seType.equals(SupportElement.Person)) {
             element = DocumentHelper.createElement("Person");
-        } else if (seType.equals(SupportElement.resource)) {
+        } else if (seType.equals(SupportElement.Resource)) {
             element = DocumentHelper.createElement("Resource");
         } else {
             //Tool
@@ -84,11 +84,11 @@ public class BDHelper {
      */
     private static Element createSupportElement(SupportElement supType, String id) {
         Element supElement;
-        if (supType.equals(SupportElement.person)) {
+        if (supType.equals(SupportElement.Person)) {
             supElement = DocumentHelper.createElement("Person");
-        } else if (supType.equals(SupportElement.resource)) {
+        } else if (supType.equals(SupportElement.Resource)) {
             supElement = DocumentHelper.createElement("Resource");
-        } else if (supType.equals(SupportElement.activity)) {
+        } else if (supType.equals(SupportElement.Activity)) {
             supElement = DocumentHelper.createElement("Activity");
         }else {
             supElement = DocumentHelper.createElement("Tool");

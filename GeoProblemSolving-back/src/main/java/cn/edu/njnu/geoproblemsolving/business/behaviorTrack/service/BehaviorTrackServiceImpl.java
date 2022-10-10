@@ -105,50 +105,50 @@ public class BehaviorTrackServiceImpl implements BehaviorTrackService{
     @Override
     public void initBehaviorDoc(String pid, String userId, Project project) {
         //初始化文档
-        Document behaviorDocXml = BDHelper.createBehaviorDoc(pid);
-        //生成创建活动的交互行为
-        //1. 创建交互行为节点、主体节点、客体节点、操作节点
-        //2. 将主体、客体、操作放入交互节点，并将其放入
-        Element behaviorEle = BDHelper.createBehaviorEle(pid, Scene.activityStructure, InteractiveBehavior.createActivity);
-        BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
-        ArrayList<String> attrs = new ArrayList<>(Arrays.asList("Name","Category", "Description", "Privacy"));
-        ArrayList<String> attrsValue = new ArrayList<>(Arrays.asList(project.getName(),project.getCategory().toString(), project.getDescription(), project.getPrivacy().toString()));
-        String tag = project.getTag();
-        if (tag != null) {
-            attrs.add("Tag");
-            attrsValue.add(tag);
-        }
-        if (project.getPicture() != null) {
-            attrs.add("Picture");
-            attrsValue.add(project.getPicture());
-        }
-        BDHelper.appendObjectSimple(behaviorEle, project.getAid(), SupportElement.activity, attrs);
-        //操作节点
-        LinkedMultiValueMap<String, String> info = new LinkedMultiValueMap<>();
-        info.put("Text", attrsValue);
-        LinkedHashMap<String, LinkedMultiValueMap<String, String>> objectIdAndAttrs = new LinkedHashMap<>();
-        objectIdAndAttrs.put(project.getAid(), info);
-        //将信息添加到交互行为文档中
-        BDHelper.appendOperation(behaviorEle, "input", objectIdAndAttrs);
-        behaviorDocXml.getRootElement().add(behaviorEle);
-        BehaviorDoc behaviorDocEntity = new BehaviorDoc();
-        behaviorDocEntity.setBid(project.getAid());
-        behaviorDocEntity.setDocument(behaviorDocXml.asXML());
-        docRepository.save(behaviorDocEntity);
+        // Document behaviorDocXml = BDHelper.createBehaviorDoc(pid);
+        // //生成创建活动的交互行为
+        // //1. 创建交互行为节点、主体节点、客体节点、操作节点
+        // //2. 将主体、客体、操作放入交互节点，并将其放入
+        // Element behaviorEle = BDHelper.createBehaviorEle(pid, Scene.activityStructure, InteractiveBehavior.createActivity);
+        // BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
+        // ArrayList<String> attrs = new ArrayList<>(Arrays.asList("Name","Category", "Description", "Privacy"));
+        // ArrayList<String> attrsValue = new ArrayList<>(Arrays.asList(project.getName(),project.getCategory().toString(), project.getDescription(), project.getPrivacy().toString()));
+        // String tag = project.getTag();
+        // if (tag != null) {
+        //     attrs.add("Tag");
+        //     attrsValue.add(tag);
+        // }
+        // if (project.getPicture() != null) {
+        //     attrs.add("Picture");
+        //     attrsValue.add(project.getPicture());
+        // }
+        // BDHelper.appendObjectSimple(behaviorEle, project.getAid(), SupportElement.activity, attrs);
+        // //操作节点
+        // LinkedMultiValueMap<String, String> info = new LinkedMultiValueMap<>();
+        // info.put("Text", attrsValue);
+        // LinkedHashMap<String, LinkedMultiValueMap<String, String>> objectIdAndAttrs = new LinkedHashMap<>();
+        // objectIdAndAttrs.put(project.getAid(), info);
+        // //将信息添加到交互行为文档中
+        // BDHelper.appendOperation(behaviorEle, "input", objectIdAndAttrs);
+        // behaviorDocXml.getRootElement().add(behaviorEle);
+        // BehaviorDoc behaviorDocEntity = new BehaviorDoc();
+        // behaviorDocEntity.setBid(project.getAid());
+        // behaviorDocEntity.setDocument(behaviorDocXml.asXML());
+        // docRepository.save(behaviorDocEntity);
     }
 
     @Override
     public void delActivity(String pid, String userId, String aid) {
-        BehaviorDoc behaviorDoc = tryAcquireLock(pid);
-        Document docXml = parseText(behaviorDoc.getDocument());
-        Element behaviorEle = BDHelper.createBehaviorEle(aid, Scene.activityStructure, InteractiveBehavior.delActivity);
-        BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
-        BDHelper.appendObjectSimple(behaviorEle, aid, SupportElement.activity, new ArrayList<>(Arrays.asList("State")));
-        LinkedMultiValueMap<String, String> attrs = new LinkedMultiValueMap<>();
-        attrs.add("Text", "Off");
-        BDHelper.appendOperation(behaviorEle, "delete", aid, attrs);
-        docXml.getRootElement().add(behaviorEle);
-        tryReleaseLock(pid, docXml.asXML());
+        // BehaviorDoc behaviorDoc = tryAcquireLock(pid);
+        // Document docXml = parseText(behaviorDoc.getDocument());
+        // Element behaviorEle = BDHelper.createBehaviorEle(aid, Scene.activityStructure, InteractiveBehavior.delActivity);
+        // BDHelper.appendSubject(behaviorEle, SupportElement.person, userId);
+        // BDHelper.appendObjectSimple(behaviorEle, aid, SupportElement.activity, new ArrayList<>(Arrays.asList("State")));
+        // LinkedMultiValueMap<String, String> attrs = new LinkedMultiValueMap<>();
+        // attrs.add("Text", "Off");
+        // BDHelper.appendOperation(behaviorEle, "delete", aid, attrs);
+        // docXml.getRootElement().add(behaviorEle);
+        // tryReleaseLock(pid, docXml.asXML());
     }
 
     @Override
