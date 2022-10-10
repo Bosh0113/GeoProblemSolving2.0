@@ -8,6 +8,24 @@ public enum InteractiveBehavior {
     createActivity,
     editActivity,
     delActivity,
+    crateTask,
+    editTask,
+    delTask,
+    assignTask,
+    setLink,
+    editLink,
+    delLink,
+
+    addTool,
+    addResource,
+    delTool,
+    delResource,
+    editTool,
+    editResource,
+    shareTool,
+    shareResource,
+    downloadResource,
+
     paramInput,
     dataInput
 }

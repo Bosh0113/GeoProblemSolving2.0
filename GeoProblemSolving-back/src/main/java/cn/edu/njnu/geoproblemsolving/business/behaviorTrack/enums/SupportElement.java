@@ -6,8 +6,8 @@ package cn.edu.njnu.geoproblemsolving.business.behaviorTrack.enums;
 * @Date 2022/7/6
 */
 public enum SupportElement {
-    person,
-    resource,
-    tool,
-    activity
+    Person,
+    Resource,
+    Tool,
+    Activity
 }
